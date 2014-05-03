@@ -1,0 +1,195 @@
+unit IupOrm.DB.SqLite.SqlGenerator;
+
+interface
+
+uses
+  IupOrm.Context.Interfaces,
+  IupOrm.DB.Interfaces;
+
+type
+
+  // Classe che si occupa di generare il codice SQL delle varie query
+  TioSqlGeneratorSqLite = class(TioSqlGenerator)
+  public
+    class function GenerateSqlSelectForObject(AContext:IioContext): IioQuery; override;
+    class function GenerateSqlSelectForList(AContext:IioContext): IioQuery; override;
+    class function GenerateSqlInsert(AContext:IioContext): IioQuery; override;
+    class function GenerateSqlUpdate(AContext:IioContext): IioQuery; override;
+    class function GenerateSqlDelete(AContext:IioContext): IioQuery; override;
+  end;
+
+implementation
+
+uses
+  System.Classes, IupOrm.DB.Factory, IupOrm.Context.Properties.Interfaces,
+  IupOrm.Attributes;
+
+{ TioSqlGeneratorSqLite }
+
+class function TioSqlGeneratorSqLite.GenerateSqlDelete(
+  AContext: IioContext): IioQuery;
+var
+  SQL: TStrings;
+begin
+  Result := nil;
+  SQL := TStringList.Create;
+  try
+    // Compone l'SQL
+    SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
+    SQL.Add(AContext.GetWhere.GetSql);
+    // Crea l'oggetto ioQuery
+    Result := TioDbFactory.Query(SQL);
+  finally
+    // Alla fine devo distruggere la StringLIst sulla quale ho costruito la query
+    // per non avere un memory leak
+    SQL.Free;
+  end;
+end;
+
+class function TioSqlGeneratorSqLite.GenerateSqlInsert(
+  AContext: IioContext): IioQuery;
+var
+  SQL: TStrings;
+  Prop: IioContextProperty;
+  Comma: Char;
+begin
+  Result := nil;
+  SQL := TStringList.Create;
+  try
+    // Compone l'SQL
+    SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql);
+    SQL.Add('(');
+    SQL.Add(AContext.GetProperties.GetSql);
+    if AContext.IsClassFromField
+      then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+    SQL.Add(') VALUES (');
+    // Cicla per comporre i valori
+    Comma := ' ';
+    for Prop in AContext.GetProperties do
+    begin
+      // If current property is the ID property then skip its value (always NULL)
+      if Prop = AContext.GetProperties.GetIdProperty then begin
+        SQL.Add(Comma + 'NULL');
+        Comma := ',';
+        Continue;
+      end;
+      // Relation type
+      case Prop.GetRelationType of
+        // If RelationType = ioRTNone save the current property value normally
+        ioRTNone: begin
+          SQL.Add(Comma + Prop.GetSqlValue(AContext.DataObject));
+          Comma := ',';
+        end;
+        //  NB: First save the related child object (for ID if it's a new child object)
+        ioRTBelongsTo: begin
+          SQL.Add(Comma + Prop.GetRelationChildObjectID(AContext.DataObject));
+          Comma := ',';
+        end;
+        // else if RelationType = ioRTHasMany then load objects and assign it to the property  (list)
+        ioRTHasMany: {Nothing};
+      end;
+    end;
+    if AContext.IsClassFromField
+      then SQL.Add(',' + AContext.ClassFromField.GetSqlValue);
+    SQL.Add(')');
+    // Crea l'oggetto ioQuery
+    Result := TioDbFactory.QueryInsert(SQL);
+  finally
+    // Alla fine devo distruggere la StringList sulla quale ho costruito la query
+    // per non avere un memory leak
+    SQL.Free;
+  end;
+end;
+
+class function TioSqlGeneratorSqLite.GenerateSqlSelectForList(
+  AContext: IioContext): IioQuery;
+var
+  SQL: TStrings;
+begin
+  Result := nil;
+  SQL := TStringList.Create;
+  try
+    // Compone l'SQL
+    SQL.Add('SELECT ' + AContext.GetProperties.GetSql);
+    if AContext.IsClassFromField
+      then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+    SQL.Add('FROM ' + AContext.GetTable.GetSql);
+    SQL.Add(AContext.GetWhere.GetSqlWithClassFromField(AContext.ClassFromField));
+    // Crea l'oggetto ioQuery
+    Result := TioDbFactory.Query(SQL);
+  finally
+    // Alla fine devo distruggere la StringList sulla quale ho costruito la query
+    // per non avere un memory leak
+    SQL.Free;
+  end;
+end;
+
+class function TioSqlGeneratorSqLite.GenerateSqlSelectForObject(
+  AContext: IioContext): IioQuery;
+var
+  SQL: TStrings;
+begin
+  Result := nil;
+  SQL := TStringList.Create;
+  try
+    // Compone l'SQL
+    SQL.Add('SELECT ' + AContext.GetProperties.GetSql);
+    if AContext.IsClassFromField
+      then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+    SQL.Add('FROM ' + AContext.GetTable.GetSql);
+    SQL.Add(AContext.GetWhere.GetSqlWithClassFromField(AContext.ClassFromField));
+    // Crea l'oggetto ioQuery
+    Result := TioDbFactory.Query(SQL);
+  finally
+    // Alla fine devo distruggere la StringList sulla quale ho costruito la query
+    // per non avere un memory leak
+    SQL.Free;
+  end;
+end;
+
+class function TioSqlGeneratorSqLite.GenerateSqlUpdate(
+  AContext: IioContext): IioQuery;
+var
+  SQL: TStrings;
+  Prop: IioContextProperty;
+  Comma: Char;
+begin
+  Result := nil;
+  SQL := TStringList.Create;
+  try
+    // Compone l'SQL
+    SQL.Add('UPDATE ' + AContext.GetTable.GetSql + ' SET');
+    Comma := ' ';
+    for Prop in AContext.GetProperties do
+    begin
+      // Relation type
+      case Prop.GetRelationType of
+        // If RelationType = ioRTNone save the current property value normally
+        ioRTNone: begin
+          SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetSqlValue(AContext.DataObject));
+          Comma := ',';
+        end;
+        //  NB: First save the related child object (for ID if it's a new child object)
+        ioRTBelongsTo: begin
+          SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetRelationChildObjectID(AContext.DataObject));
+          Comma := ',';
+        end;
+        // else if RelationType = ioRTHasMany then load objects and assign it to the property  (list)
+        ioRTHasMany: {Nothing};
+      end;
+    end;
+    // ClassFromField if enabled
+    if AContext.IsClassFromField
+      then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=' + AContext.ClassFromField.GetSqlValue);
+    // Where conditions
+    SQL.Add(AContext.GetWhere.GetSql);
+    // Crea l'oggetto ioQuery
+    Result := TioDbFactory.Query(SQL);
+  finally
+    // Alla fine devo distruggere la StringList sulla quale ho costruito la query
+    // per non avere un memory leak
+    SQL.Free;
+  end;
+end;
+
+end.

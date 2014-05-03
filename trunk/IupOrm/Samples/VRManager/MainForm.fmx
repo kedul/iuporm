@@ -1,0 +1,437 @@
+object TabbedwithNavigationForm: TTabbedwithNavigationForm
+  Left = 0
+  Top = 0
+  Caption = 'TabbedwithNavigation'
+  ClientHeight = 460
+  ClientWidth = 320
+  FormFactor.Width = 1440
+  FormFactor.Height = 900
+  FormFactor.Devices = [dkDesktop]
+  OnShow = FormShow
+  DesignerMobile = True
+  DesignerWidth = 320
+  DesignerHeight = 480
+  DesignerDeviceName = 'iPhone'
+  DesignerOrientation = 0
+  object TabControl1: TTabControl
+    Align = alClient
+    FullSize = True
+    Height = 460.000000000000000000
+    TabHeight = 49.000000000000000000
+    TabIndex = 0
+    TabOrder = 0
+    TabPosition = tpBottom
+    Width = 320.000000000000000000
+    object TabItem1: TTabItem
+      WordWrap = False
+      Height = 49.000000000000000000
+      IsSelected = True
+      TabOrder = 0
+      Text = 'Corrente'
+      Width = 80.000000000000000000
+      object TabControl2: TTabControl
+        Align = alClient
+        FullSize = True
+        Height = 411.000000000000000000
+        TabHeight = 49.000000000000000000
+        TabIndex = 1
+        TabOrder = 0
+        TabPosition = tpNone
+        Width = 320.000000000000000000
+        object TabItem5: TTabItem
+          WordWrap = False
+          Height = 8.000000000000000000
+          IsSelected = False
+          Position.X = 146.000000000000000000
+          Position.Y = 392.000000000000000000
+          TabOrder = 0
+          Text = 'TabItem5'
+          Width = 8.000000000000000000
+          object ToolBar1: TToolBar
+            Height = 44.000000000000000000
+            TabOrder = 0
+            Width = 320.000000000000000000
+            object lblTitle1: TLabel
+              Align = alCenter
+              Height = 27.000000000000000000
+              StyleLookup = 'toollabel'
+              Text = 'Title'
+              Width = 56.000000000000000000
+            end
+            object btnNext: TSpeedButton
+              Action = ChangeTabAction1
+              Anchors = [akTop, akRight]
+              Height = 31.000000000000000000
+              Position.X = 280.000000000000000000
+              Position.Y = 6.000000000000000000
+              StyleLookup = 'nexttoolbuttonbordered'
+              Width = 33.000000000000000000
+            end
+          end
+          object Button3: TButton
+            Height = 44.000000000000000000
+            TabOrder = 1
+            Text = 'Crea DB'
+            Trimming = ttCharacter
+            Width = 89.000000000000000000
+            OnClick = Button3Click
+          end
+          object Button2: TButton
+            Height = 44.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 88.000000000000000000
+            TabOrder = 2
+            Text = 'ToList (class)'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = Button2Click
+          end
+          object Button4: TButton
+            Height = 44.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 128.000000000000000000
+            TabOrder = 3
+            Text = 'ToObjectList'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = Button4Click
+          end
+          object Button5: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 176.000000000000000000
+            TabOrder = 4
+            Text = 'Costs (generics)'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = Button5Click
+          end
+          object Button6: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 200.000000000000000000
+            TabOrder = 5
+            Text = 'Costs (class ref)'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = Button6Click
+          end
+          object Button7: TButton
+            Height = 20.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 368.000000000000000000
+            TabOrder = 6
+            Text = 'Create DB (Auto)'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = Button7Click
+          end
+          object Button8: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 320.000000000000000000
+            TabOrder = 7
+            Text = 'Travels with costs'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = Button8Click
+          end
+          object Button9: TButton
+            Height = 44.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 48.000000000000000000
+            TabOrder = 8
+            Text = 'ToList (Intf) first 1'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = Button1Click
+          end
+          object ButtonCOstsTCostFuel: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 224.000000000000000000
+            TabOrder = 9
+            Text = 'Costs (TCostFuel)'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = ButtonCOstsTCostFuelClick
+          end
+        end
+        object TabItem6: TTabItem
+          WordWrap = False
+          Height = 8.000000000000000000
+          IsSelected = True
+          Position.X = 156.000000000000000000
+          Position.Y = 392.000000000000000000
+          TabOrder = 1
+          Text = 'TabItem6'
+          Width = 8.000000000000000000
+          object ToolBar2: TToolBar
+            Height = 44.000000000000000000
+            TabOrder = 0
+            Width = 320.000000000000000000
+            object lblTitle2: TLabel
+              Align = alCenter
+              Height = 27.000000000000000000
+              StyleLookup = 'toollabel'
+              Text = 'Title'
+              Width = 56.000000000000000000
+            end
+            object btnBack: TSpeedButton
+              Action = ChangeTabAction2
+              Height = 31.000000000000000000
+              Position.X = 6.000000000000000000
+              Position.Y = 6.000000000000000000
+              StyleLookup = 'backtoolbutton'
+              Width = 49.000000000000000000
+            end
+            object SpeedButton2: TSpeedButton
+              Action = ChangeTabAction4
+              Anchors = [akTop, akRight]
+              Height = 31.000000000000000000
+              Position.X = 279.000000000000000000
+              Position.Y = 5.000000000000000000
+              StyleLookup = 'nexttoolbuttonbordered'
+              Trimming = ttCharacter
+              Width = 33.000000000000000000
+            end
+          end
+          object ButtonNewTravel: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 56.000000000000000000
+            TabOrder = 1
+            Text = 'New Travel'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = ButtonNewTravelClick
+          end
+          object ButtonDeleteTravelByID: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 80.000000000000000000
+            TabOrder = 2
+            Text = 'Delete Travel by ID'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = ButtonDeleteTravelByIDClick
+          end
+          object ButtonDeleteTravelEmptyDesc: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 104.000000000000000000
+            TabOrder = 3
+            Text = 'Delete travels with empty desc'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = ButtonDeleteTravelEmptyDescClick
+          end
+          object ButtonUpdateTravel: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 128.000000000000000000
+            TabOrder = 4
+            Text = 'Update Travel'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = ButtonUpdateTravelClick
+          end
+          object ButtonChangeCostType1: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 176.000000000000000000
+            TabOrder = 5
+            Text = 'Change CostType gasolio 2>3'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = ButtonChangeCostType1Click
+          end
+          object ButtonChangeCostType2: TButton
+            Height = 25.000000000000000000
+            Position.X = 32.000000000000000000
+            Position.Y = 200.000000000000000000
+            TabOrder = 6
+            Text = 'Change CostType gasolio 3>2'
+            Trimming = ttCharacter
+            Width = 257.000000000000000000
+            OnClick = ButtonChangeCostType2Click
+          end
+        end
+        object TabItem7: TTabItem
+          WordWrap = False
+          Height = 8.000000000000000000
+          IsSelected = False
+          Position.X = 166.000000000000000000
+          Position.Y = 392.000000000000000000
+          TabOrder = 2
+          Text = 'TabItem7'
+          Trimming = ttCharacter
+          Width = 8.000000000000000000
+          object ToolBar6: TToolBar
+            Height = 44.000000000000000000
+            TabOrder = 0
+            Width = 320.000000000000000000
+            object Label1: TLabel
+              Align = alCenter
+              Height = 27.000000000000000000
+              StyleLookup = 'toollabel'
+              Text = 'Title'
+              Width = 56.000000000000000000
+              Trimming = ttCharacter
+            end
+            object SpeedButton1: TSpeedButton
+              Action = ChangeTabAction3
+              Height = 31.000000000000000000
+              Position.X = 6.000000000000000000
+              Position.Y = 6.000000000000000000
+              StyleLookup = 'backtoolbutton'
+              Trimming = ttCharacter
+              Width = 49.000000000000000000
+            end
+          end
+          object ListView1: TListView
+            ItemAppearanceClassName = 'TListItemAppearance'
+            ItemEditAppearanceClassName = 'TListItemShowCheckAppearance'
+            HeaderAppearanceClassName = 'TListHeaderObjects'
+            FooterAppearanceClassName = 'TListHeaderObjects'
+            EditModeOptions = [DisallowSelection, HideSelection, ClearWhenStart]
+            EditMode = False
+            ItemIndex = 0
+            Align = alClient
+            Height = 367.000000000000000000
+            TabOrder = 1
+            Width = 320.000000000000000000
+          end
+        end
+      end
+    end
+    object TabItem2: TTabItem
+      WordWrap = False
+      Height = 49.000000000000000000
+      IsSelected = False
+      Position.X = 80.000000000000000000
+      TabOrder = 1
+      Text = 'Viaggi'
+      Width = 80.000000000000000000
+      object ToolBar3: TToolBar
+        Height = 44.000000000000000000
+        TabOrder = 0
+        Width = 320.000000000000000000
+        object lblTitle3: TLabel
+          Align = alCenter
+          Height = 27.000000000000000000
+          StyleLookup = 'toollabel'
+          Text = 'Title'
+          Width = 56.000000000000000000
+        end
+      end
+    end
+    object TabItem3: TTabItem
+      WordWrap = False
+      Height = 49.000000000000000000
+      IsSelected = False
+      Position.X = 160.000000000000000000
+      TabOrder = 2
+      Text = 'Impostazioni'
+      Width = 80.000000000000000000
+      object ToolBar4: TToolBar
+        Height = 44.000000000000000000
+        TabOrder = 0
+        Width = 320.000000000000000000
+        object lblTitle4: TLabel
+          Align = alCenter
+          Height = 27.000000000000000000
+          StyleLookup = 'toollabel'
+          Text = 'Title'
+          Width = 56.000000000000000000
+        end
+      end
+    end
+    object TabItem4: TTabItem
+      WordWrap = False
+      Height = 49.000000000000000000
+      IsSelected = False
+      Position.X = 240.000000000000000000
+      StyleLookup = 'tabitembookmarks'
+      TabOrder = 3
+      Text = 'TabItem4'
+      Width = 80.000000000000000000
+      object ToolBar5: TToolBar
+        Height = 44.000000000000000000
+        TabOrder = 0
+        Width = 320.000000000000000000
+        object lblTitle5: TLabel
+          Align = alCenter
+          Height = 27.000000000000000000
+          StyleLookup = 'toollabel'
+          Text = 'Title'
+          Width = 56.000000000000000000
+        end
+      end
+    end
+  end
+  object ActionList1: TActionList
+    Left = 96
+    Top = 8
+    object ChangeTabAction1: TChangeTabAction
+      CustomText = 'Next'
+      Tab = TabItem6
+      Transition = ttSlide
+    end
+    object ChangeTabAction2: TChangeTabAction
+      CustomText = 'Back'
+      Tab = TabItem5
+      Transition = ttSlide
+    end
+    object ChangeTabAction3: TChangeTabAction
+      CustomText = 'Back'
+      Tab = TabItem6
+      Transition = ttSlide
+    end
+    object ChangeTabAction4: TChangeTabAction
+      CustomText = 'Next'
+      Tab = TabItem7
+      Transition = ttSlide
+    end
+  end
+  object PrototypeBindSource1: TPrototypeBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ListViewItem_Caption'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'ListViewItem_DetailText'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'ListViewItem_GroupHeader'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    OnCreateAdapter = PrototypeBindSource1CreateAdapter
+    Left = 144
+    Top = 264
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 188
+    Top = 277
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = PrototypeBindSource1
+      FieldName = 'ListViewItem_Caption'
+      Control = ListView1
+      FillExpressions = <>
+      AutoBufferCount = False
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+  end
+end

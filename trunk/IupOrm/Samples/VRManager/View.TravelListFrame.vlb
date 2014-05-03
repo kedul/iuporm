@@ -1,0 +1,16 @@
+﻿[]
+Coordinates=111,89,82,33
+
+[TravelsListView]
+Coordinates=90,150,92,159
+
+[PBSTravels]
+Coordinates=350,110,132,105
+Visible=True
+
+[BindingsList1]
+Coordinates=111,1,82,33
+
+[Button1]
+Coordinates=111,1,53,51
+

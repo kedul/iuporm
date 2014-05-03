@@ -1,0 +1,69 @@
+object ViewTravelListFrame: TViewTravelListFrame
+  Align = alClient
+  Height = 510.000000000000000000
+  Width = 367.000000000000000000
+  object TravelsListView: TListView
+    ItemAppearanceClassName = 'TListItemRightDetailAppearance'
+    ItemEditAppearanceClassName = 'TListItemRightDetailShowCheckAppearance'
+    HeaderAppearanceClassName = 'TListHeaderObjects'
+    FooterAppearanceClassName = 'TListHeaderObjects'
+    EditModeOptions = [DisallowSelection, HideSelection, ClearWhenStart]
+    EditMode = False
+    Align = alClient
+    Height = 488.000000000000000000
+    TabOrder = 0
+    Width = 367.000000000000000000
+  end
+  object Button1: TButton
+    Align = alTop
+    Height = 22.000000000000000000
+    TabOrder = 1
+    Text = 'Load Data'
+    Width = 367.000000000000000000
+    OnClick = Button1Click
+  end
+  object PBSTravels: TPrototypeBindSource
+    AutoActivate = False
+    AutoEdit = False
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'ListViewItem_Caption'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'ListViewItem_DetailText'
+        Generator = 'ContactTitles'
+        ReadOnly = False
+      end
+      item
+        Name = 'ListViewItem_GroupHeader'
+        Generator = 'ColorsNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    Left = 176
+    Top = 88
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = PBSTravels
+      FieldName = 'ListViewItem_Caption'
+      Control = TravelsListView
+      FillExpressions = <
+        item
+          SourceMemberName = 'ListViewItem_DetailText'
+          ControlMemberName = 'Detail'
+        end>
+      AutoBufferCount = False
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+  end
+end
