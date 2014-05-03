@@ -26,7 +26,6 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
       WordWrap = False
       Height = 49.000000000000000000
       IsSelected = True
-      Position.X = 1.000000000000000000
       TabOrder = 0
       Text = 'Corrente'
       Width = 80.000000000000000000
@@ -56,8 +55,8 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
               Align = alCenter
               Height = 27.000000000000000000
               StyleLookup = 'toollabel'
-              Text = 'Titolo'
-              Width = 85.000000000000000000
+              Text = 'VR Man'
+              Width = 91.000000000000000000
             end
             object btnNext: TSpeedButton
               Action = ChangeTabAction1
@@ -310,7 +309,7 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
       WordWrap = False
       Height = 49.000000000000000000
       IsSelected = False
-      Position.X = 81.000000000000000000
+      Position.X = 80.000000000000000000
       TabOrder = 1
       Text = 'Viaggi'
       Width = 80.000000000000000000
@@ -331,7 +330,7 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
       WordWrap = False
       Height = 49.000000000000000000
       IsSelected = False
-      Position.X = 161.000000000000000000
+      Position.X = 160.000000000000000000
       TabOrder = 2
       Text = 'Impostazioni'
       Width = 80.000000000000000000
@@ -352,11 +351,11 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
       WordWrap = False
       Height = 49.000000000000000000
       IsSelected = False
-      Position.X = 241.000000000000000000
+      Position.X = 240.000000000000000000
       StyleLookup = 'tabitembookmarks'
       TabOrder = 3
       Text = 'TabItem4'
-      Width = 79.000000000000000000
+      Width = 80.000000000000000000
       object ToolBar5: TToolBar
         Height = 44.000000000000000000
         TabOrder = 0
