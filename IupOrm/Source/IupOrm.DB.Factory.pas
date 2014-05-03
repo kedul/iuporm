@@ -47,9 +47,9 @@ var
 begin
   // Compone il nome completo del file database
 {$IFDEF IOS}
-  DBFileNameFull := TPath.Combine(TPath.GetDocumentsPath, 'VRManager.db');
+  DBFileNameFull := TPath.Combine(TPath.GetDocumentsPath, 'db.db');
 {$ELSE}
-  DBFileNameFull := TPath.Combine(TPath.GetDocumentsPath, 'VRManager.db');
+  DBFileNameFull := TPath.Combine(TPath.GetDocumentsPath, 'db.db');
 {$ENDIF}
   // Crea la connessione al DB
   LConnection := TSQLConnection.Create(nil);
