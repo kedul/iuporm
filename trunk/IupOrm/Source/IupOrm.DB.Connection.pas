@@ -11,6 +11,7 @@ type
   strict private
     FConnection: TioInternalSqlConnection;
     FCurrentTransaction: TDBXTransaction;
+    FTransactionCounter: Integer;
   public
     constructor Create(AConnection:TioInternalSqlConnection);
     destructor Destroy; override;
@@ -28,12 +29,15 @@ implementation
 
 procedure TioConnection.Commit;
 begin
-  FConnection.CommitFreeAndNil(FCurrentTransaction);
+  Dec(FTransactionCounter);
+  if FTransactionCounter = 0
+    then FConnection.CommitFreeAndNil(FCurrentTransaction);
 end;
 
 constructor TioConnection.Create(AConnection: TioInternalSqlConnection);
 begin
   inherited Create;
+  FTransactionCounter := 0;
   FConnection := AConnection;
   FCurrentTransaction := nil;
 end;
@@ -56,12 +60,19 @@ end;
 
 procedure TioConnection.Rollback;
 begin
-  FConnection.RollbackFreeAndNil(FCurrentTransaction);
+  Dec(FTransactionCounter);
+  if FTransactionCounter = 0
+    then FConnection.RollbackFreeAndNil(FCurrentTransaction);
 end;
 
 procedure TioConnection.StartTransaction;
 begin
-  FCurrentTransaction := FConnection.BeginTransaction;
+  if FTransactionCounter <= 0 then
+  begin
+    FCurrentTransaction := FConnection.BeginTransaction;
+    FTransactionCounter := 0;
+  end;
+  inc(FTransactionCounter);
 end;
 
 end.

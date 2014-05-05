@@ -314,17 +314,17 @@
                         <RemoteName>Entitlements.plist</RemoteName>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2048x1496.png" Configuration="Debug" Class="iPad_Launch2048">
+                <DeployFile LocalName="iOSSimulator\Debug\VRManagerClient.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="iOSSimulator">
-                        <RemoteName>Default-Landscape@2x~ipad.png</RemoteName>
+                        <RemoteName>VRManagerClient.rsm</RemoteName>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_29x29.png" Configuration="Debug" Class="iPad_Setting29">
                     <Platform Name="iOSSimulator"/>
                 </DeployFile>
-                <DeployFile LocalName="iOSSimulator\Debug\VRManagerClient.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2048x1496.png" Configuration="Debug" Class="iPad_Launch2048">
                     <Platform Name="iOSSimulator">
-                        <RemoteName>VRManagerClient.rsm</RemoteName>
+                        <RemoteName>Default-Landscape@2x~ipad.png</RemoteName>
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="iOSSimulator\Release\VRManagerClient.info.plist" Configuration="Release" Class="ProjectiOSSimulatorInfoPList">

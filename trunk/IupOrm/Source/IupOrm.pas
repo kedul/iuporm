@@ -37,6 +37,10 @@ type
     class function Load<T:class,constructor>: TioWhere<T>; overload;
     class procedure Delete(AObj: TObject);
     class procedure Persist(AObj: TObject);
+    class procedure StartTransaction;
+    class procedure CommitTransaction;
+    class procedure RollbackTransaction;
+    class procedure Init(AFolderName:String='IupOrm');
   end;
 
 implementation
@@ -144,33 +148,42 @@ end;
 
 class procedure TIupOrm.PersistObject(AContext:IioContext; ARelationPropertyName:String=''; ARelationOID:Integer=0);
 begin
-  // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
-  if (ARelationPropertyName <> '') and (ARelationOID <> 0)
-    then AContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(AContext.DataObject, ARelationOID);
-  // PreProcess (persist) relation childs (BelongsTo)
-  Self.PreProcessRelationChild(AContext);
-  // Process the current object
-  // --------------------------
-  case AContext.ObjectStatus of
-    // DIRTY
-    //  If the ID property of the object is not assigned then insert
-    //  the object else update
-    osDirty:
-    begin
-      if AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger = 0
-      then Self.InsertObject(AContext)
-      else Self.UpdateObject(AContext);
-      AContext.ObjectStatus := osClean;
+  TioDbFactory.Connection.StartTransaction;
+  try
+
+    // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
+    if (ARelationPropertyName <> '') and (ARelationOID <> 0)
+      then AContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(AContext.DataObject, ARelationOID);
+    // PreProcess (persist) relation childs (BelongsTo)
+    Self.PreProcessRelationChild(AContext);
+    // Process the current object
+    // --------------------------
+    case AContext.ObjectStatus of
+      // DIRTY
+      //  If the ID property of the object is not assigned then insert
+      //  the object else update
+      osDirty:
+      begin
+        if AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger = 0
+        then Self.InsertObject(AContext)
+        else Self.UpdateObject(AContext);
+        AContext.ObjectStatus := osClean;
+      end;
+      // DELETE
+      osDeleted: begin
+        Self.DeleteObject(AContext);
+        AContext.ObjectStatus := osClean;
+      end;
     end;
-    // DELETE
-    osDeleted: begin
-      Self.DeleteObject(AContext);
-      AContext.ObjectStatus := osClean;
-    end;
+    // --------------------------
+    // PostProcess (persist) relation childs (HasMany, HasOne)
+    Self.PostProcessRelationChild(AContext);
+
+    TioDBFactory.Connection.Commit;
+  except
+    TioDBFactory.Connection.Rollback;
+    raise;
   end;
-  // --------------------------
-  // PostProcess (persist) relation childs (HasMany, HasOne)
-  Self.PostProcessRelationChild(AContext);
 end;
 
 class function TIupOrm.RefTo(AClassRef: TioClassRef): TioWhere;
@@ -185,10 +198,31 @@ begin
   Result.SetClassRef(T);
 end;
 
+class procedure TIupOrm.RollbackTransaction;
+begin
+  TioDBFactory.Connection.Rollback;
+end;
+
+class procedure TIupOrm.StartTransaction;
+begin
+  TioDBFactory.Connection.StartTransaction;
+end;
+
+class procedure TIupOrm.Init(AFolderName: String);
+begin
+  TioDbFactory.SetDBFolder(AFolderName);
+  TioDBFactory.NewConnection;
+end;
+
 class procedure TIupOrm.UpdateObject(AContext: IioContext);
 begin
   // Create and execute query
   TioDbFactory.SqlGenerator.GenerateSqlUpdate(AContext).ExecSQL;
+end;
+
+class procedure TIupOrm.CommitTransaction;
+begin
+  TioDBFactory.Connection.Commit;
 end;
 
 class procedure TIupOrm.Delete(AObj: TObject);

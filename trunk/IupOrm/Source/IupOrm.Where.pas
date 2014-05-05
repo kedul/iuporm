@@ -355,7 +355,8 @@ var
 begin
   // Init
   AQuery := nil;
-  try
+  TioDBFactory.Connection.StartTransaction;
+  try try
     // Wrap the DestList into a DuckTypedList
     ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Create Context
@@ -375,6 +376,11 @@ begin
     end;
     // Close query
     AQuery.Close;
+    TioDBFactory.Connection.Commit;
+  except
+    TioDBFactory.Connection.Rollback;
+    raise;
+  end;
   finally
     // Destroy itself at the end to avoid memory leak
     Self.Free;
@@ -396,7 +402,8 @@ var
 begin
   // Init
   Result := nil;
-  try
+  TioDBFactory.Connection.StartTransaction;
+  try try
     // Create Context
     AContext := TioContextFactory.Context(Self.FClassRef, Self);
     // Create & open query
@@ -406,6 +413,11 @@ begin
     Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
     // Close query
     AQuery.Close;
+    TioDBFactory.Connection.Commit;
+  except
+    TioDBFactory.Connection.Rollback;
+    raise;
+  end;
   finally
     // Destroy itself at the end to avoid memory leak
     Self.Free;

@@ -80,6 +80,7 @@ type
       var ABindSourceAdapter: TBindSourceAdapter);
     procedure ButtonCOstsTCostFuelClick(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   strict private
     { Private declarations }
     FViewTravelListFrame: TViewTravelListFrame;
@@ -100,7 +101,8 @@ uses
   IupOrm.Where, Model.CostTypeWithCostListInterface, Model.BaseListClasses,
   Model.TravelWithCostList, Model.TravelWithCostListInterface,
   IupOrm.DB.DBCreator.Interfaces, IupOrm.DB.DBCreator.Factory,
-  IupOrm.DB.Interfaces, IupOrm.DB.Factory, IupOrm.CommonTypes;
+  IupOrm.DB.Interfaces, IupOrm.DB.Factory, IupOrm.CommonTypes,
+  System.IOUtils;
 
 {$R *.fmx}
 
@@ -354,6 +356,11 @@ begin
   finally
     ATravel.Free;
   end;
+end;
+
+procedure TTabbedwithNavigationForm.FormCreate(Sender: TObject);
+begin
+  TIupOrm.Init('VRManager');
 end;
 
 procedure TTabbedwithNavigationForm.FormShow(Sender: TObject);
