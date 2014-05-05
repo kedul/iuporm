@@ -7,6 +7,7 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
   FormFactor.Width = 1440
   FormFactor.Height = 900
   FormFactor.Devices = [dkDesktop]
+  OnCreate = FormCreate
   OnShow = FormShow
   DesignerMobile = True
   DesignerWidth = 320

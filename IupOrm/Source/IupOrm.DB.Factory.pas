@@ -21,8 +21,10 @@ type
     class function SqlGenerator: TioSqlGeneratorRef;
     class function SqlDataConverter: TioSqlDataConverterRef;
     class function Connection: IioConnection;
+    class function NewConnection: IioConnection;
     class function Query(SQL:TStrings): IioQuery;
     class function QueryInsert(SQL:TStrings): IioQuery;
+    class procedure SetDBFolder(AFolderName: String);
   end;
 
 implementation
@@ -33,6 +35,10 @@ uses
   IupOrm.DB.SqLite.SqlDataConverter, IupOrm.DB.SqLite.SqlGenerator,
   IupOrm.Where.SqlItems;
 
+var
+  ioDBFolder: String;
+  ioDBConnection: IioConnection;
+
 { TioDbBuilder }
 
 class function TioDbFactory.CompareOperator: TioCompareOperatorRef;
@@ -41,15 +47,28 @@ begin
 end;
 
 class function TioDbFactory.Connection: IioConnection;
+begin
+  Result := ioDBConnection;
+end;
+
+class function TioDbFactory.LogicRelation: TioLogicRelationRef;
+begin
+  Result := TioLogicRelationSqLite;
+end;
+
+class function TioDbFactory.NewConnection: IioConnection;
 var
   DBFileNameFull: String;
   LConnection: TSqlConnection;
 begin
+  // Crea la cartella del DB se non c'è
+  if not TDirectory.Exists(ioDBFolder)
+    then TDirectory.CreateDirectory(ioDBFolder);
   // Compone il nome completo del file database
 {$IFDEF IOS}
-  DBFileNameFull := TPath.Combine(TPath.GetDocumentsPath, 'db.db');
+  DBFileNameFull := TPath.Combine(DBFolder, 'db.db');
 {$ELSE}
-  DBFileNameFull := TPath.Combine(TPath.GetDocumentsPath, 'db.db');
+  DBFileNameFull := TPath.Combine(ioDBFolder, 'db.db');
 {$ENDIF}
   // Crea la connessione al DB
   LConnection := TSQLConnection.Create(nil);
@@ -59,13 +78,9 @@ begin
   LConnection.Params.Values['HostName'] := 'localhost';
   LConnection.Params.Values['Database'] := DBFileNameFull;
   LConnection.Open;
-  // Crea la ioCOnnection da ritornare
-  Result := TioConnection.Create(LConnection);
-end;
-
-class function TioDbFactory.LogicRelation: TioLogicRelationRef;
-begin
-  Result := TioLogicRelationSqLite;
+  // Crea la ioCOnnection da ritornare, la assegna alla variabile globale
+  //  e richiama se stessa
+  ioDBConnection := TioConnection.Create(LConnection);
 end;
 
 class function TioDbFactory.Query(SQL: TStrings): IioQuery;
@@ -94,6 +109,11 @@ begin
   end;
 end;
 
+class procedure TioDbFactory.SetDBFolder(AFolderName: String);
+begin
+  ioDBFolder := TPath.Combine(TPath.GetDocumentsPath, AFolderName);
+end;
+
 class function TioDbFactory.SqlDataConverter: TioSqlDataConverterRef;
 begin
   Result := TioSqlDataConverterSqLite;
@@ -118,5 +138,6 @@ class function TioDbFactory.WhereItemTValue(AValue: TValue): IioSqlItemWhere;
 begin
   Result := TioSqlItemsWhereTValue.Create(AValue);
 end;
+
 
 end.
