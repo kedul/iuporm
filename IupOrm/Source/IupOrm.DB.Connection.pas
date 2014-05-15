@@ -3,7 +3,7 @@ unit IupOrm.DB.Connection;
 interface
 
 uses
-  IupOrm.DB.Interfaces, Data.DBXCommon;
+  Data.DbxSqlite, IupOrm.DB.Interfaces, Data.DBXCommon;
 
 type
 

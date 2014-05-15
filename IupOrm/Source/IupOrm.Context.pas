@@ -38,6 +38,8 @@ type
     function IsClassFromField: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
+    // Blob field present
+    function BlobFieldExists: Boolean;
     // DataObject
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjectStatus
@@ -50,6 +52,11 @@ uses
   IupOrm.Context.Factory, IupOrm.DB.Factory, System.TypInfo;
 
 { TioContext }
+
+function TioContext.BlobFieldExists: Boolean;
+begin
+  Result := Self.GetProperties.BlobFieldExists;
+end;
 
 function TioContext.ClassFromField: IioClassFromField;
 begin

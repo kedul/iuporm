@@ -25,7 +25,9 @@ type
     constructor Create(ARttiProperty:TRttiProperty; ASqlFieldName:String; AFieldType:String; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String);
     function GetName: String;
     function GetSqlFieldName: String;
+    function GetSqlParamName: String;
     function GetFieldType: String;
+    function IsBlob: Boolean;
     function GetValue(Instance: Pointer): TValue;
     procedure SetValue(Instance: Pointer; AValue:TValue);
     function GetSqlValue(ADataObject:TObject): String;
@@ -43,6 +45,7 @@ type
     FPropertyItems: TList<IioContextProperty>;
     FIdProperty: IioContextProperty;
     FObjStatusProperty: IioContextProperty;
+    FBlobFieldExists: Boolean;
   strict protected
     // ObjectStatus property
     function GetObjStatusProperty: IioContextProperty;
@@ -56,6 +59,8 @@ type
     procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False);
     function GetIdProperty:IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
+    // Blob field present
+    function BlobFieldExists: Boolean;
     // ObjectStatus Exist
     function ObjStatusExist: Boolean;
     // ObjectStatus property
@@ -86,7 +91,9 @@ end;
 
 function TioProperty.GetFieldType: String;
 begin
-  Result := FFieldType;
+  if FFieldType.IsEmpty
+    then Result := TioDbFactory.SqlDataConverter.PropertyToFieldType(Self)
+    else Result := FFieldType;
 end;
 
 function TioProperty.GetName: String;
@@ -150,6 +157,11 @@ begin
   Result := FSqlFieldName;
 end;
 
+function TioProperty.GetSqlParamName: String;
+begin
+  Result := 'P_' + Self.GetSqlFieldName;
+end;
+
 function TioProperty.GetSqlValue(ADataObject:TObject): String;
 begin
   Result := TioDbFactory.SqlDataConverter.TValueToSql(Self.GetValue(ADataObject));
@@ -158,6 +170,11 @@ end;
 function TioProperty.GetValue(Instance: Pointer): TValue;
 begin
   Result := FRttiProperty.GetValue(Instance);
+end;
+
+function TioProperty.IsBlob: Boolean;
+begin
+  Result := Self.GetFieldType.StartsWith('BLOB');
 end;
 
 procedure TioProperty.SetValue(Instance: Pointer; AValue: TValue);
@@ -171,10 +188,17 @@ procedure TioProperties.Add(AProperty: IioContextProperty; AIsId: Boolean);
 begin
   FPropertyItems.Add(AProperty);
   if AIsId then FIdProperty := AProperty;
+  if AProperty.IsBlob then Self.FBlobFieldExists := True;
+end;
+
+function TioProperties.BlobFieldExists: Boolean;
+begin
+  Result := FBlobFieldExists;
 end;
 
 constructor TioProperties.Create;
 begin
+  FBlobFieldExists := False;
   FPropertyItems := TList<IioContextProperty>.Create;
 end;
 

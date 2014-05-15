@@ -9,6 +9,9 @@
         <Projects Include="..\..\Samples\VRManager\VRManagerClient.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Samples\Pizza\PizzaProject.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +38,23 @@
     <Target Name="VRManagerClient:Make">
         <MSBuild Projects="..\..\Samples\VRManager\VRManagerClient.dproj" Targets="Make"/>
     </Target>
+    <Target Name="PizzaProject">
+        <MSBuild Projects="..\..\Samples\Pizza\PizzaProject.dproj"/>
+    </Target>
+    <Target Name="PizzaProject:Clean">
+        <MSBuild Projects="..\..\Samples\Pizza\PizzaProject.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzaProject:Make">
+        <MSBuild Projects="..\..\Samples\Pizza\PizzaProject.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="IupOrmProject;VRManagerClient"/>
+        <CallTarget Targets="IupOrmProject;VRManagerClient;PizzaProject"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="IupOrmProject:Clean;VRManagerClient:Clean"/>
+        <CallTarget Targets="IupOrmProject:Clean;VRManagerClient:Clean;PizzaProject:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="IupOrmProject:Make;VRManagerClient:Make"/>
+        <CallTarget Targets="IupOrmProject:Make;VRManagerClient:Make;PizzaProject:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -5,7 +5,7 @@ package IupOrmProject;
 {$ALIGN 8}
 {$ASSERTIONS ON}
 {$BOOLEVAL OFF}
-{$DEBUGINFO ON}
+{$DEBUGINFO OFF}
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
 {$IOCHECKS ON}
@@ -31,7 +31,9 @@ requires
   rtl,
   DbxCommonDriver,
   dbrtl,
-  dbexpress;
+  dbexpress,
+  fmx,
+  DBXSqliteDriver;
 
 contains
   IupOrm.Attributes in '..\..\Source\IupOrm.Attributes.pas',
@@ -74,6 +76,7 @@ contains
   IupOrm.DB.SqLite.LogicRelations in '..\..\Source\IupOrm.DB.SqLite.LogicRelations.pas',
   IupOrm.DB.SqLite.SqlDataConverter in '..\..\Source\IupOrm.DB.SqLite.SqlDataConverter.pas',
   IupOrm.DB.SqLite.SqlGenerator in '..\..\Source\IupOrm.DB.SqLite.SqlGenerator.pas',
-  IupOrm.DB.DBCreator.SqLite.SqlGenerator in '..\..\Source\IupOrm.DB.DBCreator.SqLite.SqlGenerator.pas';
+  IupOrm.DB.DBCreator.SqLite.SqlGenerator in '..\..\Source\IupOrm.DB.DBCreator.SqLite.SqlGenerator.pas',
+  IupOrm.DuckTyped.StreamObject in '..\..\Source\IupOrm.DuckTyped.StreamObject.pas';
 
 end.

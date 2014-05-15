@@ -116,7 +116,7 @@ begin
       Continue;
     end;
     // Prop Init
-    PropId := False;
+    PropId := (Prop.Name = 'ID');  // Is a OID property if the name of the property itself is 'ID'
     PropFieldName := Prop.Name;
     PropSkip := False;
     PropRelationType := ioRTNone;
