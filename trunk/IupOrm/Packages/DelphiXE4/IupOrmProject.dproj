@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{EDA76E4A-4BD0-4BDC-A9E0-03FA00D3B650}</ProjectGuid>
         <MainSource>IupOrmProject.dpk</MainSource>
-        <ProjectVersion>14.6</ProjectVersion>
+        <ProjectVersion>15.4</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
@@ -11,6 +11,11 @@
         <AppType>Package</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Base)'=='true') or '$(Base_Android)'!=''">
+        <Base_Android>true</Base_Android>
+        <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='iOSDevice' and '$(Base)'=='true') or '$(Base_iOSDevice)'!=''">
@@ -50,6 +55,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
+        <SanitizedProjectName>IupOrmProject</SanitizedProjectName>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <GenPackage>true</GenPackage>
@@ -61,6 +67,10 @@
         <DCC_S>false</DCC_S>
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Android)'!=''">
+        <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=preferExternal;largeHeap=False;theme=TitleBar;hardwareAccelerated=true</VerInfo_Keys>
+        <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice)'!=''">
         <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=6.0;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;CFBundleResourceSpecification=ResourceRules.plist</VerInfo_Keys>
@@ -94,13 +104,15 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-        <DCC_DebugInformation>false</DCC_DebugInformation>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -110,6 +122,8 @@
         <DCCReference Include="DbxCommonDriver.dcp"/>
         <DCCReference Include="dbrtl.dcp"/>
         <DCCReference Include="dbexpress.dcp"/>
+        <DCCReference Include="fmx.dcp"/>
+        <DCCReference Include="DBXSqliteDriver.dcp"/>
         <DCCReference Include="..\..\Source\IupOrm.Attributes.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.CommonTypes.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Context.CassFromField.pas"/>
@@ -151,6 +165,7 @@
         <DCCReference Include="..\..\Source\IupOrm.DB.SqLite.SqlDataConverter.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.DB.SqLite.SqlGenerator.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.DB.DBCreator.SqLite.SqlGenerator.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.DuckTyped.StreamObject.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -212,9 +227,14 @@
                     <VersionInfoKeys Name="CFBundleInfoDictionaryVersion"/>
                     <VersionInfoKeys Name="CFBundleDevelopmentRegion"/>
                 </VersionInfoKeys>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k200.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp200.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment/>
             <Platforms>
+                <Platform value="Android">False</Platform>
                 <Platform value="iOSDevice">False</Platform>
                 <Platform value="iOSSimulator">False</Platform>
                 <Platform value="OSX32">False</Platform>

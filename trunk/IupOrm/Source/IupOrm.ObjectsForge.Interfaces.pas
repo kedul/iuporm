@@ -14,9 +14,11 @@ type
 
   // ObjectMaker interface
   TioObjectMakerIntf = class abstract
+  strict protected
     class function LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
   public
+    class function CreateObjectFromBlobField(AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function CreateObjectByClassRef(AClassRef: TClass): TObject;
     class function CreateObjectByRttiType(ARttiType: TRttiType): TObject;
     class function CreateListByClassRef(AClassRef:TClass; AOwnsObjects:Boolean=True): TObject;
@@ -27,7 +29,9 @@ type
 implementation
 
 uses
-  System.TypInfo, IupOrm.Exceptions, IupOrm, IupOrm.RttiContext.Factory;
+  System.TypInfo, IupOrm.Exceptions, IupOrm, IupOrm.RttiContext.Factory,
+  IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory, System.Classes,
+  Data.DB;
 
 { TioObjectMakerIntf }
 
@@ -106,6 +110,29 @@ begin
   // Second solution, dirty and fast (by Daniele Teti DORM)
   // Result := TObject(ARttiType.GetMethod('Create')
   // .Invoke(ARttiType.AsInstance.MetaclassType, []).AsObject);
+end;
+
+class function TioObjectMakerIntf.CreateObjectFromBlobField(
+  AQuery: IioQuery; AProperty: IioContextProperty): TObject;
+var
+  ADuckTypedStreamObject: IioDuckTypedStreamObject;
+  AStream: TStream;
+begin
+  // Create the object
+  Result := Self.CreateObjectByRttiType(   AProperty.GetRttiProperty.PropertyType   );
+  // If the field is null then exit
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldName).IsNull then Exit;
+  // Wrap the object into a DuckTypedStreamObject
+  ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(Result);
+  // Get the BlobStream
+  AStream := AQuery.CreateBlobStream(AProperty, bmRead);
+  try
+    // Load stream o the object
+    AStream.Position := 0;
+    ADuckTypedStreamObject.LoadFromStream(AStream);
+  finally
+    AStream.Free;
+  end;
 end;
 
 class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;

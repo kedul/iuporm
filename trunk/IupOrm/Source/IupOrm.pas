@@ -30,6 +30,7 @@ type
     class procedure PostProcessRelationChild(AContext:IioContext);
     class procedure PersistRelationChildList(AMasterContext:IioContext; AMasterProperty:IioContextProperty);
     class procedure PersistRelationChildObject(AMasterContext:IioContext; AMasterProperty:IioContextProperty);
+    class procedure PersistCollection_Internal(ACollection:TObject; ARelationPropertyName:String=''; ARelationOID:Integer=0);
   public
     class function RefTo(AClassRef:TioClassRef): TioWhere; overload;
     class function RefTo<T:class,constructor>: TioWhere<T>; overload;
@@ -37,6 +38,7 @@ type
     class function Load<T:class,constructor>: TioWhere<T>; overload;
     class procedure Delete(AObj: TObject);
     class procedure Persist(AObj: TObject);
+    class procedure PersistCollection(ACollection: TObject);
     class procedure StartTransaction;
     class procedure CommitTransaction;
     class procedure RollbackTransaction;
@@ -69,14 +71,21 @@ begin
   Self.PersistObject(AContext);
 end;
 
-class procedure TIupOrm.PersistRelationChildList(AMasterContext:IioContext; AMasterProperty:IioContextProperty);
+class procedure TIupOrm.PersistCollection(ACollection: TObject);
+begin
+  // Redirect to the internal PersistCollection_Internal (same of PersistRelationChildList)
+  PersistCollection_Internal(ACollection);
+end;
+
+class procedure TIupOrm.PersistCollection_Internal(ACollection: TObject;
+  ARelationPropertyName: String; ARelationOID: Integer);
 var
   ADuckTypedList: IioDuckTypedList;
   AObj: TObject;
   AContext: IioContext;
 begin
   // Wrap the DestList into a DuckTypedList
-  ADuckTypedList := TioDuckTypedFactory.DuckTypedList(   AMasterProperty.GetRelationChildObject(AMasterContext.DataObject)   );
+  ADuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
   // Loop the list
   for AObj in ADuckTypedList do
   begin
@@ -84,10 +93,19 @@ begin
     AContext := TioContextFactory.Context(AObj.ClassType, nil, AObj);
     // Persist object
     Self.PersistObject(AContext
-                      , AMasterProperty.GetRelationChildPropertyName
-                      , AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger
+                      , ARelationPropertyName
+                      , ARelationOID
                       );
   end;
+end;
+
+class procedure TIupOrm.PersistRelationChildList(AMasterContext:IioContext; AMasterProperty:IioContextProperty);
+begin
+  // Redirect to the internal PersistCollection_Internal (same of PersistCollection)
+  PersistCollection_Internal( AMasterProperty.GetRelationChildObject(AMasterContext.DataObject)  // The collection
+                            , AMasterProperty.GetRelationChildPropertyName
+                            , AMasterContext.GetProperties.GetIdProperty.GetValue(AMasterContext.DataObject).AsInteger
+                            );
 end;
 
 class procedure TIupOrm.PersistRelationChildObject(AMasterContext: IioContext;

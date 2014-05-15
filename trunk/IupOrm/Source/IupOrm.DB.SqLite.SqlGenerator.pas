@@ -10,6 +10,8 @@ type
 
   // Classe che si occupa di generare il codice SQL delle varie query
   TioSqlGeneratorSqLite = class(TioSqlGenerator)
+  strict protected
+    class procedure LoadSqlParamsFromContext(AQuery:IioQuery; AContext:IioContext);
   public
     class function GenerateSqlSelectForObject(AContext:IioContext): IioQuery; override;
     class function GenerateSqlSelectForList(AContext:IioContext): IioQuery; override;
@@ -75,11 +77,20 @@ begin
       end;
       // Relation type
       case Prop.GetRelationType of
+
+
+
+        // #####BLOB
         // If RelationType = ioRTNone save the current property value normally
         ioRTNone: begin
-          SQL.Add(Comma + Prop.GetSqlValue(AContext.DataObject));
+          if Prop.IsBlob
+            then SQL.Add(Comma + ':' + Prop.GetSqlParamName)
+            else SQL.Add(Comma + Prop.GetSqlValue(AContext.DataObject));
           Comma := ',';
         end;
+
+
+
         //  NB: First save the related child object (for ID if it's a new child object)
         ioRTBelongsTo: begin
           SQL.Add(Comma + Prop.GetRelationChildObjectID(AContext.DataObject));
@@ -94,6 +105,15 @@ begin
     SQL.Add(')');
     // Crea l'oggetto ioQuery
     Result := TioDbFactory.QueryInsert(SQL);
+
+
+
+    // #####BLOB
+    // If some blob fields exist then load data on the relative parameters
+    if AContext.BlobFieldExists then Self.LoadSqlParamsFromContext(Result, AContext);
+
+
+
   finally
     // Alla fine devo distruggere la StringList sulla quale ho costruito la query
     // per non avere un memory leak
@@ -164,11 +184,19 @@ begin
     begin
       // Relation type
       case Prop.GetRelationType of
+
+
+        // #####BLOB
         // If RelationType = ioRTNone save the current property value normally
         ioRTNone: begin
-          SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetSqlValue(AContext.DataObject));
+          if Prop.IsBlob
+            then SQL.Add(Comma + Prop.GetSqlFieldName + '=:' +  Prop.GetSqlParamName)
+            else SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetSqlValue(AContext.DataObject));
           Comma := ',';
         end;
+
+
+
         //  NB: First save the related child object (for ID if it's a new child object)
         ioRTBelongsTo: begin
           SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetRelationChildObjectID(AContext.DataObject));
@@ -183,13 +211,34 @@ begin
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=' + AContext.ClassFromField.GetSqlValue);
     // Where conditions
     SQL.Add(AContext.GetWhere.GetSql);
-    // Crea l'oggetto ioQuery
+    // Create ioQuery object
     Result := TioDbFactory.Query(SQL);
+
+
+
+    // #####BLOB
+    // If some blob fields exist then load data on the relative parameters
+    if AContext.BlobFieldExists then Self.LoadSqlParamsFromContext(Result, AContext);
+
+
+
   finally
     // Alla fine devo distruggere la StringList sulla quale ho costruito la query
     // per non avere un memory leak
     SQL.Free;
   end;
+end;
+
+class procedure TioSqlGeneratorSqLite.LoadSqlParamsFromContext(AQuery: IioQuery;
+  AContext: IioContext);
+var
+  Prop: IioContextProperty;
+begin
+  // #####BLOB
+  // Load query parameters from context
+  for Prop in AContext.GetProperties do
+    if Prop.IsBlob then
+      AQuery.SaveStreamObjectToSqlParam(Prop.GetValue(AContext.DataObject).AsObject, Prop);
 end;
 
 end.

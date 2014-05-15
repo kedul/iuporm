@@ -8,6 +8,9 @@ uses
 
 type
 
+  //
+
+  // Context interface
   IioContext = interface
     ['{6B512CDA-23C6-42A3-AC44-905344B019E9}']
     function GetClassRef: TioClassRef;
@@ -18,6 +21,8 @@ type
     function IsClassFromField: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
+    // Blob field present
+    function BlobFieldExists: Boolean;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(AValue: TObject);

@@ -13,6 +13,7 @@ type
 
   TioInternalSqlConnection = TSQLConnection;
   TioFields = TFields;
+  TioParams = TParams;
 
   TioCompareOperatorRef = class of TioCompareOperator;
   TioLogicRelationRef = class of TioLogicRelation;
@@ -47,7 +48,10 @@ type
     function ExecSQL: Integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
+    function Params: TioParams;
     function Connection: IioConnection;
+    function CreateBlobStream(AProperty: IioContextProperty; Mode: TBlobStreamMode): TStream;
+    procedure SaveStreamObjectToSqlParam(AObj:TObject; AProperty: IioContextProperty);
     property SQL: TStrings read GetSQL;
   end;
 
@@ -58,6 +62,7 @@ type
     class function StringToSQL(AString:String): String; virtual; abstract;
     class function FloatToSQL(AFloat:Extended): String; virtual; abstract;
     class function TValueToSql(AValue:TValue): String; virtual; abstract;
+    class function PropertyToFieldType(AProp:IioContextProperty): String; virtual; abstract;
   end;
 
   // INterfaccia per le classi che devono generare i vari tipi di query

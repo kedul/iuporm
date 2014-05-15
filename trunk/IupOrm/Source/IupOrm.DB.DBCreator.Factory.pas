@@ -3,13 +3,14 @@ unit IupOrm.DB.DBCreator.Factory;
 interface
 
 uses
-  IupOrm.DB.DBCreator.Interfaces, System.Rtti, IupOrm.DB.Interfaces;
+  IupOrm.DB.DBCreator.Interfaces, System.Rtti, IupOrm.DB.Interfaces,
+  IupOrm.Context.Properties.Interfaces;
 
 type
 
   TioDBCreatorFactory = class
   public
-    class function GetField(AFieldName:String; AFieldType:String; AIsKeyField:Boolean; ARttiProperty:TRttiProperty; ASqlGenerator:IioDBCreatorSqlGenerator): IioDBCreatorField;
+    class function GetField(AFieldName:String; AIsKeyField:Boolean; AProperty:IioContextProperty; ASqlGenerator:IioDBCreatorSqlGenerator; AIsClassFromField:Boolean): IioDBCreatorField;
     class function GetTable(ATableName: String; AIsClassFromField:Boolean; ASqlGenerator:IioDBCreatorSqlGenerator): IioDBCreatorTable;
     class function GetDBCreator: IioDBCreator;
     class function GetSqlGenerator: IioDBCreatorSqlGenerator;
@@ -28,10 +29,10 @@ begin
   Result := TioDBCreator.Create(Self.GetSqlGenerator);
 end;
 
-class function TioDBCreatorFactory.GetField(AFieldName: String; AFieldType: String;
-  AIsKeyField: Boolean; ARttiProperty:TRttiProperty; ASqlGenerator:IioDBCreatorSqlGenerator): IioDBCreatorField;
+class function TioDBCreatorFactory.GetField(AFieldName: String; AIsKeyField: Boolean;
+  AProperty:IioContextProperty; ASqlGenerator:IioDBCreatorSqlGenerator; AIsClassFromField:Boolean): IioDBCreatorField;
 begin
-  Result := TioDBCreatorField.Create(AFieldName, AFieldType, AIsKeyField, ARttiProperty, ASqlGenerator);
+  Result := TioDBCreatorField.Create(AFieldName, AIsKeyField, AProperty, ASqlGenerator, AIsClassFromField);
 end;
 
 class function TioDBCreatorFactory.GetSqlGenerator: IioDBCreatorSqlGenerator;

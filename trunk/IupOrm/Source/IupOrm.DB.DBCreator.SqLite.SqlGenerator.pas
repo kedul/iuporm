@@ -4,7 +4,7 @@ interface
 
 uses
   IupOrm.DB.DBCreator.Interfaces, System.TypInfo, System.Rtti, System.Classes,
-  IupOrm.DB.Interfaces, Data.DB;
+  IupOrm.DB.Interfaces, Data.DB, IupOrm.Context.Properties.Interfaces;
 
 type
 
@@ -25,20 +25,20 @@ type
     procedure InsertTestRow(ATable:IioDBCreatorTable);
     procedure RemoveTestRow(ATable:IioDBCreatorTable);
     function GenerateSqlTestValue(AField:IioDBCreatorField): String;
-  public
-    constructor Create(AQuery:IioQuery);
-    function RttiPropertyToFieldType(AProp:TRttiProperty): String;
-    function TableExists(ATable:IioDBCreatorTable): Boolean;
     procedure LoadFieldsState_Exists(ATable:IioDBCreatorTable);
     procedure LoadFieldsState_SameType(ATable:IioDBCreatorTable);
+  public
+    constructor Create(AQuery:IioQuery);
+    function TableExists(ATable:IioDBCreatorTable): Boolean;
     procedure LoadFieldsState(ATable:IioDBCreatorTable);
     procedure AutoCreateDatabase(ADBCreator: IioDBCreator);
+    function GetClassFromFieldColumnType: String;
   end;
 
 implementation
 
 uses
-  System.SysUtils, IupOrm.Exceptions;
+  System.SysUtils, IupOrm.Exceptions, IupOrm.Attributes;
 
 { TioDBCreatorSqLiteSqlGenerator }
 
@@ -125,6 +125,11 @@ begin
   else if AField.FieldType = 'REAL'
     then Result := '1.1' ;
   // NB: BLOB type in the future
+end;
+
+function TioDBCreatorSqLiteSqlGenerator.GetClassFromFieldColumnType: String;
+begin
+  Result := 'TEXT';
 end;
 
 procedure TioDBCreatorSqLiteSqlGenerator.InsertTestRow(
@@ -337,16 +342,5 @@ begin
   end;
 end;
 
-function TioDBCreatorSqLiteSqlGenerator.RttiPropertyToFieldType(AProp:TRttiProperty): String;
-begin
-  case AProp.PropertyType.TypeKind of
-    tkInt64, tkInteger, tkClass, tkInterface:  // NB: tkClass e tkInterface perchè assumo che, in caso di campo di tipo oggetto (classe o interfaccia) il campo sia sempre un ID integer
-      Result := 'INTEGER';
-    tkFloat:
-      Result := 'REAL';
-    tkString, tkUString, tkWChar, tkLString, tkWString, tkChar:
-      Result := 'TEXT';
-  end;
-end;
 
 end.

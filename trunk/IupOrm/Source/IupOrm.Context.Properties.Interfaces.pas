@@ -15,7 +15,9 @@ type
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
     function GetName: string;
     function GetSqlFieldName: string;
+    function GetSqlParamName: String;
     function GetFieldType: String;
+    function IsBlob: Boolean;
     function GetValue(Instance: Pointer): TValue;
     procedure SetValue(Instance: Pointer; AValue: TValue);
     function GetSqlValue(ADataObject: TObject): string;
@@ -33,6 +35,8 @@ type
     procedure Add(AProperty: IioContextProperty; AIsId: Boolean = False);
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
+    // Blob field present
+    function BlobFieldExists: Boolean;
     // ObjectStatus Exist
     function ObjStatusExist: Boolean;
     // ObjectStatus property

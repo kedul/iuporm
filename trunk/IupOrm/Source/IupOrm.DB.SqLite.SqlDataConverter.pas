@@ -4,7 +4,7 @@ interface
 
 uses
   IupOrm.DB.Interfaces,
-  System.Rtti;
+  System.Rtti, IupOrm.Context.Properties.Interfaces;
 
 type
 
@@ -16,12 +16,13 @@ type
     class function StringToSQL(AString:String): String; override;
     class function FloatToSQL(AFloat:Extended): String; override;
     class function TValueToSql(AValue:TValue): String; override;
+    class function PropertyToFieldType(AProp:IioContextProperty): String; override;
   end;
 
 implementation
 
 uses
-  System.SysUtils, System.StrUtils, System.TypInfo;
+  System.SysUtils, System.StrUtils, System.TypInfo, IupOrm.Attributes;
 
 { TioSqlConverterSqLite }
 
@@ -36,6 +37,28 @@ begin
   Result := ReplaceText(Result, FormatSettings.DecimalSeparator, Char('.'));
 end;
 
+class function TioSqlDataConverterSqLite.PropertyToFieldType(
+  AProp: IioContextProperty): String;
+begin
+  // According to the RelationType of the property...
+  case AProp.GetRelationType of
+    // Normal property, no relation, field type is by TypeKind of the property itself
+    ioRTNone: begin
+      case AProp.GetRttiProperty.PropertyType.TypeKind of
+        tkInt64, tkInteger: Result := 'INTEGER';
+        tkFloat: Result := 'REAL';
+        tkString, tkUString, tkWChar, tkLString, tkWString, tkChar: Result := 'TEXT';
+        tkClass, tkInterface: Result := 'BLOB';
+      end;
+    end;
+    // If it's a BelongsTo relation property then field type is always INTEGER
+    //  because the ID fields always are INTEGERS values
+    iortBelongsTo: Result := 'INTEGER';
+    // Otherwise return NULL field type
+    else Result := 'NULL';
+  end;
+end;
+
 class function TioSqlDataConverterSqLite.StringToSQL(AString: String): String;
 begin
   Result := QuotedStr(AString);
@@ -43,6 +66,7 @@ end;
 
 class function TioSqlDataConverterSqLite.TValueToSql(AValue: TValue): String;
 begin
+// ######BLOB
   // Default
   Result := 'NULL';
   // In base al tipo

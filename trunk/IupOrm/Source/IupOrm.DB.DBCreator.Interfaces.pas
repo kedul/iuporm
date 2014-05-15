@@ -4,7 +4,7 @@ interface
 
 uses
   System.Generics.Collections, System.Rtti, System.Classes,
-  IupOrm.DB.Interfaces;
+  IupOrm.DB.Interfaces, IupOrm.Context.Properties.Interfaces;
 
 type
 
@@ -27,8 +27,7 @@ type
     function GetFieldType: String;
     property FieldType:String read GetFieldType;
     // Rtti property reference
-    function GetRttiProperty: TRttiProperty;
-    property RttiProperty:TRttiProperty read GetRttiProperty;
+    function GetProperty: IioContextProperty;
     // DBFieldExists
     procedure SetDBFieldExist(AValue:Boolean);
     function GetDBFieldExist: Boolean;
@@ -37,6 +36,9 @@ type
     procedure SetDBFieldSameType(AValue:Boolean);
     function GetDBFieldSameType: Boolean;
     property DBFieldSameType:Boolean read GetDBFieldSameType write SetDBFieldSameType;
+    // IsClassFromFIeld
+    function GetIsClassFromField: Boolean;
+    property IsClassFromField:Boolean read GetIsClassFromField;
   end;
 
   IioDBCreatorTable = interface
@@ -65,10 +67,10 @@ type
 
   IioDBCreatorSqlGenerator = interface
     ['{8E138570-0918-495C-845A-A65D3FEF4961}']
-    function RttiPropertyToFieldType(AProp:TRttiProperty): String;
     function TableExists(ATable:IioDBCreatorTable): Boolean;
     procedure LoadFieldsState(ATable:IioDBCreatorTable);
     procedure AutoCreateDatabase(ADBCreator: IioDBCreator);
+    function GetClassFromFieldColumnType: String;
   end;
 
 implementation
