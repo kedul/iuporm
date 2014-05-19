@@ -33,7 +33,9 @@ requires
   dbrtl,
   dbexpress,
   fmx,
-  DBXSqliteDriver;
+  DBXSqliteDriver,
+  bindengine,
+  bindcomp;
 
 contains
   IupOrm.Attributes in '..\..\Source\IupOrm.Attributes.pas',

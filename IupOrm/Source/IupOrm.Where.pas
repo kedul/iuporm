@@ -8,14 +8,15 @@ uses
   IupOrm.CommonTypes,
   IupOrm.Interfaces,
   IupOrm.SqlItems,
-  IupOrm.Context.Properties.Interfaces, IupOrm.Context.Table.Interfaces;
+  IupOrm.Context.Properties.Interfaces, IupOrm.Context.Table.Interfaces,
+  System.Classes, Data.Bind.ObjectScope, IupOrm.Where.SqlItems.Interfaces;
 
 type
 
   // Where conditions (standard version)
   TioWhere = class (TioSqlItem)
   strict protected
-    FWhereItems: TList<IioSqlItem>;
+    FWhereItems: TWhereItems;
     FClassRef: TioClassRef;
     FContextProperties: IioContextProperties;
     FDisableClassFromField: Boolean;
@@ -23,9 +24,11 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function GetSql: String; reintroduce;
+    function GetWhereItems: TWhereItems;
+    function GetSql(AddWhere:Boolean=True): String; reintroduce;
     function GetSqlWithClassFromField(AClassFromField: IioClassFromField): String;
     function GetDisableClassFromField: Boolean;
+    function GetClassRef: TioClassRef;
     procedure SetClassRef(AClassRef:TioClassRef);
     procedure SetContextProperties(AContextProperties:IioContextProperties);
     // ------ Destination methods
@@ -69,6 +72,7 @@ type
     function _LikeTo(AValue:TValue): TioWhere;
     // ------
     function _Where: TioWhere; overload;
+    function _Where(AWhereCond:TioWhere): TioWhere; overload;
     function _Where(ATextCondition:String): TioWhere; overload;
     function _Property(APropertyName:String): TioWhere;
     function _PropertyOID: TioWhere;
@@ -76,10 +80,12 @@ type
   end;
 
   // Where conditions (generic version)
-  TioWhere<T:class> = class (TioWhere)
+  TioWhere<T:class,constructor> = class (TioWhere)
   public
     // ------ Destination methods
     function ToObject: T; overload;
+    function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
+    function ToActiveListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     // ------ Conditions
     function ByOID(AOID:Integer): TioWhere<T>;
     function Add(ATextCondition:String): TioWhere<T>;
@@ -116,20 +122,23 @@ type
     function _LikeTo(AValue:TValue): TioWhere<T>;
     // ------
     function _Where: TioWhere<T>; overload;
+    function _Where(AWhereCond:TioWhere): TioWhere<T>; overload;
     function _Where(ATextCondition:String): TioWhere<T>; overload;
     function _Property(APropertyName:String): TioWhere<T>;
     function _PropertyOID: TioWhere<T>;
     function _Value(AValue:TValue): TioWhere<T>;
   end;
 
+
 implementation
 
 uses
   IupOrm.DB.Factory, IupOrm.DB.Interfaces,
-  IupOrm.Context.Factory, System.SysUtils, IupOrm.Where.SqlItems.Interfaces,
+  IupOrm.Context.Factory, System.SysUtils,
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory,
   IupOrm.ObjectsForge.Factory, IupOrm.Context.Interfaces,
-  IupOrm.RttiContext.Factory;
+  IupOrm.RttiContext.Factory, IupOrm,
+  IupOrm.LiveBindings.ActiveListBindSourceAdapter;
 
 { TioWhere }
 
@@ -264,7 +273,7 @@ end;
 constructor TioWhere.Create;
 begin
   FDisableClassFromField := False;
-  FWhereItems := TList<IioSqlItem>.Create;
+  FWhereItems := TWhereItems.Create;
 end;
 
 procedure TioWhere.Delete;
@@ -296,19 +305,24 @@ begin
   FDisableClassFromField := True;
 end;
 
+function TioWhere.GetClassRef: TioClassRef;
+begin
+  Result := FClassRef;
+end;
+
 function TioWhere.GetDisableClassFromField: Boolean;
 begin
   Result := FDisableClassFromField;
 end;
 
-function TioWhere.GetSql: String;
+function TioWhere.GetSql(AddWhere:Boolean): String;
 var
   CurrSqlItem: IioSqlItem;
 begin
   // NB: NO inherited
   Result := '';
   if FWhereItems.Count = 0 then Exit;
-  Result := 'WHERE ';
+  if AddWhere then Result := 'WHERE ';
   for CurrSqlItem in FWhereItems do
   begin
     // Set ContextProperty if TioSqlItemWhere descendant
@@ -327,6 +341,11 @@ begin
     then Result := 'WHERE '
     else Result := Result + ' AND ';
   Result := Result + AClassFromField.GetSqlFieldName + ' LIKE ' + TioDbFactory.SqlDataConverter.StringToSQL('%<'+AClassFromField.GetClassName+'>%');
+end;
+
+function TioWhere.GetWhereItems: TWhereItems;
+begin
+  Result := FWhereItems;
 end;
 
 function TioWhere.IsAnInterface<T>: Boolean;
@@ -494,10 +513,20 @@ begin
   Self.FWhereItems.Add(TioDbFactory.WhereItemTValue(AValue));
 end;
 
+function TioWhere._Where(AWhereCond:TioWhere): TioWhere;
+var
+  AItem: IioSqlItem;
+begin
+  Self.FWhereItems.Clear;
+  for AItem in AWhereCond.GetWhereItems do Self.FWhereItems.Add(AItem);
+  Result := Self;
+end;
+
 function TioWhere._Where(ATextCondition: String): TioWhere;
 begin
   Result := Self;
-  Self.Add(ATextCondition);
+  if ATextCondition <> ''
+    then Self.Add(ATextCondition);
 end;
 
 function TioWhere._Where: TioWhere;
@@ -554,6 +583,38 @@ function TioWhere<T>.DisableClassFromField: TioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).DisableClassFromField;
+end;
+
+function TioWhere<T>.ToListBindSourceAdapter(AOwner: TComponent;
+  AOwnsObject: Boolean): TBindSourceAdapter;
+begin
+  Result := TListBindSourceAdapter<T>.Create(
+                                              AOwner
+                                            , Self.ToList<TObjectList<T>>
+                                            , AOwnsObject
+                                            );
+end;
+
+function TioWhere<T>.ToActiveListBindSourceAdapter(AOwner: TComponent;
+  AOwnsObject: Boolean): TBindSourceAdapter;
+var
+  AContext: IioContext;
+begin
+  try
+    // Create Context
+    AContext := TioContextFactory.Context(Self.FClassRef, Self);
+    // Create the adapter
+    Result := TioActiveListBindSourceAdapter<T>.Create(
+                                                        Self.FClassRef
+                                                      , Self.GetSql(False)
+                                                      , AOwner
+                                                      , TObjectList<T>.Create(AOwnsObject)  // Create an empty list for adapter creation only
+                                                      , AOwnsObject
+                                                      );
+  finally
+    // Destroy itself at the end to avoid memory leak
+    Self.Free;
+  end;
 end;
 
 function TioWhere<T>.ToObject: T;
@@ -703,6 +764,12 @@ function TioWhere<T>._Value(AValue: TValue): TioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._Value(AValue);
+end;
+
+function TioWhere<T>._Where(AWhereCond:TioWhere): TioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._Where(AWhereCond);
 end;
 
 function TioWhere<T>._Where(ATextCondition: String): TioWhere<T>;
