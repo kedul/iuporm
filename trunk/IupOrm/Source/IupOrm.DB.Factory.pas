@@ -48,6 +48,7 @@ end;
 
 class function TioDbFactory.Connection: IioConnection;
 begin
+  if not Assigned(ioDBConnection) then TioDBFactory.NewConnection;
   Result := ioDBConnection;
 end;
 
@@ -66,7 +67,7 @@ begin
     then TDirectory.CreateDirectory(ioDBFolder);
   // Compone il nome completo del file database
 {$IFDEF IOS}
-  DBFileNameFull := TPath.Combine(DBFolder, 'db.db');
+  DBFileNameFull := TPath.Combine(ioDBFolder, 'db.db');
 {$ELSE}
   DBFileNameFull := TPath.Combine(ioDBFolder, 'db.db');
 {$ENDIF}

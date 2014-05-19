@@ -68,7 +68,7 @@ Coordinates=136,71,67,36
 Coordinates=508,1,108,33
 
 []
-Coordinates=914,1,91,36
+Coordinates=417,155,59,58
 Visible=True
 ExplicitSubNodes=ItemIndex
 
@@ -92,9 +92,6 @@ Coordinates=240,126,59,58
 
 [ButtonDeleteTravelEmptyDesc]
 Coordinates=524,78,190,58
-
-[Button3]
-Coordinates=417,155,59,58
 
 [ButtonUpdateTravel]
 Coordinates=101,222,129,58

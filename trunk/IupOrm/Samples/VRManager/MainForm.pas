@@ -37,7 +37,6 @@ type
     btnBack: TSpeedButton;
     btnNext: TSpeedButton;
     TabItem7: TTabItem;
-    Button3: TButton;
     Button2: TButton;
     Button4: TButton;
     Button5: TButton;
@@ -67,7 +66,6 @@ type
     procedure Button2Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure ButtonNewTravelClick(Sender: TObject);
@@ -141,11 +139,6 @@ begin
   finally
     AList.Free;
   end;
-end;
-
-procedure TTabbedwithNavigationForm.Button3Click(Sender: TObject);
-begin
-  TServiceFactory<TBaseClass>.Connection.GetNewConnection(nil);
 end;
 
 procedure TTabbedwithNavigationForm.Button4Click(Sender: TObject);

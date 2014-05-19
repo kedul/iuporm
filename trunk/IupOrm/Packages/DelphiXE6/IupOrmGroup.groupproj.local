@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2014/05/02 18:07:00.000.441,C:\Users\Mauri\Documents\RAD Studio\Projects\ProjectGroup1.groupproj=C:\Users\Mauri\Documents\Projects\IupOrm\Packages\DelphiXE4\IupOrmGroup.groupproj</Transaction>
+  </Transactions>
+	<Default.Personality>
+		<Projects ActiveProject="C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\Pizza ToBindSourceAdapter\PizzaProject.dproj"/>
+	</Default.Personality>
+</BorlandProject>

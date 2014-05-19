@@ -229,7 +229,6 @@ end;
 class procedure TIupOrm.Init(AFolderName: String);
 begin
   TioDbFactory.SetDBFolder(AFolderName);
-  TioDBFactory.NewConnection;
 end;
 
 class procedure TIupOrm.UpdateObject(AContext: IioContext);
