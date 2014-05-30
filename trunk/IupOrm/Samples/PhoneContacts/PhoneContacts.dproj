@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{800994A1-DEA3-4FF8-B11D-1E14062E758D}</ProjectGuid>
+        <ProjectGuid>{6CB319AF-B4EA-4922-B974-2BF0D246209C}</ProjectGuid>
         <ProjectVersion>15.4</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <MainSource>PhoneContacts.dpr</MainSource>
