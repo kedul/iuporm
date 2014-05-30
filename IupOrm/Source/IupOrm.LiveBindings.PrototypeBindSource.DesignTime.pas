@@ -26,7 +26,7 @@ uses
   procedure Register;
   begin
     RegisterComponents('IupOrm', [TioPrototypeBindSource]);
-    RegisterPropertyEditor(TypeInfo(String), TioPrototypeBindSource, 'ioMasterPropertyName', TioBindSourceMasterPropertyEditor);
+//    RegisterPropertyEditor(TypeInfo(String), TioPrototypeBindSource, 'ioMasterPropertyName', TioBindSourceMasterPropertyEditor);
   end;
 
 { TioBindSourceMasterPropertyEditor }

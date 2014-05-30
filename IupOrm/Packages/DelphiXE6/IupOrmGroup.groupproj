@@ -15,6 +15,9 @@
         <Projects Include="..\..\Samples\VRManager\VRManagerClient.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Samples\PhoneContacts\PhoneContacts.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="..\..\Samples\PhoneContactsProtypeBS\PhoneContactsPrototypeBS.dproj">
             <Dependencies/>
         </Projects>
@@ -62,6 +65,15 @@
     <Target Name="VRManagerClient:Make">
         <MSBuild Projects="..\..\Samples\VRManager\VRManagerClient.dproj" Targets="Make"/>
     </Target>
+    <Target Name="PhoneContacts">
+        <MSBuild Projects="..\..\Samples\PhoneContacts\PhoneContacts.dproj"/>
+    </Target>
+    <Target Name="PhoneContacts:Clean">
+        <MSBuild Projects="..\..\Samples\PhoneContacts\PhoneContacts.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PhoneContacts:Make">
+        <MSBuild Projects="..\..\Samples\PhoneContacts\PhoneContacts.dproj" Targets="Make"/>
+    </Target>
     <Target Name="PhoneContactsPrototypeBS">
         <MSBuild Projects="..\..\Samples\PhoneContactsProtypeBS\PhoneContactsPrototypeBS.dproj"/>
     </Target>
@@ -72,13 +84,13 @@
         <MSBuild Projects="..\..\Samples\PhoneContactsProtypeBS\PhoneContactsPrototypeBS.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="IupOrmProject_DesignTime;IupOrmProject;PizzaProject;VRManagerClient;PhoneContactsPrototypeBS"/>
+        <CallTarget Targets="IupOrmProject_DesignTime;IupOrmProject;PizzaProject;VRManagerClient;PhoneContacts;PhoneContactsPrototypeBS"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="IupOrmProject_DesignTime:Clean;IupOrmProject:Clean;PizzaProject:Clean;VRManagerClient:Clean;PhoneContactsPrototypeBS:Clean"/>
+        <CallTarget Targets="IupOrmProject_DesignTime:Clean;IupOrmProject:Clean;PizzaProject:Clean;VRManagerClient:Clean;PhoneContacts:Clean;PhoneContactsPrototypeBS:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="IupOrmProject_DesignTime:Make;IupOrmProject:Make;PizzaProject:Make;VRManagerClient:Make;PhoneContactsPrototypeBS:Make"/>
+        <CallTarget Targets="IupOrmProject_DesignTime:Make;IupOrmProject:Make;PizzaProject:Make;VRManagerClient:Make;PhoneContacts:Make;PhoneContactsPrototypeBS:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
