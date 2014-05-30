@@ -9,7 +9,9 @@ uses
   IupOrm.CommonTypes,
   IupOrm.Where,
   IupOrm.DB.Interfaces,
-  IupOrm.ObjectHelperTools.Interfaces;
+  IupOrm.Helpers.ObjectHelperTools.Interfaces,
+  IupOrm.Helpers.BindSourceHelperTools.Interfaces,
+  IupOrm.LiveBindings.Interfaces;
 
 type
 
@@ -17,6 +19,13 @@ type
   TioTObjectHelper = class helper for TObject
   public
     function IupOrm: IioObjectHelperTools;
+  end;
+
+  // TioBaseBindSource class helper (PrototypeBindSource and so on)
+  TioBindSourceHelper = class helper for TioBaseBindSource
+  public
+    function IupOrm: IioBindSourceHelperTools;
+    procedure Append;
   end;
 
   // TIupOrm
@@ -42,14 +51,17 @@ type
     class procedure StartTransaction;
     class procedure CommitTransaction;
     class procedure RollbackTransaction;
-    class procedure Init(AFolderName:String='IupOrm');
+    class procedure SetDBFolder(AFolderName:String);
+    class procedure SetDBFolderInDocuments(AFolderName:String);
+    class procedure AutoCreateDatabase;
   end;
 
 implementation
 
 uses
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory, IupOrm.Attributes,
-  IupOrm.DB.Factory, IupOrm.Exceptions, IupOrm.ObjectHelperTools;
+  IupOrm.DB.Factory, IupOrm.Exceptions, IupOrm.Helpers.ObjectHelperTools,
+  IupOrm.Helpers.BindSourceHelperTools, IupOrm.DB.DBCreator.Factory;
 
 
 { TIupOrm }
@@ -226,15 +238,25 @@ begin
   TioDBFactory.Connection.StartTransaction;
 end;
 
-class procedure TIupOrm.Init(AFolderName: String);
+class procedure TIupOrm.SetDBFolder(AFolderName: String);
 begin
   TioDbFactory.SetDBFolder(AFolderName);
+end;
+
+class procedure TIupOrm.SetDBFolderInDocuments(AFolderName: String);
+begin
+  TioDbFactory.SetDBFolderIntoDocuments(AFolderName);
 end;
 
 class procedure TIupOrm.UpdateObject(AContext: IioContext);
 begin
   // Create and execute query
   TioDbFactory.SqlGenerator.GenerateSqlUpdate(AContext).ExecSQL;
+end;
+
+class procedure TIupOrm.AutoCreateDatabase;
+begin
+  TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase;
 end;
 
 class procedure TIupOrm.CommitTransaction;
@@ -284,6 +306,18 @@ end;
 function TioTObjectHelper.IupOrm: IioObjectHelperTools;
 begin
   Result := TioObjectHelperTools.Create(Self);
+end;
+
+{ TioBindSourceHelper }
+
+procedure TioBindSourceHelper.Append;
+begin
+  Self.InternalAdapter.Append;
+end;
+
+function TioBindSourceHelper.IupOrm: IioBindSourceHelperTools;
+begin
+  Result := TioBindSourceHelperTools.Create(Self);
 end;
 
 end.

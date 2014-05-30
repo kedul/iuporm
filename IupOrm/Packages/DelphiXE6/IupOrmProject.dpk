@@ -25,6 +25,7 @@ package IupOrmProject;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'IupOrm Runtime'}
 {$IMPLICITBUILD ON}
 
 requires
@@ -61,8 +62,8 @@ contains
   IupOrm.DuckTyped.List in '..\..\Source\IupOrm.DuckTyped.List.pas',
   IupOrm.Exceptions in '..\..\Source\IupOrm.Exceptions.pas',
   IupOrm.Interfaces in '..\..\Source\IupOrm.Interfaces.pas',
-  IupOrm.ObjectHelperTools.Interfaces in '..\..\Source\IupOrm.ObjectHelperTools.Interfaces.pas',
-  IupOrm.ObjectHelperTools in '..\..\Source\IupOrm.ObjectHelperTools.pas',
+  IupOrm.Helpers.ObjectHelperTools.Interfaces in '..\..\Source\IupOrm.Helpers.ObjectHelperTools.Interfaces.pas',
+  IupOrm.Helpers.ObjectHelperTools in '..\..\Source\IupOrm.Helpers.ObjectHelperTools.pas',
   IupOrm.ObjectsForge.Factory in '..\..\Source\IupOrm.ObjectsForge.Factory.pas',
   IupOrm.ObjectsForge.Interfaces in '..\..\Source\IupOrm.ObjectsForge.Interfaces.pas',
   IupOrm.ObjectsForge.ObjectMaker in '..\..\Source\IupOrm.ObjectsForge.ObjectMaker.pas',
@@ -80,6 +81,13 @@ contains
   IupOrm.DB.SqLite.SqlGenerator in '..\..\Source\IupOrm.DB.SqLite.SqlGenerator.pas',
   IupOrm.DB.DBCreator.SqLite.SqlGenerator in '..\..\Source\IupOrm.DB.DBCreator.SqLite.SqlGenerator.pas',
   IupOrm.DuckTyped.StreamObject in '..\..\Source\IupOrm.DuckTyped.StreamObject.pas',
-  IupOrm.LiveBindings.ActiveListBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.ActiveListBindSourceAdapter.pas';
+  IupOrm.LiveBindings.ActiveListBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.ActiveListBindSourceAdapter.pas',
+  IupOrm.LiveBindings.ActiveObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.ActiveObjectBindSourceAdapter.pas',
+  IupOrm.LiveBindings.Interfaces in '..\..\Source\IupOrm.LiveBindings.Interfaces.pas',
+  IupOrm.LiveBindings.DetailAdaptersContainer in '..\..\Source\IupOrm.LiveBindings.DetailAdaptersContainer.pas',
+  IupOrm.LiveBindings.Factory in '..\..\Source\IupOrm.LiveBindings.Factory.pas',
+  IupOrm.Helpers.BindSourceHelperTools.Interfaces in '..\..\Source\IupOrm.Helpers.BindSourceHelperTools.Interfaces.pas',
+  IupOrm.Helpers.BindSourceHelperTools in '..\..\Source\IupOrm.Helpers.BindSourceHelperTools.pas',
+  IupOrm.LiveBindings.PrototypeBindSource in '..\..\Source\IupOrm.LiveBindings.PrototypeBindSource.pas';
 
 end.

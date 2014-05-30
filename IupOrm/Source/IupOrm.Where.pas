@@ -35,6 +35,7 @@ type
     function ToObject: TObject;
     function ToList<TDEST:class,constructor>(AOwnsObjects:Boolean=True): TDEST; overload;
     procedure ToList(AList: TObject); overload;
+    function ToActiveListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
     procedure Delete;
     // ------ Conditions
     function ByOID(AOID:Integer): TioWhere;
@@ -85,7 +86,6 @@ type
     // ------ Destination methods
     function ToObject: T; overload;
     function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
-    function ToActiveListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     // ------ Conditions
     function ByOID(AOID:Integer): TioWhere<T>;
     function Add(ATextCondition:String): TioWhere<T>;
@@ -365,6 +365,30 @@ begin
   FContextProperties := AContextProperties;
 end;
 
+function TioWhere.ToActiveListBindSourceAdapter(AOwner: TComponent;
+  AOwnsObject: Boolean): TBindSourceAdapter;
+var
+  AContext: IioContext;
+begin
+  try
+    // Create Context
+    // (without context the "Self.GetSql(False)" fail)
+    AContext := TioContextFactory.Context(Self.FClassRef, Self);
+    // Create the adapter
+    Result := TioActiveListBindSourceAdapter.Create(
+                                                      Self.FClassRef
+                                                    , Self.GetSql(False)
+                                                    , AOwner
+                                                    , TObjectList<TObject>.Create    // Create an empty list for adapter creation only
+                                                    , True  // AutoLoadData := True
+                                                    , AOwnsObject
+                                                   );
+  finally
+    // Destroy itself at the end to avoid memory leak
+    Self.Free;
+  end;
+end;
+
 procedure TioWhere.ToList(AList: TObject);
 var
   ADuckTypedList: IioDuckTypedList;
@@ -593,28 +617,6 @@ begin
                                             , Self.ToList<TObjectList<T>>
                                             , AOwnsObject
                                             );
-end;
-
-function TioWhere<T>.ToActiveListBindSourceAdapter(AOwner: TComponent;
-  AOwnsObject: Boolean): TBindSourceAdapter;
-var
-  AContext: IioContext;
-begin
-  try
-    // Create Context
-    AContext := TioContextFactory.Context(Self.FClassRef, Self);
-    // Create the adapter
-    Result := TioActiveListBindSourceAdapter<T>.Create(
-                                                        Self.FClassRef
-                                                      , Self.GetSql(False)
-                                                      , AOwner
-                                                      , TObjectList<T>.Create(AOwnsObject)  // Create an empty list for adapter creation only
-                                                      , AOwnsObject
-                                                      );
-  finally
-    // Destroy itself at the end to avoid memory leak
-    Self.Free;
-  end;
 end;
 
 function TioWhere<T>.ToObject: T;
