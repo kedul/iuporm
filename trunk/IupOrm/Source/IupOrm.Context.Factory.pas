@@ -108,7 +108,9 @@ begin
   for Prop in Typ.GetProperties do
   begin
     // Skip RefCount property from TInterfacedObject
-    if Prop.Name = 'RefCount' then Continue;
+    if (Prop.Name = 'RefCount')
+    or (Prop.Name = 'Disposed')
+      then Continue;
     // ObjStatus property
     if Prop.Name = 'ObjStatus' then
     begin
@@ -165,7 +167,8 @@ var
   ClassFromField: IioClassFromField;
 begin
   // Prop Init
-  TableName := Typ.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
+//  TableName := Typ.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
+  TableName := Typ.MetaclassType.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
   // Check attributes
   for Attr in Typ.GetAttributes do
   begin

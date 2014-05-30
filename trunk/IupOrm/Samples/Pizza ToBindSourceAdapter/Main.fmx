@@ -8,7 +8,6 @@ object MainForml: TMainForml
   FormFactor.Height = 900
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   OnKeyUp = FormKeyUp
   DesignerMobile = True
   DesignerWidth = 320
@@ -47,19 +46,11 @@ object MainForml: TMainForml
           Width = 170.000000000000000000
         end
         object btLoad: TButton
-          Action = acLoad
+          Action = acRefresh
           Height = 44.000000000000000000
           Position.X = 3.000000000000000000
           StyleLookup = 'refreshtoolbutton'
           TabOrder = 2
-          Width = 44.000000000000000000
-        end
-        object btPersist: TButton
-          Action = acPersist
-          Height = 44.000000000000000000
-          Position.X = 41.000000000000000000
-          StyleLookup = 'organizetoolbutton'
-          TabOrder = 3
           Width = 44.000000000000000000
         end
         object btNew: TButton
@@ -68,17 +59,18 @@ object MainForml: TMainForml
           Position.X = 280.000000000000000000
           Position.Y = 9.000000000000000000
           StyleLookup = 'additembutton'
-          TabOrder = 5
+          TabOrder = 4
           Width = 26.000000000000000000
         end
       end
       object ListView1: TListView
         ItemAppearanceClassName = 'TImageListItemAppearance'
-        ItemEditAppearanceClassName = 'TImageListItemShowCheck'
+        ItemEditAppearanceClassName = 'TImageListItemDeleteAppearance'
         HeaderAppearanceClassName = 'TListHeaderObjects'
         FooterAppearanceClassName = 'TListHeaderObjects'
         ItemIndex = 0
         Align = Client
+        CanParentFocus = True
         Height = 416.000000000000000000
         TabOrder = 1
         Width = 320.000000000000000000
@@ -368,28 +360,17 @@ object MainForml: TMainForml
       CustomText = 'Back'
       Tab = TabItem1
     end
-    object acLoad: TAction
-      Text = 'acRefresh'
-      OnExecute = acLoadExecute
-    end
     object acDelete: TAction
       Text = 'acDelete'
       OnExecute = acDeleteExecute
-      OnUpdate = acNewUpdate
     end
     object acNew: TAction
       Text = 'acNew'
       OnExecute = acNewExecute
-      OnUpdate = acNewUpdate
     end
-    object acPersist: TAction
-      Text = 'acPersist'
-      OnExecute = acPersistExecute
-      OnUpdate = acNewUpdate
-    end
-    object acIupOrmInit: TAction
-      Text = 'acIupOrmInit'
-      OnExecute = acIupOrmInitExecute
+    object acRefresh: TAction
+      Text = 'acRefresh'
+      OnExecute = acRefreshExecute
     end
   end
 end

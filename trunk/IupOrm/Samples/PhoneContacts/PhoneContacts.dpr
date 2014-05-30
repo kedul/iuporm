@@ -1,27 +1,30 @@
-program PizzaProject;
+program PhoneContacts;
 
 uses
+  IupOrm,
   System.StartUpCopy,
   FMX.MobilePreview,
   FMX.Forms,
-  Main in 'Main.pas' {MainForml},
+  MainForm in 'MainForm.pas' {Form1},
   Model in 'Model.pas',
-  IupOrm,
-  IupOrm.DB.DBCreator.Factory;
+  SampleData in 'SampleData.pas';
 
 {$R *.res}
 
 begin
-  ReportMemoryLeaksOnShutdown := True;
+
 
   // ============ IupOrm initialization ====================
   // Set the directory name (under the Documents folder)
-  TIupOrm.SetDBFolderInDocuments('Pizza');
+  TIupOrm.SetDBFolderInDocuments('IupOrm PhoneContacts Database');
   // AutoCreation and AutoUpdate of the database
-  TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase;
+  TIupOrm.AutoCreateDatabase;
   // ============ IupOrm initialization ====================
 
+  // Check for sample data creation
+  TSampleData.CheckForSampleDataCreation;
+
   Application.Initialize;
-  Application.CreateForm(TMainForml, MainForml);
+  Application.CreateForm(TForm1, Form1);
   Application.Run;
 end.

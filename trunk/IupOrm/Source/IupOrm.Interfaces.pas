@@ -2,6 +2,9 @@ unit IupOrm.Interfaces;
 
 interface
 
+uses
+  Data.Bind.ObjectScope;
+
 type
 
   IioSqlItem = interface

@@ -1,21 +1,21 @@
 ﻿[PrototypeBindSource1]
-Coordinates=220,50,125,141
+Coordinates=220,50,143,152
 Visible=True
 
 [TabControl1]
-Coordinates=291,365,74,33
+Coordinates=291,365,85,36
 
 [TabItem1]
-Coordinates=206,365,59,33
+Coordinates=206,365,69,36
 
 [TabItem2]
-Coordinates=121,365,59,33
+Coordinates=121,365,69,36
 
 [BindingsList1]
 Coordinates=172,241,91,36
 
 []
-Coordinates=383,320,53,51
+Coordinates=383,80,53,51
 
 [ActionList1]
 Coordinates=154,206,70,33
@@ -27,44 +27,59 @@ Coordinates=154,206,108,33
 Coordinates=154,206,108,33
 
 [BackButton]
-Coordinates=310,210,72,51
+Coordinates=310,210,80,58
 
 [DetailLabel]
-Coordinates=140,210,69,51
+Coordinates=140,210,79,58
 
 [DetailToolbar]
-Coordinates=418,198,80,33
+Coordinates=418,198,91,36
 
 [MasterToolbar]
-Coordinates=10,365,85,33
+Coordinates=10,365,97,36
 
 [MasterLabel]
-Coordinates=220,210,74,51
+Coordinates=220,210,85,58
 
 [imgContact]
-Coordinates=10,50,70,51
+Coordinates=10,50,80,58
 
 [lblName]
-Coordinates=410,10,54,51
+Coordinates=410,10,62,58
 
 [ListView1]
-Coordinates=10,120,89,159
+Coordinates=10,120,107,190
 
 [lblID]
-Coordinates=200,280,40,51
+Coordinates=200,280,41,58
 
 [edName]
-Coordinates=383,250,54,51
-
-[btPersist]
-Coordinates=383,80,53,51
+Coordinates=383,250,63,58
 
 [btLoad]
-Coordinates=343,1,68,51
-
-[acLoad]
-Coordinates=111,139,64,33
+Coordinates=343,1,54,58
 
 [btPost]
-Coordinates=383,390,40,51
+Coordinates=383,390,51,58
+
+[Button6]
+Coordinates=0,0,59,58
+
+[acRefresh]
+Coordinates=210,1,73,36
+
+[acNew]
+Coordinates=161,146,54,36
+
+[btNew]
+Coordinates=181,348,51,58
+
+[btDelete]
+Coordinates=109,1,63,58
+
+[acDelete]
+Coordinates=401,87,65,36
+
+[OpenDialog1]
+Coordinates=401,142,90,36
 

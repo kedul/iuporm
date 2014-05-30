@@ -34,11 +34,9 @@ type
     ListView1: TListView;
     LinkListControlToField2: TLinkListControlToField;
     LinkPropertyToFieldBitmap: TLinkPropertyToField;
-    acLoad: TAction;
     btLoad: TButton;
     lblID: TLabel;
     LinkPropertyToFieldText2: TLinkPropertyToField;
-    btPersist: TButton;
     edName: TEdit;
     LinkControlToField1: TLinkControlToField;
     btPost: TButton;
@@ -47,9 +45,8 @@ type
     Button6: TButton;
     acDelete: TAction;
     acNew: TAction;
-    acPersist: TAction;
     btDelete: TButton;
-    acIupOrmInit: TAction;
+    acRefresh: TAction;
     procedure ListView1ItemClick(const Sender: TObject;
       const AItem: TListViewItem);
     procedure FormCreate(Sender: TObject);
@@ -57,15 +54,11 @@ type
       Shift: TShiftState);
     procedure PrototypeBindSource1CreateAdapter(Sender: TObject;
       var ABindSourceAdapter: TBindSourceAdapter);
-    procedure FormDestroy(Sender: TObject);
     procedure btPostClick(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure acDeleteExecute(Sender: TObject);
     procedure acNewExecute(Sender: TObject);
-    procedure acPersistExecute(Sender: TObject);
-    procedure acLoadExecute(Sender: TObject);
-    procedure acIupOrmInitExecute(Sender: TObject);
-    procedure acNewUpdate(Sender: TObject);
+    procedure acRefreshExecute(Sender: TObject);
   private
     { Private declarations }
     FPizzaList: TPizzaList;
@@ -89,43 +82,14 @@ begin
   PrototypeBindSource1.Delete;
 end;
 
-procedure TMainForml.acIupOrmInitExecute(Sender: TObject);
-begin
-  // Set the directory name (under the Documents folder)
-  TIupOrm.Init('Pizza');
-  // AutoCreation and AutoUpdate of the database
-  TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase;
-end;
-
-procedure TMainForml.acLoadExecute(Sender: TObject);
-begin
-  PrototypeBindSource1.Refresh;
-  Exit;
-
-  FPizzaListAdapter.First; //Bug
-  if Assigned(FPizzaList) then FPizzaList.Free;
-
-  // IupOrm call
-  FPizzaList := TIupOrm.Load<TPizza>.ToList<TPizzaList>;
-
-  FPizzaListAdapter.SetList(FPizzaList, False);
-  FPizzaListAdapter.Active := True;
-end;
-
 procedure TMainForml.acNewExecute(Sender: TObject);
 begin
-  PrototypeBindSource1.InternalAdapter.Append;
+  PrototypeBindSource1.Append;
 end;
 
-procedure TMainForml.acNewUpdate(Sender: TObject);
+procedure TMainForml.acRefreshExecute(Sender: TObject);
 begin
-  TAction(Sender).Enabled := PrototypeBindSource1.Active;
-end;
-
-procedure TMainForml.acPersistExecute(Sender: TObject);
-begin
-  TIupOrm.PersistCollection(FPizzaList);
-  ShowMessage('Persisted!');
+  PrototypeBindSource1.Refresh;
 end;
 
 procedure TMainForml.Button6Click(Sender: TObject);
@@ -135,23 +99,16 @@ begin
   if FPizzaListAdapter.State = seBrowse
     then FPizzaListAdapter.Edit;
   (FPizzaListAdapter.Current as TPizza).Img.LoadFromFile(OpenDialog1.FileName);
-//  imgContact.Bitmap.LoadFromFile(OpenDialog1.FileName);
 end;
 
 procedure TMainForml.FormCreate(Sender: TObject);
 begin
-
   { This defines the default active tab at runtime }
   TabControl1.ActiveTab := TabItem1;
 {$IFDEF ANDROID}
   { This hides the toolbar back button on Android }
   BackButton.Visible := False;
 {$ENDIF}
-end;
-
-procedure TMainForml.FormDestroy(Sender: TObject);
-begin
-  if Assigned(FPizzaList) then FPizzaList.Free;
 end;
 
 procedure TMainForml.FormKeyUp(Sender: TObject; var Key: Word;
@@ -186,7 +143,7 @@ procedure TMainForml.PrototypeBindSource1CreateAdapter(Sender: TObject;
   var ABindSourceAdapter: TBindSourceAdapter);
 begin
   // Directly get the BindSourceAdapter from IupOrm
-  ABindSourceAdapter := TIupOrm.Load<TPizza>._Where._Property('ID')._GreaterThan(3).ToActiveListBindSourceAdapter(Self);
+  ABindSourceAdapter := TIupOrm.Load<TPizza>.ToActiveListBindSourceAdapter(Self);
 end;
 
 end.

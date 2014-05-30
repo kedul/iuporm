@@ -28,6 +28,11 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Base)'=='true') or '$(Base_OSX32)'!=''">
+        <Base_OSX32>true</Base_OSX32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
         <Base_Win32>true</Base_Win32>
         <CfgParent>Base</CfgParent>
@@ -69,10 +74,12 @@
         <DCC_K>false</DCC_K>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
+        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;fmx;bindengine;bindcomp;dbexpress;DBXSqliteDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=preferExternal;largeHeap=False;theme=TitleBar;hardwareAccelerated=true</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice)'!=''">
+        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;fmx;bindengine;bindcomp;dbexpress;DBXSqliteDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=6.0;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;CFBundleResourceSpecification=ResourceRules.plist</VerInfo_Keys>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -81,18 +88,24 @@
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSSimulator)'!=''">
+        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;fmx;bindengine;bindcomp;dbexpress;DBXSqliteDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
         <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=6.0;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;CFBundleResourceSpecification=ResourceRules.plist</VerInfo_Keys>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_OSX32)'!=''">
+        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;fmx;bindengine;bindcomp;dbexpress;DBXSqliteDriver;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;fmx;bindengine;bindcomp;dbexpress;DBXSqliteDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>rtl;DbxCommonDriver;dbrtl;fmx;bindengine;bindcomp;dbexpress;DBXSqliteDriver;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -107,6 +120,9 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_Description>IupOrm Runtime</DCC_Description>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -150,8 +166,8 @@
         <DCCReference Include="..\..\Source\IupOrm.DuckTyped.List.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Exceptions.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\IupOrm.ObjectHelperTools.Interfaces.pas"/>
-        <DCCReference Include="..\..\Source\IupOrm.ObjectHelperTools.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.Helpers.ObjectHelperTools.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.Helpers.ObjectHelperTools.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.ObjectsForge.Factory.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.ObjectsForge.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.ObjectsForge.ObjectMaker.pas"/>
@@ -170,6 +186,13 @@
         <DCCReference Include="..\..\Source\IupOrm.DB.DBCreator.SqLite.SqlGenerator.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.DuckTyped.StreamObject.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.LiveBindings.ActiveListBindSourceAdapter.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.LiveBindings.ActiveObjectBindSourceAdapter.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.LiveBindings.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.LiveBindings.DetailAdaptersContainer.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.LiveBindings.Factory.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.Helpers.BindSourceHelperTools.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.Helpers.BindSourceHelperTools.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.LiveBindings.PrototypeBindSource.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -231,6 +254,10 @@
                     <VersionInfoKeys Name="CFBundleInfoDictionaryVersion"/>
                     <VersionInfoKeys Name="CFBundleDevelopmentRegion"/>
                 </VersionInfoKeys>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k200.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp200.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
             </Delphi.Personality>
             <Deployment/>
             <Platforms>
