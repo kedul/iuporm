@@ -28,6 +28,7 @@ uses
   Model.TravelWithCostList in 'Model.TravelWithCostList.pas';
 
 {$R *.res}
+{$STRONGLINKTYPES ON}
 
 begin
 //  ReportMemoryLeaksOnShutdown := DebugHook <> 0;

@@ -257,29 +257,29 @@
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="MainForm.pas"/>
     <File Path="MainForm.fmx"/>
+    <File Path="Model.BaseClasses.pas"/>
     <File Path="Model.BaseConst.pas"/>
     <File Path="Model.BaseInterfaces.pas"/>
-    <File Path="Model.BaseClasses.pas"/>
-    <File Path="Model.CostType.pas"/>
-    <File Path="Model.Travel.pas"/>
+    <File Path="Model.BaseListClasses.pas"/>
     <File Path="Model.Cost.pas"/>
+    <File Path="Model.CostType.pas"/>
+    <File Path="Model.CostTypeListWithCostList.pas"/>
+    <File Path="Model.CostTypeWithCostList.pas"/>
+    <File Path="Model.CostTypeWithCostListInterface.pas"/>
+    <File Path="Model.Travel.pas"/>
+    <File Path="Model.TravelWithCostList.pas"/>
+    <File Path="Model.TravelWithCostListInterface.pas"/>
     <File Path="Service.Interfaces.pas"/>
-    <File Path="Service.SQLite.pas"/>
     <File Path="Service.pas"/>
+    <File Path="Service.SQLite.pas"/>
+    <File Path="UViewFactory.pas"/>
     <File Path="UVMBase.pas"/>
+    <File Path="UVMFactory.pas"/>
+    <File Path="UVMTravelList.pas"/>
     <File Path="View.TravelListFrame.pas"/>
     <File Path="View.TravelListFrame.fmx"/>
-    <File Path="Model.CostTypeWithCostListInterface.pas"/>
-    <File Path="Model.CostTypeWithCostList.pas"/>
-    <File Path="ViewModel.Interfaces.pas"/>
-    <File Path="UVMTravelList.pas"/>
-    <File Path="UVMFactory.pas"/>
-    <File Path="UViewFactory.pas"/>
-    <File Path="Model.BaseListClasses.pas"/>
-    <File Path="Model.CostTypeListWithCostList.pas"/>
     <File Path="ViewModel.GenericsVM.pas"/>
+    <File Path="ViewModel.Interfaces.pas"/>
     <File Path="ViewModel.pas"/>
-    <File Path="Model.TravelWithCostListInterface.pas"/>
-    <File Path="Model.TravelWithCostList.pas"/>
   </ProjectSortOrder>
 </BorlandProject>
