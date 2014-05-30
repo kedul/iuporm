@@ -10,6 +10,7 @@ uses
   IupOrm.DB.DBCreator.Factory;
 
 {$R *.res}
+{$STRONGLINKTYPES ON}
 
 begin
   ReportMemoryLeaksOnShutdown := True;

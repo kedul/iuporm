@@ -36,15 +36,12 @@ end;
 class procedure TSampleData.CreateSampleData;
 var
   NewPerson: TPerson;
-  NewPhone: TPhoneNumber;
 begin
   // TPerson
   NewPerson := TPerson.Create('Maurizio', 'Del Magno');
   NewPerson.Phones.Add(   TPhoneNumber.Create('Home', '0541/112233', NewPerson.ID)   );
   NewPerson.Phones.Add(   TPhoneNumber.Create('Mobile', '329/11223344', NewPerson.ID)   );
-  NewPhone := TPhoneNumber.Create('Office', '0541/234687', NewPerson.ID);
-  NewPhone.IupOrm.Persist;
-  NewPerson.Phones.Add(NewPhone);
+  NewPerson.Phones.Add(   TPhoneNumber.Create('Office', '0541/234687', NewPerson.ID)   );
   NewPerson.IupOrm.Persist;
 
   NewPerson := TPerson.Create('Andrea', 'Costa');

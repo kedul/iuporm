@@ -10,6 +10,7 @@ uses
   SampleData in 'SampleData.pas';
 
 {$R *.res}
+{$STRONGLINKTYPES ON}
 
 begin
 
