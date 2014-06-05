@@ -78,7 +78,7 @@ begin
   // Check
   if not Assigned(AObj) then Exit;
   // Create Context
-  AContext := TioContextFactory.Context(AObj.ClassType, nil, AObj);
+  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
   // Execute
   Self.PersistObject(AContext);
 end;
@@ -102,7 +102,7 @@ begin
   for AObj in ADuckTypedList do
   begin
     // Create context for current object
-    AContext := TioContextFactory.Context(AObj.ClassType, nil, AObj);
+    AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
     // Persist object
     Self.PersistObject(AContext
                       , ARelationPropertyName
@@ -129,7 +129,7 @@ begin
   // Get the child object
   AObj := AMasterProperty.GetRelationChildObject(AMasterContext.DataObject);
   // Create context for current child object
-  AContext := TioContextFactory.Context(AObj.ClassType, nil, AObj);
+  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
   // Persist object
   Self.PersistObject(AContext
                     , AMasterProperty.GetRelationChildPropertyName
@@ -180,7 +180,6 @@ class procedure TIupOrm.PersistObject(AContext:IioContext; ARelationPropertyName
 begin
   TioDbFactory.Connection.StartTransaction;
   try
-
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     if (ARelationPropertyName <> '') and (ARelationOID <> 0)
       then AContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(AContext.DataObject, ARelationOID);
@@ -271,7 +270,7 @@ begin
   // Check
   if not Assigned(AObj) then Exit;
   // Create Context
-  AContext := TioContextFactory.Context(AObj.ClassType, nil, AObj);
+  AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
   // Execute
   Self.DeleteObject(AContext);
 end;

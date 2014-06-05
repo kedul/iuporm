@@ -38,7 +38,7 @@ begin
   try
     // Compone l'SQL
     SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
-    SQL.Add(AContext.GetWhere.GetSql);
+    SQL.Add(AContext.Where.GetSql);
     // Crea l'oggetto ioQuery
     Result := TioDbFactory.Query(SQL);
   finally
@@ -134,7 +134,7 @@ begin
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
     SQL.Add('FROM ' + AContext.GetTable.GetSql);
-    SQL.Add(AContext.GetWhere.GetSqlWithClassFromField(AContext.ClassFromField));
+    SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.ClassFromField));
     // Crea l'oggetto ioQuery
     Result := TioDbFactory.Query(SQL);
   finally
@@ -157,7 +157,7 @@ begin
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
     SQL.Add('FROM ' + AContext.GetTable.GetSql);
-    SQL.Add(AContext.GetWhere.GetSqlWithClassFromField(AContext.ClassFromField));
+    SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.ClassFromField));
     // Crea l'oggetto ioQuery
     Result := TioDbFactory.Query(SQL);
   finally
@@ -210,7 +210,7 @@ begin
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=' + AContext.ClassFromField.GetSqlValue);
     // Where conditions
-    SQL.Add(AContext.GetWhere.GetSql);
+    SQL.Add(AContext.Where.GetSql);
     // Create ioQuery object
     Result := TioDbFactory.Query(SQL);
 

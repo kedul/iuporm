@@ -4,7 +4,8 @@ interface
 
 uses
   IupOrm.DB.DBCreator.Interfaces, System.Generics.Collections, System.Rtti,
-  IupOrm.DB.Interfaces, IupOrm.Context.Properties.Interfaces;
+  IupOrm.DB.Interfaces, IupOrm.Context.Properties.Interfaces,
+  IupOrm.Context.Interfaces, IupOrm.Context.Map.Interfaces;
 
 type
 
@@ -75,9 +76,8 @@ type
     FSqlGenerator: IioDBCreatorSqlGenerator;
   strict protected
     function FindOrCreateTable(ATableName:String; AIsClassFromField:Boolean): IioDBCreatorTable;
-    procedure LoadTableStructureFromRtti(ARttiContext:TRttiContext; ARttiType:TRttiInstanceType);
-    function IsValidEntity(AType:TRttiInstanceType): Boolean;
-    procedure LoadDBStructureFromRtti;
+    procedure LoadTableStructure(AMap: IioMap);
+    procedure LoadDBStructure;
   public
     constructor Create(ASqlGenerator:IioDBCreatorSqlGenerator); overload;
     destructor Destroy; override;
@@ -89,9 +89,9 @@ type
 implementation
 
 uses
-  IupOrm.Attributes, IupOrm.DB.DBCreator.Factory, IupOrm.Context.Interfaces,
+  IupOrm.Attributes, IupOrm.DB.DBCreator.Factory,
   IupOrm.Context.Factory, System.SysUtils,
-  IupOrm.CommonTypes, IupOrm.RttiContext.Factory;
+  IupOrm.CommonTypes, IupOrm.RttiContext.Factory, IupOrm.Context.Container;
 
 { TioDBCreatorField }
 
@@ -237,7 +237,7 @@ var
   ATable: IioDBCreatorTable;
 begin
   // Build DB structure analizing Rtti informations
-  Self.LoadDBStructureFromRtti;
+  Self.LoadDBStructure;
   // Create or restructure database
   FSqlGenerator.AutoCreateDatabase(Self);
 end;
@@ -249,39 +249,26 @@ begin
   FTables := TioDBCreatorTableList.Create;
 end;
 
-procedure TioDBCreator.LoadDBStructureFromRtti;
+procedure TioDBCreator.LoadDBStructure;
 var
-  Ctx: TRttiContext;
-  Typ: TRttiType;
-  Inst: TRttiInstanceType;
+  AContextSlot: TioMapSlot;
 begin
-  Ctx := TioRttiContextFactory.RttiContext;
-  for Typ in Ctx.GetTypes do
-  begin
-    // Only instance type
-    if not (Typ is TRttiInstanceType) then Continue;
-    Inst := TRttiInstanceType(Typ);
-    // Only classes with explicit ioTable attribute
-    if not Self.IsValidEntity(Inst) then Continue;
-    // Load Table structure
-    Self.LoadTableStructureFromRtti(Ctx, Inst);
-  end;
+  // Loop for all entities (model classes) of the application
+  //  and load the TableStructure
+  for AContextSlot in TioMapContainer.GetContainer.Values
+    do Self.LoadTableStructure(AContextSlot.GetMap);
 end;
 
-procedure TioDBCreator.LoadTableStructureFromRtti(ARttiContext: TRttiContext;
-  ARttiType: TRttiInstanceType);
+procedure TioDBCreator.LoadTableStructure(AMap: IioMap);
 var
-  AContext: IioContext;
   AProperty: IioContextProperty;
   ATable: IioDBCreatorTable;
   AField: IioDBCreatorField;
 begin
-  // Create the context
-  AContext := TioContextFactory.Context(ARttiType.MetaclassType);
   // Find or Create Table
-  ATable := Self.FindOrCreateTable(AContext.GetTable.TableName, AContext.GetTable.IsClassFromField);
+  ATable := Self.FindOrCreateTable(AMap.GetTable.TableName, AMap.GetTable.IsClassFromField);
   // Loop for properties
-  for AProperty in AContext.GetProperties do
+  for AProperty in AMap.GetProperties do
   begin
     // For creation purpose a HasMany or HasOne relation property
     //  must not create the field
@@ -291,7 +278,7 @@ begin
     // If not already exixts create and add it to the list
     if ATable.FieldExists(AProperty.GetSqlFieldName) then Continue;
     AField := TioDBCreatorFactory.GetField(AProperty.GetSqlFieldName
-                                          ,(AProperty = AContext.GetProperties.GetIdProperty)
+                                          ,(AProperty = AMap.GetProperties.GetIdProperty)
                                           ,AProperty
                                           ,FSqlGenerator
                                           ,False
@@ -335,19 +322,6 @@ begin
   // Otherwise create a new Table and add it to the list then return it
   Result := TioDBCreatorFactory.GetTable(ATableName, AIsClassFromField, FSqlGenerator);
   Self.FTables.Add(ATableName, Result);
-end;
-
-function TioDBCreator.IsValidEntity(AType: TRttiInstanceType): Boolean;
-var
-  Attr: TCustomAttribute;
-begin
-  Result := False;
-  for Attr in AType.GetAttributes do
-    if Attr is ioTable then
-    begin
-      Result := True;
-      Exit;
-    end;
 end;
 
 end.

@@ -353,7 +353,7 @@ end;
 
 procedure TTabbedwithNavigationForm.FormCreate(Sender: TObject);
 begin
-  TIupOrm.Init('VRManager');
+  TIupOrm.SetDBFolderInDocuments('VRManager');
 end;
 
 procedure TTabbedwithNavigationForm.FormShow(Sender: TObject);

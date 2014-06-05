@@ -6,34 +6,35 @@ uses
   IupOrm.Context.Properties.Interfaces,
   IupOrm.Context.Interfaces,
   IupOrm.CommonTypes,
-  IupOrm.Where, IupOrm.Context.Table.Interfaces, System.Rtti;
+  IupOrm.Where, IupOrm.Context.Table.Interfaces, System.Rtti,
+  IupOrm.Context.Map.Interfaces;
 
 type
 
   TioContext = class(TInterfacedObject, IioContext)
   strict private
-    FClassRef: TioClassRef;
+    FMap: IioMap;
     FDataObject: TObject;
-    FTable: IioContextTable;
-    FProperties: IioContextProperties;
     FWhere: TioWhere;
     FSelfCreatedWhere: Boolean;
-    FRttiContext: TRttiContext;
-    FRttiType: TRttiInstanceType;
   strict protected
+    // Map
+    function Map: IioMap;
     // DataObject
     function GetDataObject: TObject;
     procedure SetDataObject(AValue: TObject);
     // ObjectStatus
     function GetObjectStatus: TIupOrmObjectStatus;
     procedure SetObjectStatus(AValue: TIupOrmObjectStatus);
+    // Where
+    function GetWhere: TioWhere;
+    procedure SetWhere(AWhere: TioWhere);
   public
-    constructor Create(AClassRef:TioClassRef; ARttiContext:TRttiContext; ARttiType:TRttiInstanceType; ATable:IioContextTable; AProperties:IioContextProperties; AWhere:TioWhere; ADataObject:TObject=nil); overload;
+    constructor Create(AClassName:String; AMap:IioMap; AWhere:TioWhere=nil; ADataObject:TObject=nil); overload;
     destructor Destroy; override;
     function GetClassRef: TioClassRef;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
-    function GetWhere: TioWhere;
     function ClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function RttiContext: TRttiContext;
@@ -44,12 +45,15 @@ type
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjectStatus
     property ObjectStatus:TIupOrmObjectStatus read GetObjectStatus write SetObjectStatus;
+    // Where
+    property Where:TioWhere read GetWhere write SetWhere;
   end;
 
 implementation
 
 uses
-  IupOrm.Context.Factory, IupOrm.DB.Factory, System.TypInfo;
+  IupOrm.Context.Factory, IupOrm.DB.Factory, System.TypInfo,
+  IupOrm.Context.Container;
 
 { TioContext }
 
@@ -60,32 +64,28 @@ end;
 
 function TioContext.ClassFromField: IioClassFromField;
 begin
-  Result := FTable.GetClassFromField;
+  Result := Self.Map.GetTable.GetClassFromField;
 end;
 
-constructor TioContext.Create(AClassRef: TioClassRef; ARttiContext:TRttiContext;
-  ARttiType:TRttiInstanceType; ATable: IioContextTable;
-  AProperties: IioContextProperties; AWhere: TioWhere; ADataObject: TObject);
+constructor TioContext.Create(AClassName:String; AMap:IioMap; AWhere:TioWhere=nil; ADataObject:TObject=nil);
 begin
   inherited Create;
-  FSelfCreatedWhere := False;
-  FClassRef := AClassRef;
-  FRttiContext := ARttiContext;
-  FRttiType := ARttiType;
-  FTable := ATable;
-  FProperties := AProperties;
+  FMap := AMap;
   FDataObject := ADataObject;
+  // ---------------------------------------------------------------------------
   // Create TioWhere if nil
+  FSelfCreatedWhere := False;
   if not Assigned(AWhere)then
   begin
     FSelfCreatedWhere := True;
     AWhere := TioContextFactory.Where;
-    if Assigned(ADataObject)
-      then AWhere.Add(AProperties.GetIdProperty.GetSqlFieldName + TioDbFactory.CompareOperator._Equal.GetSql + AProperties.GetIdProperty.GetSqlValue(ADataObject));
+    if Assigned(FDataObject)
+      then AWhere.Add(Self.GetProperties.GetIdProperty.GetSqlFieldName + TioDbFactory.CompareOperator._Equal.GetSql + Self.GetProperties.GetIdProperty.GetSqlValue(FDataObject));
   end;
   // Add ContextProperties to TioWhere and assign it to the field
-  AWhere.SetContextProperties(FProperties);
+  AWhere.SetContextProperties(Self.GetProperties);
   FWhere := AWhere;
+  // ---------------------------------------------------------------------------
 end;
 
 destructor TioContext.Destroy;
@@ -96,7 +96,7 @@ end;
 
 function TioContext.GetClassRef: TioClassRef;
 begin
-  Result := FClassRef;
+  Result := Self.Map.GetClassRef;
 end;
 
 function TioContext.GetDataObject: TObject;
@@ -106,24 +106,24 @@ end;
 
 function TioContext.GetObjectStatus: TIupOrmObjectStatus;
 begin
-  if FProperties.ObjStatusExist
-    then Result := TIupOrmObjectStatus(   FProperties.ObjStatusProperty.GetValue(Self.FDataObject).AsOrdinal   )
+  if Self.GetProperties.ObjStatusExist
+    then Result := TIupOrmObjectStatus(   Self.GetProperties.ObjStatusProperty.GetValue(Self.FDataObject).AsOrdinal   )
     else Result := osDirty;
 end;
 
 function TioContext.GetProperties: IioContextProperties;
 begin
-  Result := FProperties;
+  Result := Self.Map.GetProperties;
 end;
 
 function TioContext.RttiContext: TRttiContext;
 begin
-  Result := FRttiContext;
+  Result := Self.Map.RttiContext;
 end;
 
 function TioContext.RttiType: TRttiInstanceType;
 begin
-  Result := FRttiType;
+  Result := Self.Map.RttiType;
 end;
 
 procedure TioContext.SetDataObject(AValue: TObject);
@@ -139,12 +139,17 @@ begin
   if not Self.GetProperties.ObjStatusExist then Exit;
   // If exist set the property value
   PropValue := TValue.From<TIupOrmObjectStatus>(AValue);
-  FProperties.ObjStatusProperty.SetValue(Self.FDataObject, PropValue);
+  Self.GetProperties.ObjStatusProperty.SetValue(Self.FDataObject, PropValue);
+end;
+
+procedure TioContext.SetWhere(AWhere: TioWhere);
+begin
+  FWhere := AWhere;
 end;
 
 function TioContext.GetTable: IioContextTable;
 begin
-  Result := FTable;
+  Result := Self.Map.GetTable;
 end;
 
 function TioContext.GetWhere: TioWhere;
@@ -154,7 +159,12 @@ end;
 
 function TioContext.IsClassFromField: Boolean;
 begin
-  Result := FTable.IsClassFromField and not FWhere.GetDisableClassFromField;
+  Result := Self.GetTable.IsClassFromField and not FWhere.GetDisableClassFromField;
+end;
+
+function TioContext.Map: IioMap;
+begin
+  Result := FMap;
 end;
 
 end.

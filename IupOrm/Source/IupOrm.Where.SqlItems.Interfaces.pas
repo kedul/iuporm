@@ -8,12 +8,12 @@ uses
 
 type
 
-  TWhereItems = TList<IioSqlItem>;
-
   IioSqlItemWhere = interface(IioSqlItem)
-    ['{EF666208-9854-4D68-93E6-DACEF5B1CF2E}']
+    ['{0916A6EC-167E-4CD2-8C0B-ADE755E5157B}']
     procedure SetContextProperties(AContextProperties: IioContextProperties);
   end;
+
+  TWhereItems = TList<IioSqlItem>;
 
 implementation
 

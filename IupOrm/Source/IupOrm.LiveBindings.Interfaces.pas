@@ -26,7 +26,7 @@ type
   IioDetailBindSourceAdaptersContainer = interface
     ['{B374E226-D7A9-4A44-9BB6-DF85AC283598}']
     procedure SetMasterObject(AMasterObj: TObject);
-    function GetBindSourceAdapter(AMasterClassRef:TioClassRef; AMasterPropertyName:String): TBindSourceAdapter;
+    function GetBindSourceAdapter(AMasterClassName:String; AMasterPropertyName:String): TBindSourceAdapter;
   end;
 
 implementation

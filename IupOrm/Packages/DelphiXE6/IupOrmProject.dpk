@@ -88,6 +88,9 @@ contains
   IupOrm.LiveBindings.Factory in '..\..\Source\IupOrm.LiveBindings.Factory.pas',
   IupOrm.Helpers.BindSourceHelperTools.Interfaces in '..\..\Source\IupOrm.Helpers.BindSourceHelperTools.Interfaces.pas',
   IupOrm.Helpers.BindSourceHelperTools in '..\..\Source\IupOrm.Helpers.BindSourceHelperTools.pas',
-  IupOrm.LiveBindings.PrototypeBindSource in '..\..\Source\IupOrm.LiveBindings.PrototypeBindSource.pas';
+  IupOrm.LiveBindings.PrototypeBindSource in '..\..\Source\IupOrm.LiveBindings.PrototypeBindSource.pas',
+  IupOrm.SqlTranslator in '..\..\Source\IupOrm.SqlTranslator.pas',
+  IupOrm.Context.Map in '..\..\Source\IupOrm.Context.Map.pas',
+  IupOrm.Context.Map.Interfaces in '..\..\Source\IupOrm.Context.Map.Interfaces.pas';
 
 end.

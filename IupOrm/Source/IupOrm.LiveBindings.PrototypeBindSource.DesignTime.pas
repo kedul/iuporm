@@ -56,7 +56,7 @@ begin
     Typ := Ctx.FindType(AMasterBindSource.ioClassName);
     if not Assigned(Typ) then raise EIupOrmException.Create(Self.ClassName + ': RttiType not found.');
     if not Typ.IsInstance then raise EIupOrmException.Create(Self.ClassName + ': RttiType is not a RttiInstanceType.');
-    AContext := TioContextFactory.Context(Typ.AsInstance.MetaclassType);
+    AContext := TioContextFactory.Context(Typ.AsInstance.MetaclassType.ClassName);
     for AProperty in AContext.GetProperties do
     begin
       if AProperty.GetRelationType = ioRTNone then Continue;
