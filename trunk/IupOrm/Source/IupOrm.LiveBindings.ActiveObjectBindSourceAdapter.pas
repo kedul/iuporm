@@ -110,7 +110,7 @@ function TioActiveObjectBindSourceAdapter.GetDetailBindSourceAdapter(
   AMasterPropertyName: String): TBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
-  Result := FDetailAdaptersContainer.GetBindSourceAdapter(Self.FClassRef, AMasterPropertyName);
+  Result := FDetailAdaptersContainer.GetBindSourceAdapter(Self.FClassRef.ClassName, AMasterPropertyName);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
 end;
 

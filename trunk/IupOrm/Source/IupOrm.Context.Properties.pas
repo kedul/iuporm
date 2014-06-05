@@ -133,7 +133,7 @@ begin
   // If the related child object non exists then exit (return 'NULL')
   if not Assigned(ChildObject) then Exit;
   // Else create the ioContext for the object and return the ID
-  ChildContext := TioContextFactory.Context(ChildObject.ClassType, nil);
+  ChildContext := TioContextFactory.Context(ChildObject.ClassName, nil);
   Result := ChildContext.GetProperties.GetIdProperty.GetSqlValue(ChildObject);
 end;
 

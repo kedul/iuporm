@@ -3,20 +3,26 @@ unit IupOrm.LiveBindings.PrototypeBindSource;
 interface
 
 uses
-  Data.Bind.ObjectScope, IupOrm.CommonTypes, IupOrm.LiveBindings.Interfaces;
+  Data.Bind.ObjectScope, IupOrm.CommonTypes, IupOrm.LiveBindings.Interfaces,
+  System.Classes;
 
 type
 
   TioPrototypeBindSource = class (TPrototypeBindSource)
-  private
+  strict private
     FioClassName: String;
     FioMasterBindSource: TioBaseBindSource;
     FioMasterPropertyName: String;
-  protected
-    function GetIupOrm_ClassRef: TioClassRef;
-    procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
+    FioWhere: TStrings;
+  private
+    procedure SetIoWhere(const Value: TStrings); protected
+  strict protected
+      procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
   published
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     property ioClassName:String read FioClassName write FioClassName;
+    property ioWhere:TStrings read FioWhere write SetIoWhere;
     property ioMasterBindSource:TioBaseBindSource read FioMasterBindSource write FioMasterBindSource;
     property ioMasterPropertyName:String read FioMasterPropertyName write FioMasterPropertyName;
   end;
@@ -24,10 +30,22 @@ type
 implementation
 
 uses
-  IupOrm, System.Classes, System.SysUtils, System.Rtti,
-  IupOrm.RttiContext.Factory, IupOrm.Exceptions;
+  IupOrm, System.SysUtils, System.Rtti,
+  IupOrm.RttiContext.Factory, IupOrm.Exceptions, IupOrm.Context.Container;
 
 { TioPrototypeBindSource }
+
+constructor TioPrototypeBindSource.Create(AOwner: TComponent);
+begin
+  inherited;
+  FioWhere := TStringList.Create;
+end;
+
+destructor TioPrototypeBindSource.Destroy;
+begin
+  FioWhere.Free;
+  inherited;
+end;
 
 procedure TioPrototypeBindSource.DoCreateAdapter(
   var ADataObject: TBindSourceAdapter);
@@ -44,19 +62,14 @@ begin
   //  else get the adapter directly from IupOrm
   if Assigned(Self.FioMasterBindSource) and (Self.FioMasterPropertyName.Trim <> '')
     then ADataObject := Self.FioMasterBindSource.IupOrm.GetDetailBindSourceAdapter(Self.FioMasterPropertyName)
-    else ADataObject := TIupOrm.Load(Self.GetIupOrm_ClassRef).ToActiveListBindSourceAdapter(Self);
+    else ADataObject := TIupOrm.Load(   TioMapContainer.GetClassRef(FioClassName)   )
+           ._Where(Self.ioWhere.Text)
+           .ToActiveListBindSourceAdapter(Self);
 end;
 
-function TioPrototypeBindSource.GetIupOrm_ClassRef: TioClassRef;
-var
-  Ctx: TRttiContext;
-  Typ: TRttiType;
+procedure TioPrototypeBindSource.SetIoWhere(const Value: TStrings);
 begin
-  Ctx := TioRttiContextFactory.RttiContext;
-  Typ := Ctx.FindType(FioClassName);
-  if not Assigned(Typ) then raise EIupOrmException.Create(Self.ClassName + ': RttiType not found.');
-  if not (Typ is TRttiInstanceType) then raise EIupOrmException.Create(Self.ClassName + ': Not TRttiInstanceType error.');
-  Result := TRttiInstanceType(Typ).MetaclassType;
+  FioWhere.Assign(Value);
 end;
 
 end.

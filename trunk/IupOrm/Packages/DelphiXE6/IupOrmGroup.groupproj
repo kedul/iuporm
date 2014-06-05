@@ -9,16 +9,22 @@
         <Projects Include="IupOrmProject.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\..\Samples\Pizza ToBindSourceAdapter\PizzaProject.dproj">
+        <Projects Include="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Samples\PizzaWin_ioActiveBindSourceAdapter\PizzaWin_ioActiveBindSourceAdapter.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Samples\Pizza_List\Pizza_List.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\VRManager\VRManagerClient.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\Samples\PhoneContacts\PhoneContacts.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\..\Samples\PhoneContactsProtypeBS\PhoneContactsPrototypeBS.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -47,14 +53,50 @@
     <Target Name="IupOrmProject:Make">
         <MSBuild Projects="IupOrmProject.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PizzaProject">
-        <MSBuild Projects="..\..\Samples\Pizza ToBindSourceAdapter\PizzaProject.dproj"/>
+    <Target Name="PhoneContacts_ioActiveBindSourceAdapter">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj"/>
     </Target>
-    <Target Name="PizzaProject:Clean">
-        <MSBuild Projects="..\..\Samples\Pizza ToBindSourceAdapter\PizzaProject.dproj" Targets="Clean"/>
+    <Target Name="PhoneContacts_ioActiveBindSourceAdapter:Clean">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PizzaProject:Make">
-        <MSBuild Projects="..\..\Samples\Pizza ToBindSourceAdapter\PizzaProject.dproj" Targets="Make"/>
+    <Target Name="PhoneContacts_ioActiveBindSourceAdapter:Make">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PhoneContacts_ioPrototypeBindSource">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj"/>
+    </Target>
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Make">
+        <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pizza_ioActiveBindSourceAdapter">
+        <MSBuild Projects="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj"/>
+    </Target>
+    <Target Name="Pizza_ioActiveBindSourceAdapter:Clean">
+        <MSBuild Projects="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pizza_ioActiveBindSourceAdapter:Make">
+        <MSBuild Projects="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PizzaWin_ioActiveBindSourceAdapter">
+        <MSBuild Projects="..\..\Samples\PizzaWin_ioActiveBindSourceAdapter\PizzaWin_ioActiveBindSourceAdapter.dproj"/>
+    </Target>
+    <Target Name="PizzaWin_ioActiveBindSourceAdapter:Clean">
+        <MSBuild Projects="..\..\Samples\PizzaWin_ioActiveBindSourceAdapter\PizzaWin_ioActiveBindSourceAdapter.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PizzaWin_ioActiveBindSourceAdapter:Make">
+        <MSBuild Projects="..\..\Samples\PizzaWin_ioActiveBindSourceAdapter\PizzaWin_ioActiveBindSourceAdapter.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Pizza_List">
+        <MSBuild Projects="..\..\Samples\Pizza_List\Pizza_List.dproj"/>
+    </Target>
+    <Target Name="Pizza_List:Clean">
+        <MSBuild Projects="..\..\Samples\Pizza_List\Pizza_List.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Pizza_List:Make">
+        <MSBuild Projects="..\..\Samples\Pizza_List\Pizza_List.dproj" Targets="Make"/>
     </Target>
     <Target Name="VRManagerClient">
         <MSBuild Projects="..\..\Samples\VRManager\VRManagerClient.dproj"/>
@@ -65,32 +107,14 @@
     <Target Name="VRManagerClient:Make">
         <MSBuild Projects="..\..\Samples\VRManager\VRManagerClient.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts">
-        <MSBuild Projects="..\..\Samples\PhoneContacts\PhoneContacts.dproj"/>
-    </Target>
-    <Target Name="PhoneContacts:Clean">
-        <MSBuild Projects="..\..\Samples\PhoneContacts\PhoneContacts.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="PhoneContacts:Make">
-        <MSBuild Projects="..\..\Samples\PhoneContacts\PhoneContacts.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="PhoneContactsPrototypeBS">
-        <MSBuild Projects="..\..\Samples\PhoneContactsProtypeBS\PhoneContactsPrototypeBS.dproj"/>
-    </Target>
-    <Target Name="PhoneContactsPrototypeBS:Clean">
-        <MSBuild Projects="..\..\Samples\PhoneContactsProtypeBS\PhoneContactsPrototypeBS.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="PhoneContactsPrototypeBS:Make">
-        <MSBuild Projects="..\..\Samples\PhoneContactsProtypeBS\PhoneContactsPrototypeBS.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Build">
-        <CallTarget Targets="IupOrmProject_DesignTime;IupOrmProject;PizzaProject;VRManagerClient;PhoneContacts;PhoneContactsPrototypeBS"/>
+        <CallTarget Targets="IupOrmProject_DesignTime;IupOrmProject;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_ioPrototypeBindSource;Pizza_ioActiveBindSourceAdapter;PizzaWin_ioActiveBindSourceAdapter;Pizza_List;VRManagerClient"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="IupOrmProject_DesignTime:Clean;IupOrmProject:Clean;PizzaProject:Clean;VRManagerClient:Clean;PhoneContacts:Clean;PhoneContactsPrototypeBS:Clean"/>
+        <CallTarget Targets="IupOrmProject_DesignTime:Clean;IupOrmProject:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_ioPrototypeBindSource:Clean;Pizza_ioActiveBindSourceAdapter:Clean;PizzaWin_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;VRManagerClient:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="IupOrmProject_DesignTime:Make;IupOrmProject:Make;PizzaProject:Make;VRManagerClient:Make;PhoneContacts:Make;PhoneContactsPrototypeBS:Make"/>
+        <CallTarget Targets="IupOrmProject_DesignTime:Make;IupOrmProject:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_ioPrototypeBindSource:Make;Pizza_ioActiveBindSourceAdapter:Make;PizzaWin_ioActiveBindSourceAdapter:Make;Pizza_List:Make;VRManagerClient:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

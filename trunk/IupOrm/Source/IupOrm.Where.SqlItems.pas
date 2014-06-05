@@ -44,10 +44,17 @@ type
     function GetSql: String; override;
   end;
 
+  // Specialized SqlItemWhere for text conditions with tags translating
+  //  property to fieldname
+  TioSqlItemsWhereText  = class(TioSqlItemsWhere)
+  public
+    function GetSql: String; override;
+  end;
+
 implementation
 
 uses
-  IupOrm.Exceptions, IupOrm.DB.Factory;
+  IupOrm.Exceptions, IupOrm.DB.Factory, IupOrm.SqlTranslator;
 
 { TioSqlItemsWhereValue }
 
@@ -93,6 +100,14 @@ end;
 function TioSqlItemsWherePropertyOID.GetSql: String;
 begin
   Result := FContextProperties.GetIdProperty.GetSqlFieldName;
+end;
+
+{ TioSqlItemsWhereText }
+
+function TioSqlItemsWhereText.GetSql: String;
+begin
+  // NB: No inherited
+  Result := TioSqlTranslator.Translate(FSqlText);
 end;
 
 end.

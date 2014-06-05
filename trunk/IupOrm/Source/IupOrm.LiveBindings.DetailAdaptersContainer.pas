@@ -11,12 +11,12 @@ type
   strict private
     FDetailAdapters: TioDetailAdapters;
   strict protected
-    procedure NewBindSourceAdapter(AMasterClassRef:TioClassRef; AMasterPropertyName:String);
+    procedure NewBindSourceAdapter(AMasterClassName: String; AMasterPropertyName:String);
   public
     constructor Create;
     destructor Destroy; override;
     procedure SetMasterObject(AMasterObj: TObject);
-    function GetBindSourceAdapter(AMasterClassRef:TioClassRef; AMasterPropertyName:String): TBindSourceAdapter;
+    function GetBindSourceAdapter(AMasterClassName: String; AMasterPropertyName:String): TBindSourceAdapter;
   end;
 
 implementation
@@ -43,23 +43,23 @@ begin
 end;
 
 function TioDetailAdaptersContainer.GetBindSourceAdapter(
-  AMasterClassRef: TioClassRef; AMasterPropertyName: String): TBindSourceAdapter;
+  AMasterClassName: String; AMasterPropertyName: String): TBindSourceAdapter;
 begin
   // If the requested adapter not exist create and add it to the container
   if not FDetailAdapters.ContainsKey(AMasterPropertyName)
-    then Self.NewBindSourceAdapter(AMasterClassRef, AMasterPropertyName);
+    then Self.NewBindSourceAdapter(AMasterClassName, AMasterPropertyName);
   // Return the requested adapter
   Result := FDetailAdapters.Items[AMasterPropertyName] as TBindSourceAdapter;
 end;
 
 procedure TioDetailAdaptersContainer.NewBindSourceAdapter(
-  AMasterClassRef: TioClassRef; AMasterPropertyName: String);
+  AMasterClassName: String; AMasterPropertyName: String);
 var
   AMasterContext: IioContext;
   AMasterProperty: IioContextProperty;
   NewAdapter: IioContainedBindSourceAdapter;
 begin
-  AMasterContext := TioContextFactory.Context(AMasterClassRef);
+  AMasterContext := TioContextFactory.Context(AMasterClassName);
   AMasterProperty := AMasterContext.GetProperties.GetPropertyByName(AMasterPropertyName);
   case AMasterProperty.GetRelationType of
     ioRTBelongsTo, ioRTHasOne:

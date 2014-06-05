@@ -7,7 +7,8 @@ uses
   IupOrm.Context.Interfaces,
   IupOrm.CommonTypes,
   IupOrm.Where, IupOrm.Context.Table.Interfaces, System.Rtti,
-  IupOrm.Attributes, System.Generics.Collections;
+  IupOrm.Attributes, System.Generics.Collections,
+  IupOrm.Context.Map.Interfaces;
 
 type
 
@@ -20,7 +21,8 @@ type
     class function ClassFromField(Typ: TRttiInstanceType; ASqlFieldName:String=IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Table(Typ: TRttiInstanceType): IioContextTable;
     class function Where: TioWhere;
-    class function Context(AioClassRef:TioClassRef; AioWhere:TioWhere=nil; ADataObject:TObject=nil): IioContext; overload;
+    class function Map(AClassRef: TioClassRef): IioMap;
+    class function Context(AClassName: String; AioWhere:TioWhere=nil; ADataObject:TObject=nil): IioContext;
   end;
 
 implementation
@@ -28,7 +30,7 @@ implementation
 uses
   IupOrm.Context, IupOrm.Context.Properties,
   System.SysUtils, IupOrm.Context.Table,
-  IupOrm.RttiContext.Factory, IupOrm.Context.Container;
+  IupOrm.RttiContext.Factory, IupOrm.Context.Container, IupOrm.Context.Map;
 
 { TioBuilderProperties }
 
@@ -51,28 +53,15 @@ begin
   Result := TioClassFromField.Create(ASqlFieldName, ClassName, QualifiedClassName, Ancestors);
 end;
 
-class function TioContextFactory.Context(AioClassRef: TioClassRef;
+class function TioContextFactory.Context(AClassName: String;
   AioWhere: TioWhere; ADataObject: TObject): IioContext;
-var
-  ARttiContext: TRttiContext;
-  ARttiType: TRttiInstanceType;
 begin
-  // Get the Context from the ContextContainer if exist
-  //  and if not exist then create it
-  Result := TioContextContainer.GetContext(AioClassRef.ClassName);
-  if Assigned(Result) then Exit;
-  // Rtti init
-  ARttiContext := TioRttiContextFactory.RttiContext;
-  ARttiType := ARttiContext.GetType(AioClassRef) as TRttiInstanceType;
-  // Create the context
-  Result := TioContext.Create(AioClassRef,
-                              ARttiContext,
-                              ARttiType,
-                              Table(ARttiType),
-                              Properties(ARttiType),
+  // Get the Context from the ContextContainer
+  Result := TioContext.Create(AClassName,
+                              TioMapContainer.GetMap(AClassName),
                               AioWhere,
                               ADataObject
-                             );
+                              );
 end;
 
 class function TioContextFactory.GetProperty(ARttiProperty: TRttiProperty;
@@ -88,6 +77,23 @@ begin
                                );
 end;
 
+
+class function TioContextFactory.Map(AClassRef: TioClassRef): IioMap;
+var
+  ARttiContext: TRttiContext;
+  ARttiType: TRttiInstanceType;
+begin
+  // Rtti init
+  ARttiContext := TioRttiContextFactory.RttiContext;
+  ARttiType := ARttiContext.GetType(AClassRef) as TRttiInstanceType;
+  // Create the context
+  Result := TioMap.Create(AClassRef,
+                          ARttiContext,
+                          ARttiType,
+                          Self.Table(ARttiType),
+                          Self.Properties(ARttiType)
+                         );
+end;
 
 class function TioContextFactory.Properties(
   Typ: TRttiInstanceType): IioContextProperties;

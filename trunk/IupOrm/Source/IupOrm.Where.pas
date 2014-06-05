@@ -138,14 +138,15 @@ uses
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory,
   IupOrm.ObjectsForge.Factory, IupOrm.Context.Interfaces,
   IupOrm.RttiContext.Factory, IupOrm,
-  IupOrm.LiveBindings.ActiveListBindSourceAdapter;
+  IupOrm.LiveBindings.ActiveListBindSourceAdapter, IupOrm.Where.SqlItems;
 
 { TioWhere }
 
 function TioWhere.Add(ATextCondition: String): TioWhere;
 begin
   Result := Self;
-  Self.FWhereItems.Add(TioSqlItem.Create(ATextCondition));
+  if ATextCondition.Trim = '' then Exit;
+  Self.FWhereItems.Add(TioSqlItemsWhereText.Create(ATextCondition));
 end;
 
 function TioWhere._And: TioWhere;
@@ -283,7 +284,7 @@ var
 begin
   try
     // Create Context
-    AContext := TioContextFactory.Context(Self.FClassRef, Self);
+    AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
     // Create & open query
     AQuery := TioDbFactory.SqlGenerator.GenerateSqlDelete(AContext);
     AQuery.ExecSQL;
@@ -318,6 +319,7 @@ end;
 function TioWhere.GetSql(AddWhere:Boolean): String;
 var
   CurrSqlItem: IioSqlItem;
+  CurrSqlItemWhere: IioSqlItemWhere;
 begin
   // NB: NO inherited
   Result := '';
@@ -326,7 +328,8 @@ begin
   for CurrSqlItem in FWhereItems do
   begin
     // Set ContextProperty if TioSqlItemWhere descendant
-    if Supports(CurrSqlItem, IioSqlItemWhere) then IioSqlItemWhere(CurrSqlItem).SetContextProperties(FContextProperties);
+    if Supports(CurrSqlItem, IioSqlItemWhere, CurrSqlItemWhere)
+      then CurrSqlItemWhere.SetContextProperties(FContextProperties);
     // Add current SqlItem
     Result := Result + CurrSqlItem.GetSql;
   end;
@@ -373,7 +376,7 @@ begin
   try
     // Create Context
     // (without context the "Self.GetSql(False)" fail)
-    AContext := TioContextFactory.Context(Self.FClassRef, Self);
+    AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
     // Create the adapter
     Result := TioActiveListBindSourceAdapter.Create(
                                                       Self.FClassRef
@@ -403,7 +406,7 @@ begin
     // Wrap the DestList into a DuckTypedList
     ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Create Context
-    AContext := TioContextFactory.Context(Self.FClassRef, Self);
+    AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
     // Create & open query
     AQuery := TioDbFactory.SqlGenerator.GenerateSqlSelectForList(AContext);
     AQuery.Open;
@@ -448,7 +451,7 @@ begin
   TioDBFactory.Connection.StartTransaction;
   try try
     // Create Context
-    AContext := TioContextFactory.Context(Self.FClassRef, Self);
+    AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
     // Create & open query
     AQuery := TioDbFactory.SqlGenerator.GenerateSqlSelectForObject(AContext);
     AQuery.Open;
