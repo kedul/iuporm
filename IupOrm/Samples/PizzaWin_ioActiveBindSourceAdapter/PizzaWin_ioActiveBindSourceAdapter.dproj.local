@@ -2,11 +2,11 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2014/05/21 16:46:56.000.737,=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2014/05/21 16:47:22.000.251,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\Main.pas=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2014/05/21 16:47:22.000.251,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\Main.fmx=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit1.fmx</Transaction>
-    <Transaction>2014/05/21 16:47:31.000.580,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\PizzaWin.dproj=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2014/05/21 16:47:22.000.251,C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\Main.pas</Transaction>
+    <Transaction>2014/05/21 16:47:22.000.251,C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit1.fmx=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\Main.fmx</Transaction>
+    <Transaction>2014/05/21 16:47:31.000.580,C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\PizzaWin.dproj</Transaction>
     <Transaction>2014/05/21 16:47:40.000.387,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\Unit1.pas</Transaction>
-    <Transaction>2014/05/21 16:47:51.000.139,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\ModelU.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\Unit1.pas</Transaction>
-    <Transaction>2014/06/05 14:55:39.949,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin_ioActiveBindSourceAdapter\PizzaWin_ioActiveBindSourceAdapter.dproj=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin_ioActiveBindSourceAdapter\PizzaWin.dproj</Transaction>
+    <Transaction>2014/05/21 16:47:51.000.139,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin\ModelU.pas</Transaction>
+    <Transaction>2014/06/05 14:55:39.000.949,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin_ioActiveBindSourceAdapter\PizzaWin.dproj=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PizzaWin_ioActiveBindSourceAdapter\PizzaWin_ioActiveBindSourceAdapter.dproj</Transaction>
   </Transactions>
 </BorlandProject>
