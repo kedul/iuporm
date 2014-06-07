@@ -41,6 +41,8 @@ type
     function RttiType: TRttiInstanceType;
     // Blob field present
     function BlobFieldExists: Boolean;
+    // ObjStatusExist
+    function ObjStatusExist: Boolean;
     // DataObject
     property DataObject:TObject read GetDataObject write SetDataObject;
     // ObjectStatus
@@ -165,6 +167,11 @@ end;
 function TioContext.Map: IioMap;
 begin
   Result := FMap;
+end;
+
+function TioContext.ObjStatusExist: Boolean;
+begin
+  Self.GetProperties.ObjStatusExist;
 end;
 
 end.

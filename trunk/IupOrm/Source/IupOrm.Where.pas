@@ -384,6 +384,7 @@ begin
                                                     , AOwner
                                                     , TObjectList<TObject>.Create    // Create an empty list for adapter creation only
                                                     , True  // AutoLoadData := True
+                                                    , AContext.ObjStatusExist  // Use ObjStatus async persist
                                                     , AOwnsObject
                                                    );
   finally

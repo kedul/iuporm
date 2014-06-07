@@ -11,6 +11,11 @@ type
   // The common ancestor for all PrototypeBindSource components
   TioBaseBindSource = TBaseObjectBindSource;
 
+  IioActiveBindSourceAdapter = interface
+    ['{F407B515-AE0B-48FD-B8C3-0D0C81774A58}']
+    procedure Persist(ReloadData:Boolean=False);
+  end;
+
   IioContainedBindSourceAdapter = interface
     ['{66AF6AD7-9093-4526-A18C-54447FB220A3}']
     procedure Free;

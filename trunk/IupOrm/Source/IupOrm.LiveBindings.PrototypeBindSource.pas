@@ -18,6 +18,8 @@ type
     procedure SetIoWhere(const Value: TStrings); protected
   strict protected
       procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
+  public
+    procedure Persist(ReloadData:Boolean=False);
   published
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -65,6 +67,16 @@ begin
     else ADataObject := TIupOrm.Load(   TioMapContainer.GetClassRef(FioClassName)   )
            ._Where(Self.ioWhere.Text)
            .ToActiveListBindSourceAdapter(Self);
+end;
+
+procedure TioPrototypeBindSource.Persist(ReloadData: Boolean);
+var
+ AioActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+begin
+  // If the InternalAdapter support the IioActiveBindSourceAdapter (is an ActiveBindSourceAdapter)
+  //  then call the Adapter Persist method
+  if Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, AioActiveBindSourceAdapter)
+    then AioActiveBindSourceAdapter.Persist(ReloadData);
 end;
 
 procedure TioPrototypeBindSource.SetIoWhere(const Value: TStrings);
