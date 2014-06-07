@@ -8,10 +8,11 @@ uses
 
 type
 
-  TioActiveObjectBindSourceAdapter = class(TObjectBindSourceAdapter, IioContainedBindSourceAdapter)
+  TioActiveObjectBindSourceAdapter = class(TObjectBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter)
   strict private
     FWhereStr: String;
     FClassRef: TioClassRef;
+    FUseObjStatus: Boolean;  // Not use directly, use UseObjStatus function or property even for internal use
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
     FMasterProperty: IioContextProperty;
@@ -23,24 +24,28 @@ type
     procedure DoAfterPost; override;
     procedure DoAfterScroll; override;
     procedure SetDataObject(AObj: TObject);
+    procedure SetObjStatus(AObjStatus: TIupOrmObjectStatus);
+    function UseObjStatus: Boolean;
   public
-    constructor Create(AClassRef:TioClassRef; AWhereStr:String; AOwner: TComponent; AObject: TObject; AutoLoadData: Boolean; AOwnsObject: Boolean = True); overload;
+    constructor Create(AClassRef:TioClassRef; AWhereStr:String; AOwner: TComponent; AObject: TObject; AutoLoadData, AUseObjStatus: Boolean; AOwnsObject: Boolean = True); overload;
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
     procedure ExtractDetailObject(AMasterObj: TObject);
+    procedure Persist(ReloadData:Boolean=False);
     function GetDetailBindSourceAdapter(AMasterPropertyName:String): TBindSourceAdapter;
   end;
 
 implementation
 
 uses
-  IupOrm, System.Rtti;
+  IupOrm, System.Rtti, IupOrm.Context.Factory, System.SysUtils;
 
 { TioActiveListBindSourceAdapter<T> }
 
 constructor TioActiveObjectBindSourceAdapter.Create(AClassRef:TioClassRef; AWhereStr: String;
-  AOwner: TComponent; AObject: TObject; AutoLoadData: Boolean; AOwnsObject: Boolean);
+  AOwner: TComponent; AObject: TObject; AutoLoadData, AUseObjStatus: Boolean; AOwnsObject: Boolean);
 begin
   FAutoLoadData := AutoLoadData;
+  FUseObjStatus := AUseObjStatus;
   inherited Create(AOwner, AObject, AClassRef, AOwnsObject);
   FLocalOwnsObject := AOwnsObject;
   FWhereStr := AWhereStr;
@@ -50,7 +55,9 @@ end;
 procedure TioActiveObjectBindSourceAdapter.DoAfterPost;
 begin
   inherited;
-  TIupOrm.Persist(Self.Current);
+  if Self.UseObjStatus
+    then Self.SetObjStatus(osDirty)
+    else TIupOrm.Persist(Self.Current);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterScroll;
@@ -62,7 +69,11 @@ end;
 procedure TioActiveObjectBindSourceAdapter.DoBeforeDelete;
 begin
   inherited;
-  TIupOrm.Delete(Self.Current);
+  if Self.UseObjStatus then
+  begin
+    Self.SetObjStatus(osDeleted);
+    Abort;
+  end else TIupOrm.Delete(Self.Current);
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoBeforeOpen;
@@ -114,6 +125,14 @@ begin
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
 end;
 
+procedure TioActiveObjectBindSourceAdapter.Persist(ReloadData:Boolean=False);
+begin
+  // Persist
+  TIupOrm.Persist(Self.DataObject);
+  // Reload
+  if ReloadData then Self.DoBeforeOpen;
+end;
+
 procedure TioActiveObjectBindSourceAdapter.SetDataObject(AObj: TObject);
 begin
   Self.First;  // Bug
@@ -126,6 +145,17 @@ procedure TioActiveObjectBindSourceAdapter.SetMasterProperty(
   AMasterProperty: IioContextProperty);
 begin
   FMasterProperty := AMasterProperty;
+end;
+
+procedure TioActiveObjectBindSourceAdapter.SetObjStatus(
+  AObjStatus: TIupOrmObjectStatus);
+begin
+  TioContextFactory.Context(Self.Current.ClassName, nil, Self.Current).ObjectStatus := AObjStatus;
+end;
+
+function TioActiveObjectBindSourceAdapter.UseObjStatus: Boolean;
+begin
+  Result := FUseObjStatus;
 end;
 
 end.

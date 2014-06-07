@@ -199,6 +199,7 @@ end;
 constructor TioProperties.Create;
 begin
   FBlobFieldExists := False;
+  FObjStatusProperty := nil;
   FPropertyItems := TList<IioContextProperty>.Create;
 end;
 

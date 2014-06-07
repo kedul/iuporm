@@ -24,6 +24,8 @@ type
     procedure SetDataObject(AValue: TObject);
     function GetDataObject: TObject;
     property DataObject:TObject read GetDataObject write SetDataObject;
+    // ObjStatusExist
+    function ObjStatusExist: Boolean;
     // ObjectStatus
     procedure SetObjectStatus(AValue: TIupOrmObjectStatus);
     function GetObjectStatus: TIupOrmObjectStatus;
