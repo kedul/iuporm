@@ -85,6 +85,7 @@ type
   public
     // ------ Destination methods
     function ToObject: T; overload;
+    function ToList(AOwnsObject:Boolean=True): TObjectList<T>; overload;
     function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     // ------ Conditions
     function ByOID(AOID:Integer): TioWhere<T>;
@@ -611,6 +612,11 @@ function TioWhere<T>.DisableClassFromField: TioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self).DisableClassFromField;
+end;
+
+function TioWhere<T>.ToList(AOwnsObject:Boolean=True): TObjectList<T>;
+begin
+  Result := Self.ToList<TObjectList<T>>;
 end;
 
 function TioWhere<T>.ToListBindSourceAdapter(AOwner: TComponent;
