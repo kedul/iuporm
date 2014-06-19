@@ -167,7 +167,7 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
             end
             object btnBack: TSpeedButton
               Action = ChangeTabAction2
-              Height = 31.000000000000000000
+              Height = 44.000000000000000000
               Position.X = 6.000000000000000000
               Position.Y = 6.000000000000000000
               StyleLookup = 'backtoolbutton'
@@ -176,11 +176,11 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
             object SpeedButton2: TSpeedButton
               Action = ChangeTabAction4
               Anchors = [akTop, akRight]
-              Height = 31.000000000000000000
+              Height = 44.000000000000000000
               Position.X = 279.000000000000000000
               Position.Y = 5.000000000000000000
               StyleLookup = 'nexttoolbuttonbordered'
-              Width = 33.000000000000000000
+              Width = 44.000000000000000000
             end
           end
           object ButtonNewTravel: TButton
@@ -260,7 +260,7 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
             end
             object SpeedButton1: TSpeedButton
               Action = ChangeTabAction3
-              Height = 31.000000000000000000
+              Height = 44.000000000000000000
               Position.X = 6.000000000000000000
               Position.Y = 6.000000000000000000
               StyleLookup = 'backtoolbutton'
@@ -334,7 +334,7 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
       StyleLookup = 'tabitembookmarks'
       TabOrder = 0
       Text = 'TabItem4'
-      Width = 80.000000000000000000
+      Width = 78.000000000000000000
       object ToolBar5: TToolBar
         Height = 44.000000000000000000
         TabOrder = 0

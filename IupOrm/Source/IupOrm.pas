@@ -96,18 +96,26 @@ var
   AObj: TObject;
   AContext: IioContext;
 begin
-  // Wrap the DestList into a DuckTypedList
-  ADuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
-  // Loop the list
-  for AObj in ADuckTypedList do
-  begin
-    // Create context for current object
-    AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
-    // Persist object
-    Self.PersistObject(AContext
-                      , ARelationPropertyName
-                      , ARelationOID
-                      );
+  Self.StartTransaction;
+  try
+    // Wrap the DestList into a DuckTypedList
+    ADuckTypedList := TioDuckTypedFactory.DuckTypedList(ACollection);
+    // Loop the list
+    for AObj in ADuckTypedList do
+    begin
+      // Create context for current object
+      AContext := TioContextFactory.Context(AObj.ClassName, nil, AObj);
+      // Persist object
+      Self.PersistObject(AContext
+                        , ARelationPropertyName
+                        , ARelationOID
+                        );
+    end;
+
+    TioDBFactory.Connection.Commit;
+  except
+    TioDBFactory.Connection.Rollback;
+    raise;
   end;
 end;
 

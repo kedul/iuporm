@@ -30,6 +30,12 @@
         <Projects Include="..\..\Samples\Pizza_ioPrototypeBindSource\Pizza_ioPrototypeBindSource.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Samples\RVMan\RVMan.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\..\Samples\SpeedTest\SpeedTest.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -119,14 +125,32 @@
     <Target Name="Pizza_ioPrototypeBindSource:Make">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBindSource\Pizza_ioPrototypeBindSource.dproj" Targets="Make"/>
     </Target>
+    <Target Name="RVMan">
+        <MSBuild Projects="..\..\Samples\RVMan\RVMan.dproj"/>
+    </Target>
+    <Target Name="RVMan:Clean">
+        <MSBuild Projects="..\..\Samples\RVMan\RVMan.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="RVMan:Make">
+        <MSBuild Projects="..\..\Samples\RVMan\RVMan.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SpeedTest">
+        <MSBuild Projects="..\..\Samples\SpeedTest\SpeedTest.dproj"/>
+    </Target>
+    <Target Name="SpeedTest:Clean">
+        <MSBuild Projects="..\..\Samples\SpeedTest\SpeedTest.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SpeedTest:Make">
+        <MSBuild Projects="..\..\Samples\SpeedTest\SpeedTest.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="IupOrmProject_DesignTime;IupOrmProject;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_ioPrototypeBindSource;Pizza_ioActiveBindSourceAdapter;PizzaWin_ioActiveBindSourceAdapter;Pizza_List;VRManagerClient;Pizza_ioPrototypeBindSource"/>
+        <CallTarget Targets="IupOrmProject_DesignTime;IupOrmProject;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_ioPrototypeBindSource;Pizza_ioActiveBindSourceAdapter;PizzaWin_ioActiveBindSourceAdapter;Pizza_List;VRManagerClient;Pizza_ioPrototypeBindSource;RVMan;SpeedTest"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="IupOrmProject_DesignTime:Clean;IupOrmProject:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_ioPrototypeBindSource:Clean;Pizza_ioActiveBindSourceAdapter:Clean;PizzaWin_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;VRManagerClient:Clean;Pizza_ioPrototypeBindSource:Clean"/>
+        <CallTarget Targets="IupOrmProject_DesignTime:Clean;IupOrmProject:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_ioPrototypeBindSource:Clean;Pizza_ioActiveBindSourceAdapter:Clean;PizzaWin_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;VRManagerClient:Clean;Pizza_ioPrototypeBindSource:Clean;RVMan:Clean;SpeedTest:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="IupOrmProject_DesignTime:Make;IupOrmProject:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_ioPrototypeBindSource:Make;Pizza_ioActiveBindSourceAdapter:Make;PizzaWin_ioActiveBindSourceAdapter:Make;Pizza_List:Make;VRManagerClient:Make;Pizza_ioPrototypeBindSource:Make"/>
+        <CallTarget Targets="IupOrmProject_DesignTime:Make;IupOrmProject:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_ioPrototypeBindSource:Make;Pizza_ioActiveBindSourceAdapter:Make;PizzaWin_ioActiveBindSourceAdapter:Make;Pizza_List:Make;VRManagerClient:Make;Pizza_ioPrototypeBindSource:Make;RVMan:Make;SpeedTest:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
