@@ -31,6 +31,7 @@ type
   protected
     class function IsValidEntity(AType:TRttiInstanceType): Boolean;
     class procedure Init;
+    class procedure SetPropertiesFieldData;
   public
     class procedure Add(AClassRef: TioClassRef);
     class function GetContainer: TioMapContainerInstance;
@@ -115,6 +116,15 @@ begin
     end;
 end;
 
+class procedure TioMapContainer.SetPropertiesFieldData;
+var
+  AMapSlot: TioMapSlot;
+begin
+  // Calculate field data for all properties in the container
+  for AMapSlot in ioMapContainerInstance.Values
+    do AMapSlot.GetMap.GetProperties.SetFieldData;
+end;
+
 { TioContextSlot }
 
 function TioMapSlot.GetClassRef: TioClassRef;
@@ -141,6 +151,7 @@ initialization
   //  all entities declarated in the application
   ioMapContainerInstance := TioMapContainerInstance.Create([doOwnsValues]);
   TioMapContainer.Init;
+  TioMapContainer.SetPropertiesFieldData;
 
 finalization
   ioMapContainerInstance.Free;

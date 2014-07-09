@@ -61,8 +61,6 @@ type
     procedure acRefreshExecute(Sender: TObject);
   private
     { Private declarations }
-    FPizzaList: TPizzaList;
-    FPizzaListAdapter: TListBindSourceAdapter<TPizza>;
   public
     { Public declarations }
   end;
@@ -96,9 +94,9 @@ procedure TMainForml.Button6Click(Sender: TObject);
 begin
   if not OpenDialog1.Execute
     then Exit;
-  if FPizzaListAdapter.State = seBrowse
-    then FPizzaListAdapter.Edit;
-  (FPizzaListAdapter.Current as TPizza).Img.LoadFromFile(OpenDialog1.FileName);
+  if PrototypeBindSource1.InternalAdapter.State = seBrowse
+    then PrototypeBindSource1.InternalAdapter.Edit;
+  (PrototypeBindSource1.InternalAdapter.Current as TPizza).Img.LoadFromFile(OpenDialog1.FileName);
 end;
 
 procedure TMainForml.FormCreate(Sender: TObject);

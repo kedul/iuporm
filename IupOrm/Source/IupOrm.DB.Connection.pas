@@ -3,15 +3,25 @@ unit IupOrm.DB.Connection;
 interface
 
 uses
-  Data.DbxSqlite, IupOrm.DB.Interfaces, Data.DBXCommon;
+  IupOrm.DB.Interfaces,
+  FireDAC.Stan.Def,
+  FireDAC.Phys.SQLite,
+  FireDAC.Stan.ExprFuncs,
+  FireDAC.Stan.Intf,
+  FireDAC.Phys,
+  FireDAC.DApt,
+  FireDAC.UI.Intf,
+  FireDAC.FMXUI.Wait,
+  FireDAC.Comp.UI,
+  FireDAC.Stan.Async;
 
 type
 
   TioConnection = class(TInterfacedObject, IioConnection)
   strict private
     FConnection: TioInternalSqlConnection;
-    FCurrentTransaction: TDBXTransaction;
     FTransactionCounter: Integer;
+    FFDGUIxWaitCursor: TFDGUIxWaitCursor;
   public
     constructor Create(AConnection:TioInternalSqlConnection);
     destructor Destroy; override;
@@ -31,20 +41,22 @@ procedure TioConnection.Commit;
 begin
   Dec(FTransactionCounter);
   if FTransactionCounter = 0
-    then FConnection.CommitFreeAndNil(FCurrentTransaction);
+    then FConnection.Commit;
 end;
 
 constructor TioConnection.Create(AConnection: TioInternalSqlConnection);
 begin
   inherited Create;
+  FFDGUIxWaitCursor := TFDGUIxWaitCursor.Create(nil);
+  FFDGUIxWaitCursor.Provider := 'FMX';
   FTransactionCounter := 0;
   FConnection := AConnection;
-  FCurrentTransaction := nil;
 end;
 
 destructor TioConnection.Destroy;
 begin
   FConnection.Free;
+  FFDGUIxWaitCursor.Free;
   inherited;
 end;
 
@@ -60,16 +72,15 @@ end;
 
 procedure TioConnection.Rollback;
 begin
-  Dec(FTransactionCounter);
-  if FTransactionCounter = 0
-    then FConnection.RollbackFreeAndNil(FCurrentTransaction);
+  FConnection.Rollback;
+  FTransactionCounter := 0;
 end;
 
 procedure TioConnection.StartTransaction;
 begin
   if FTransactionCounter <= 0 then
   begin
-    FCurrentTransaction := FConnection.BeginTransaction;
+    FConnection.StartTransaction;
     FTransactionCounter := 0;
   end;
   inc(FTransactionCounter);

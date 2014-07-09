@@ -32,7 +32,7 @@ type
 implementation
 
 uses
-  IupOrm.DB.SqLite.CompareOperators, Data.SqlExpr, System.IOUtils,
+  IupOrm.DB.SqLite.CompareOperators, System.IOUtils,
   IupOrm.DB.Connection, IupOrm.DB.SqLite.LogicRelations, IupOrm.DB.Query,
   IupOrm.DB.SqLite.SqlDataConverter, IupOrm.DB.SqLite.SqlGenerator,
   IupOrm.Where.SqlItems;
@@ -77,7 +77,7 @@ end;
 class function TioDbFactory.NewConnection: IioConnection;
 var
   DBPath, DBFileNameFull: String;
-  LConnection: TSqlConnection;
+  LConnection: TioInternalSqlConnection;
 begin
   // Get DBFOlder
   DBPath := Self.GetDBFolder;
@@ -87,7 +87,7 @@ begin
   // Compone il nome completo del file database
   DBFileNameFull := TPath.Combine(DBPath, 'db.db');
   // Crea la connessione al DB
-  LConnection := TSQLConnection.Create(nil);
+  LConnection := TioInternalSqlConnection.Create(nil);
   LConnection.DriverName := 'SQLite';
   LConnection.LoginPrompt := False;
   LConnection.Params.Values['FailIfMissing'] := 'False';
@@ -101,9 +101,9 @@ end;
 
 class function TioDbFactory.Query(SQL: TStrings): IioQuery;
 var
-  NewQry: TSQLQuery;
+  NewQry: TioInternalSqlQuery;
 begin
-  NewQry := TSqlQuery.Create(nil);
+  NewQry := TioInternalSqlQuery.Create(nil);
   try
     if Assigned(SQL) then NewQry.SQL.AddStrings(SQL);
     Result := TioQuery.Create(Self.Connection, NewQry);
@@ -114,9 +114,9 @@ end;
 
 class function TioDbFactory.QueryInsert(SQL: TStrings): IioQuery;
 var
-  NewQry: TSQLQuery;
+  NewQry: TioInternalSqlQuery;
 begin
-  NewQry := TSqlQuery.Create(nil);
+  NewQry := TioInternalSqlQuery.Create(nil);
   try
     NewQry.SQL.AddStrings(SQL);
     Result := TioQueryInsert.Create(Self.Connection, NewQry, 'SELECT last_insert_rowid()');

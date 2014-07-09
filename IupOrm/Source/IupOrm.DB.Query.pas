@@ -6,8 +6,9 @@ uses
   IupOrm.Context.Properties.Interfaces,
   IupOrm.DB.Interfaces,
   System.Classes,
-  Data.SqlExpr,
-  System.Rtti, Data.DB;
+  System.Rtti,
+  FireDAC.Comp.Client,
+  Data.DB;
 
 type
 
@@ -15,11 +16,11 @@ type
   TioQuery = class(TInterfacedObject, IioQuery)
   strict private
     FSqlConnection: IioConnection;
-    FSqlQuery: TSQLQuery;
+    FSqlQuery: TioInternalSqlQuery;
   strict protected
     function GetValueByFieldIndexAsVariant(Idx:Integer): Variant;
   public
-    constructor Create(AConnection:IioConnection; ASQLQuery:TSQLQuery);
+    constructor Create(AConnection:IioConnection; ASQLQuery:TioInternalSqlQuery);
     destructor Destroy; override;
     procedure First;
     procedure Last;
@@ -45,7 +46,7 @@ type
   strict private
     FGetLastIdSql: String;
   public
-    constructor Create(AConnection:IioConnection; ASQLQuery:TSQLQuery; AGetLastIdSql:String='');
+    constructor Create(AConnection:IioConnection; ASQLQuery:TioInternalSqlQuery; AGetLastIdSql:String='');
     function ExecSQL: Integer; override;
   end;
 
@@ -69,19 +70,19 @@ begin
 end;
 
 constructor TioQuery.Create(AConnection: IioConnection;
-  ASQLQuery: TSQLQuery);
+  ASQLQuery: TioInternalSqlQuery);
 begin
   inherited Create;
   FSqlQuery := ASQLQuery;
   FSqlConnection := AConnection;  // Per utilizzare il reference counting
   if Assigned(AConnection)
-    then FSqlQuery.SQLConnection := AConnection.GetConnection as TSQLConnection;
+    then FSqlQuery.Connection := AConnection.GetConnection;
 end;
 
 function TioQuery.CreateBlobStream(AProperty: IioContextProperty;
   Mode: TBlobStreamMode): TStream;
 begin
-  Result := FSqlQuery.CreateBlobStream(   Fields.FieldByName(AProperty.GetSqlFieldName)   , Mode);
+  Result := FSqlQuery.CreateBlobStream(   Fields.FieldByName(AProperty.GetSqlFieldAlias)   , Mode);
 end;
 
 destructor TioQuery.Destroy;
@@ -97,7 +98,8 @@ end;
 
 function TioQuery.ExecSQL: Integer;
 begin
-  Result := FSqlQuery.ExecSQL;
+  Result := 0;
+  FSqlQuery.ExecSQL;
 end;
 
 function TioQuery.Fields: TioFields;
@@ -120,14 +122,14 @@ begin
   // If the property is a BelongsTo relation then return data as Integer
   //  (the type for ID)
   if AProperty.GetRelationType = ioRTBelongsTo
-    then Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldName).AsInteger
+    then Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger
 
   // If the property is mapped into a blob field
   else if AProperty.IsBlob
     then Result := TioObjectMakerFactory.GetObjectMaker(False).CreateObjectFromBlobField(Self, AProperty)
 
   // If the field is null
-  else if FSqlQuery.FieldByName(AProperty.GetSqlFieldName).IsNull
+  else if FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).IsNull
     then Exit
 
   // Otherwise data type is by Property.TypeKind
@@ -135,11 +137,11 @@ begin
   begin
     case AProperty.GetRttiProperty.PropertyType.TypeKind of
       tkInt64, tkInteger:
-        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldName).AsInteger;
+        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger;
       tkFloat:
-        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldName).AsFloat;
+        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsFloat;
       tkString, tkUString, tkWChar, tkLString, tkWString, tkChar:
-        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldName).AsString;
+        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsString;
     end;
   end;
 end;
@@ -182,12 +184,12 @@ end;
 procedure TioQuery.SaveStreamObjectToSqlParam(AObj: TObject;
   AProperty: IioContextProperty);
 var
-  AParam: TParam;
+  AParam: TioParam;
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
   AStream: TStream;
 begin
   // First prepare the query in it is not
-  Self.FSqlQuery.Params.ParseSQL(Self.SQL.Text, True);
+//  Self.FSqlQuery.Prepare;
   // Get the param
   AParam := Self.FSqlQuery.Params.ParamByName(AProperty.GetSqlParamName);
   if not Assigned(AParam) then raise EIupOrmException.Create(Self.ClassName +  ': ' + AProperty.GetSqlParamName + ' Sql parameter not found');
@@ -196,6 +198,7 @@ begin
   // If the wrapped object IsEmpty set the Param value to NULL then exit
   if ADuckTypedStreamObject.IsEmpty then
   begin
+    AParam.DataType := ftBlob;
     AParam.Clear;
     Exit;
   end;
@@ -216,7 +219,7 @@ end;
 { TioQueryInsert }
 
 constructor TioQueryInsert.Create(AConnection: IioConnection;
-  ASQLQuery: TSQLQuery; AGetLastIdSql: String);
+  ASQLQuery: TioInternalSqlQuery; AGetLastIdSql: String);
 begin
   inherited Create(AConnection, ASQLQuery);
   FGetLastIdSql := AGetLastIdSql;

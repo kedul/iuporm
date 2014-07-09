@@ -56,6 +56,7 @@ type
     procedure ListView1Click(Sender: TObject);
     procedure acPostExecute(Sender: TObject);
     procedure acDeleteExecute(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -102,6 +103,15 @@ end;
 procedure TMainForml.acRefreshExecute(Sender: TObject);
 begin
   PrototypeBindSource1.Refresh;
+end;
+
+procedure TMainForml.Button6Click(Sender: TObject);
+begin
+  if not OpenDialog1.Execute
+    then Exit;
+  if PrototypeBindSource1.InternalAdapter.State = seBrowse
+    then PrototypeBindSource1.InternalAdapter.Edit;
+  (PrototypeBindSource1.InternalAdapter.Current as TPizza).Img.LoadFromFile(OpenDialog1.FileName);
 end;
 
 procedure TMainForml.FormCreate(Sender: TObject);

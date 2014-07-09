@@ -95,7 +95,7 @@ begin
   // Set the directory name (under the Documents folder)
   TIupOrm.SetDBFolderInDocuments('Pizza');
   // AutoCreation and AutoUpdate of the database
-  TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase;
+  TIupOrm.AutoCreateDatabase;
 end;
 
 procedure TMainForml.acLoadExecute(Sender: TObject);

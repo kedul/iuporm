@@ -7,14 +7,17 @@ uses
   IupOrm.CommonTypes,
   IupOrm.Interfaces,
   System.Rtti,
-  System.Generics.Collections;
+  System.Generics.Collections, IupOrm.Context.Table.Interfaces;
 
 type
 
   IioContextProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
     function GetName: string;
-    function GetSqlFieldName: string;
+    function GetQualifiedSqlFieldName: string;
+    function GetFullQualifiedSqlFieldName: String;
+    function GetSqlFieldName: String;
+    function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;
     function IsBlob: Boolean;
@@ -27,6 +30,8 @@ type
     function GetRelationChildPropertyName: String;
     function GetRelationChildObject(Instance: Pointer): TObject;
     function GetRelationChildObjectID(Instance: Pointer): String;
+    procedure SetTable(ATable:IioContextTable);
+    procedure SetFieldData;
   end;
 
   IioContextProperties = interface(IioSqlItem)
@@ -35,6 +40,10 @@ type
     procedure Add(AProperty: IioContextProperty; AIsId: Boolean = False);
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
+    procedure SetTable(ATable:IioContextTable);
+    function GetSqlQualified: String;
+    function GetSqlFullQualified: String;
+    procedure SetFieldData;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist

@@ -8,7 +8,7 @@ uses
   IupOrm.Attributes,
   IupOrm.SqlItems,
   System.Rtti,
-  System.Generics.Collections;
+  System.Generics.Collections, IupOrm.Context.Table.Interfaces;
 
 type
 
@@ -16,15 +16,22 @@ type
   TioProperty = class (TInterfacedObject, IioContextProperty)
   strict private
     FRttiProperty: TRttiProperty;
-    FSqlFieldName: String;
+    FFieldDefinitionString, FSqlFieldTableName, FSqlFieldName, FSqlFieldAlias: String;
+    FQualifiedSqlFieldName: String;
+    FFullQualifiedSqlFieldName: String;
     FFieldType: String;
     FRelationType: TioRelationType;
     FRelationChildClassRef: TioClassRef;
     FRelationChildPropertyName: String;
+    FTable:IioContextTable;
   public
-    constructor Create(ARttiProperty:TRttiProperty; ASqlFieldName:String; AFieldType:String; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String);
+    constructor Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; AFieldType:String; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String);
     function GetName: String;
+    function GetQualifiedSqlFieldName: String;
+    function GetFullQualifiedSqlFieldName: String;
+    function GetSqlFieldTableName: String;
     function GetSqlFieldName: String;
+    function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
     function GetFieldType: String;
     function IsBlob: Boolean;
@@ -37,9 +44,12 @@ type
     function GetRelationChildPropertyName: String;
     function GetRelationChildObject(Instance: Pointer): TObject;
     function GetRelationChildObjectID(Instance: Pointer): String;
+    procedure SetTable(ATable:IioContextTable);
+    procedure SetFieldData;
   end;
 
   // Classe con l'elenco delle proprietà della classe
+  TioPropertiesGetSqlFunction = reference to function(AProperty:IioContextProperty):String;
   TioProperties = class (TioSqlItem, IioContextProperties)
   strict private
     FPropertyItems: TList<IioContextProperty>;
@@ -47,6 +57,7 @@ type
     FObjStatusProperty: IioContextProperty;
     FBlobFieldExists: Boolean;
   strict protected
+    function InternalGetSql(AFunc: TioPropertiesGetSqlFunction): String;
     // ObjectStatus property
     function GetObjStatusProperty: IioContextProperty;
     procedure SetObjStatusProperty(AValue: IioContextProperty);
@@ -56,9 +67,13 @@ type
     function GetEnumerator
       : TEnumerator<IioContextProperty>;
     function GetSql: String; override;
+    function GetSqlQualified: String;
+    function GetSqlFullQualified: String;
     procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False);
     function GetIdProperty:IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
+    procedure SetTable(ATable:IioContextTable);
+    procedure SetFieldData;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
@@ -72,16 +87,17 @@ implementation
 
 uses
   System.TypInfo, IupOrm.Context.Interfaces, IupOrm.Context.Factory,
-  IupOrm.DB.Factory, IupOrm.Exceptions, System.SysUtils;
+  IupOrm.DB.Factory, IupOrm.Exceptions, System.SysUtils, IupOrm.SqlTranslator,
+  System.StrUtils;
 
 { TioProperty }
 
-constructor TioProperty.Create(ARttiProperty:TRttiProperty; ASqlFieldName:String; AFieldType:String;
+constructor TioProperty.Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; AFieldType:String;
 ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef;
 ARelationChildPropertyName:String);
 begin
   FRttiProperty := ARttiProperty;
-  FSqlFieldName := ASqlFieldName;
+  FFieldDefinitionString := AFieldDefinitionString;
   FFieldType := AFieldType;
   // Relation fields
   FRelationType := ARelationType;
@@ -94,6 +110,11 @@ begin
   if FFieldType.IsEmpty
     then Result := TioDbFactory.SqlDataConverter.PropertyToFieldType(Self)
     else Result := FFieldType;
+end;
+
+function TioProperty.GetFullQualifiedSqlFieldName: String;
+begin
+  Result := FFullQualifiedSqlFieldName;
 end;
 
 function TioProperty.GetName: String;
@@ -152,14 +173,29 @@ begin
   Result := FRttiProperty;
 end;
 
+function TioProperty.GetSqlFieldAlias: String;
+begin
+  Result := FSqlFieldAlias;
+end;
+
 function TioProperty.GetSqlFieldName: String;
 begin
   Result := FSqlFieldName;
 end;
 
+function TioProperty.GetSqlFieldTableName: String;
+begin
+  Result := FSqlFieldTableName;
+end;
+
+function TioProperty.GetQualifiedSqlFieldName: String;
+begin
+  Result := FQualifiedSqlFieldName;
+end;
+
 function TioProperty.GetSqlParamName: String;
 begin
-  Result := 'P_' + Self.GetSqlFieldName;
+  Result := 'P_' + Self.GetSqlFieldAlias;
 end;
 
 function TioProperty.GetSqlValue(ADataObject:TObject): String;
@@ -175,6 +211,37 @@ end;
 function TioProperty.IsBlob: Boolean;
 begin
   Result := Self.GetFieldType.StartsWith('BLOB');
+end;
+
+procedure TioProperty.SetFieldData;
+var
+  DotPos, AsPos: Smallint;
+  AValue: String;
+begin
+  AValue := FFieldDefinitionString;
+  // Translate (if contains tags)
+  AValue := TioSqlTranslator.Translate(AValue);
+  // Retrieve the markers position
+  DotPos := Pos('.', AValue);
+  AsPos := Pos(' AS ', AValue, DotPos);
+  if AsPos = 0 then AsPos := AValue.Length+1;
+  // Retrieve Table reference
+  FSqlFieldTableName := LeftStr(AValue, DotPos-1);
+  if FSqlFieldTableName = '' then FSqlFieldTableName := FTable.TableName;
+  // Retrieve FieldName
+  FSqlFieldName := MidStr(AValue, DotPos+1, AsPos-DotPos-1);
+  // Retrieve Field Alias
+  FSqlFieldAlias := MidStr(AValue, AsPos+4, AValue.Length);
+  if FSqlFieldAlias = '' then FSqlFieldAlias := FSqlFieldTableName + '_' + FSqlFieldName;
+  // Set QualifiedFieldName
+  FQualifiedSqlFieldName := FSqlFieldTableName + '.' + FSqlFieldName;
+  // Set FullQualifiedFieldName
+  FFullQualifiedSqlFieldName := FQualifiedSqlFieldName + ' AS ' + FSqlFieldAlias;
+end;
+
+procedure TioProperty.SetTable(ATable: IioContextTable);
+begin
+  FTable := ATable;
 end;
 
 procedure TioProperty.SetValue(Instance: Pointer; AValue: TValue);
@@ -239,6 +306,41 @@ begin
 end;
 
 function TioProperties.GetSql: String;
+begin
+  // Use Internal function with an anonomous method
+  Result := Self.InternalGetSql(
+    function (AProp:IioCOntextProperty): String
+    begin
+      Result := AProp.GetSqlFieldName;
+    end
+  );
+end;
+
+
+function TioProperties.GetSqlFullQualified: String;
+begin
+  // Use Internal function with an anonomous method
+  Result := Self.InternalGetSql(
+    function (AProp:IioCOntextProperty): String
+    begin
+      Result := AProp.GetFullQualifiedSqlFieldName;
+    end
+  );
+end;
+
+function TioProperties.GetSqlQualified: String;
+begin
+  // Use Internal function with an anonomous method
+  Result := Self.InternalGetSql(
+    function (AProp:IioCOntextProperty): String
+    begin
+      Result := AProp.GetQualifiedSqlFieldName;
+    end
+  );
+end;
+
+function TioProperties.InternalGetSql(
+  AFunc: TioPropertiesGetSqlFunction): String;
 var
   Prop: IioContextProperty;
 begin
@@ -248,19 +350,34 @@ begin
     if Prop.GetRelationType = ioRTHasMany then Continue;
     // Add the current property
     if Result <> '' then Result := Result + ', ';
-    Result := Result + Prop.GetSqlFieldName;
+    Result := Result + AFunc(Prop);
   end;
 end;
-
 
 function TioProperties.ObjStatusExist: Boolean;
 begin
   Result := Assigned(FObjStatusProperty);
 end;
 
+procedure TioProperties.SetFieldData;
+var
+  AProperty: IioContextProperty;
+begin
+  for AProperty in FPropertyItems
+    do AProperty.SetFieldData;
+end;
+
 procedure TioProperties.SetObjStatusProperty(AValue: IioContextProperty);
 begin
   FObjStatusProperty := AValue;
+end;
+
+procedure TioProperties.SetTable(ATable: IioContextTable);
+var
+  AProperty: IioContextProperty;
+begin
+  for AProperty in FPropertyItems do
+    AProperty.SetTable(ATable);
 end;
 
 end.

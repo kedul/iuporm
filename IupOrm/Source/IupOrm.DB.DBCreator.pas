@@ -264,7 +264,9 @@ var
   AProperty: IioContextProperty;
   ATable: IioDBCreatorTable;
   AField: IioDBCreatorField;
+  ATableName: String;
 begin
+  ATableName := AMap.GetTable.TableName;
   // Find or Create Table
   ATable := Self.FindOrCreateTable(AMap.GetTable.TableName, AMap.GetTable.IsClassFromField);
   // Loop for properties

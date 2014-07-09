@@ -4,7 +4,7 @@ interface
 
 uses
   IupOrm.DB.DBCreator.Interfaces, System.TypInfo, System.Rtti, System.Classes,
-  IupOrm.DB.Interfaces, Data.DB, IupOrm.Context.Properties.Interfaces;
+  IupOrm.DB.Interfaces, IupOrm.Context.Properties.Interfaces, Data.DB;
 
 type
 

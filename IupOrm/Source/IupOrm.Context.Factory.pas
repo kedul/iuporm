@@ -19,6 +19,9 @@ type
     class function GetProperty(ARttiProperty:TRttiProperty; ASqlFieldName:String; AFieldType:String; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String): IioContextProperty;
     class function Properties(Typ: TRttiInstanceType): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; ASqlFieldName:String=IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
+    class function Joins: IioJoins;
+    class function JoinItem(const AJoinAttribute:ioJoin): IioJoinItem;
+    class function GroupBy(ASqlText:String): IioGroupBy;
     class function Table(Typ: TRttiInstanceType): IioContextTable;
     class function Where: TioWhere;
     class function Map(AClassRef: TioClassRef): IioMap;
@@ -77,6 +80,24 @@ begin
                                );
 end;
 
+
+class function TioContextFactory.GroupBy(ASqlText:String): IioGroupBy;
+begin
+  Result := TioGroupBy.Create(ASqlText);
+end;
+
+class function TioContextFactory.JoinItem(const AJoinAttribute:ioJoin): IioJoinItem;
+begin
+  Result := TioJoinItem.Create(AJoinAttribute.JoinType,
+                               AJoinAttribute.JoinClassRef,
+                               AJoinAttribute.JoinCondition
+                              );
+end;
+
+class function TioContextFactory.Joins: IioJoins;
+begin
+  Result := TioJoins.Create;
+end;
 
 class function TioContextFactory.Map(AClassRef: TioClassRef): IioMap;
 var
@@ -171,18 +192,23 @@ var
   Attr: TCustomAttribute;
   TableName: String;
   ClassFromField: IioClassFromField;
+  AJoins: IioJoins;
+  AGroupBy: IioGroupBy;
 begin
   // Prop Init
-//  TableName := Typ.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
   TableName := Typ.MetaclassType.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
+  AJoins := Self.Joins;
+  AGroupBy := nil;
   // Check attributes
   for Attr in Typ.GetAttributes do
   begin
     if Attr is ioTable then TableName := ioTable(Attr).Value;
     if Attr is ioClassFromField then ClassFromField := Self.ClassFromField(Typ);
+    if Attr is ioJoin then AJoins.Add(Self.JoinItem(   ioJoin(Attr)   ));
+    if (Attr is ioGroupBy) and (not Assigned(AGroupBy)) then AGroupBy := Self.GroupBy(   ioGroupBy(Attr).Value   );
   end;
   // Create result Properties object
-  Result := TioContextTable.Create(TableName, ClassFromField);
+  Result := TioContextTable.Create(TableName, ClassFromField, AJoins, AGroupBy);
 end;
 
 class function TioContextFactory.Where: TioWhere;
