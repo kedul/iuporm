@@ -34,6 +34,10 @@ type
     procedure SetWhere(AWhere: TioWhere);
     function GetWhere: TioWhere;
     property Where:TioWhere read GetWhere write SetWhere;
+    // GroupBy
+    function GetGroupBySql: String;
+    // Join
+    function GetJoin: IioJoins;
   end;
 
 implementation

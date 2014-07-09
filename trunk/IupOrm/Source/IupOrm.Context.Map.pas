@@ -52,7 +52,9 @@ begin
   FRttiContext := ARttiContext;
   FRttiType := ARttiType;
   FTable := ATable;
+  // Set properties
   FProperties := AProperties;
+  FProperties.SetTable(FTable);
 end;
 
 function TioMap.GetClassRef: TioClassRef;

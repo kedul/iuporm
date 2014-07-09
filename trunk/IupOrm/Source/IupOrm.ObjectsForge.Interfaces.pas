@@ -121,7 +121,7 @@ begin
   // Create the object
   Result := Self.CreateObjectByRttiType(   AProperty.GetRttiProperty.PropertyType   );
   // If the field is null then exit
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldName).IsNull then Exit;
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
   // Wrap the object into a DuckTypedStreamObject
   ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(Result);
   // Get the BlobStream

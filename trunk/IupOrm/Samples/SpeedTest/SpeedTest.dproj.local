@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2014/06/18 17:28:46.000.650,=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2014/06/18 17:29:58.000.459,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\SpeedTest\Main.fmx=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit2.fmx</Transaction>
+    <Transaction>2014/06/18 17:29:58.000.459,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\SpeedTest\Main.pas=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2014/06/18 17:30:10.000.232,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\SpeedTest\SpeedTest.dproj=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2014/06/18 17:33:15.000.975,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\SpeedTest\Unit1.pas</Transaction>
+    <Transaction>2014/06/18 17:33:22.000.430,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\SpeedTest\Model.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\SpeedTest\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

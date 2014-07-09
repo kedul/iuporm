@@ -10,6 +10,9 @@ type
   // Relation types
   TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne);
 
+  // Join types
+  TioJoinType = (ioInner, ioCross, ioLeftOuter, ioRightOuter, ioFullOuter);
+
   // ===========================================================================
   // START BASE ATTRIBUTES
   // ---------------------------------------------------------------------------
@@ -98,6 +101,23 @@ type
   ioClassFromField = class(TioCustomAttribute)
   end;
 
+  // GroupBy
+  ioGroupBy = class(TioCustomStringAttribute)
+  end;
+
+  // Join attribute
+  ioJoin = class(TioCustomAttribute)
+  strict private
+    FJoinType: TioJoinType;
+    FJoinClassRef: TioClassRef;
+    FJoinCondition: String;
+  public
+    constructor Create(const AJoinType:TioJoinType; AJoinClassRef:TioClassRef; AJoinCondition:String='');
+    property JoinType: TioJoinType read FJoinType;
+    property JoinClassRef: TioClassRef read FJoinClassRef;
+    property JoinCondition: String read FJoinCondition;
+  end;
+
   // ---------------------------------------------------------------------------
   // SEND CLASS ATTRIBUTES
   // ===========================================================================
@@ -130,5 +150,16 @@ begin
   FChildPropertyName := AChildPropertyName;
 end;
 
+
+{ ioJoin }
+
+constructor ioJoin.Create(const AJoinType: TioJoinType;
+  AJoinClassRef: TioClassRef; AJoinCondition: String);
+begin
+  inherited Create;
+  FJoinType := AJoinType;
+  FJoinClassRef := AJoinClassRef;
+  FJoinCondition := AJoinCondition;
+end;
 
 end.

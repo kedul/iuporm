@@ -2,27 +2,27 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 567
-  ClientWidth = 384
+  ClientHeight = 460
+  ClientWidth = 320
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   DesignerMobile = True
-  DesignerWidth = 384
-  DesignerHeight = 592
-  DesignerDeviceName = 'Google Nexus 4'
+  DesignerWidth = 320
+  DesignerHeight = 480
+  DesignerDeviceName = 'iPhone'
   DesignerOrientation = 0
-  DesignerOSVersion = ''
+  DesignerOSVersion = '7'
   object TabControl1: TTabControl
     Align = Client
     FullSize = True
-    Height = 567.000000000000000000
+    Height = 460.000000000000000000
     TabHeight = 49.000000000000000000
     TabIndex = 0
     TabOrder = 9
     TabPosition = None
-    Width = 384.000000000000000000
+    Width = 320.000000000000000000
     object TabItem1: TTabItem
       CustomIcon = <
         item
@@ -33,17 +33,17 @@ object Form1: TForm1
       Text = 'TabItem1'
       Width = 8.000000000000000000
       object ToolBar1: TToolBar
-        Height = 48.000000000000000000
+        Height = 44.000000000000000000
         TabOrder = 1
-        Width = 384.000000000000000000
+        Width = 320.000000000000000000
         object Button1: TButton
           Action = NextTabAction1
           Align = Right
-          Height = 48.000000000000000000
-          Position.X = 336.000000000000000000
+          Height = 44.000000000000000000
+          Position.X = 276.000000000000000000
           StyleLookup = 'nexttoolbutton'
           TabOrder = 2
-          Width = 48.000000000000000000
+          Width = 44.000000000000000000
         end
       end
       object MasterListView: TListView
@@ -53,9 +53,9 @@ object Form1: TForm1
         FooterAppearanceClassName = 'TListHeaderObjects'
         ItemIndex = 1
         Align = Client
-        Height = 353.000000000000000000
+        Height = 250.000000000000000000
         TabOrder = 3
-        Width = 384.000000000000000000
+        Width = 320.000000000000000000
         object TabControl2: TTabControl
           FullSize = True
           Height = 200.000000000000000000
@@ -69,10 +69,10 @@ object Form1: TForm1
       object Label1: TLabel
         Align = Bottom
         Height = 23.000000000000000000
-        Position.Y = 401.000000000000000000
+        Position.Y = 294.000000000000000000
         TextSettings.HorzAlign = Center
         Text = 'Phones'
-        Width = 384.000000000000000000
+        Width = 320.000000000000000000
       end
       object DetailListView: TListView
         ItemAppearanceClassName = 'TListItemRightDetailAppearance'
@@ -82,9 +82,9 @@ object Form1: TForm1
         ItemIndex = 0
         Align = Bottom
         Height = 143.000000000000000000
-        Position.Y = 424.000000000000000000
+        Position.Y = 317.000000000000000000
         TabOrder = 4
-        Width = 384.000000000000000000
+        Width = 320.000000000000000000
       end
     end
     object TabItem2: TTabItem
@@ -99,19 +99,19 @@ object Form1: TForm1
       object Label2: TLabel
         Align = Bottom
         Height = 23.000000000000000000
-        Position.Y = 369.000000000000000000
+        Position.Y = 262.000000000000000000
         TextSettings.HorzAlign = Center
         Text = 'Phones'
-        Width = 384.000000000000000000
+        Width = 320.000000000000000000
       end
       object ToolBar2: TToolBar
         Height = 48.000000000000000000
         TabOrder = 4
-        Width = 384.000000000000000000
+        Width = 320.000000000000000000
         object ToolBar3: TToolBar
           Height = 48.000000000000000000
           TabOrder = 5
-          Width = 384.000000000000000000
+          Width = 320.000000000000000000
           object Button2: TButton
             Action = PreviousTabAction1
             Align = Left
@@ -125,8 +125,8 @@ object Form1: TForm1
       object DetailBindNavigator: TBindNavigator
         Align = Bottom
         Height = 25.000000000000000000
-        Position.Y = 392.000000000000000000
-        Width = 384.000000000000000000
+        Position.Y = 285.000000000000000000
+        Width = 320.000000000000000000
         TabOrder = 5
         DataSource = DetailBS
         VisibleButtons = [nbFirst, nbPrior, nbNext, nbLast, nbInsert, nbDelete, nbEdit, nbPost, nbCancel]
@@ -136,21 +136,21 @@ object Form1: TForm1
       object Grid1: TGrid
         Align = MostBottom
         Height = 150.000000000000000000
-        Position.Y = 417.000000000000000000
+        Position.Y = 310.000000000000000000
         TabOrder = 6
-        Width = 384.000000000000000000
+        Width = 320.000000000000000000
         RowCount = 200
         RowHeight = 21.000000000000000000
       end
       object Panel1: TPanel
         Align = Client
-        Height = 321.000000000000000000
-        Width = 384.000000000000000000
+        Height = 214.000000000000000000
+        Width = 320.000000000000000000
         TabOrder = 7
         object MasterBindNavigator: TBindNavigator
           Align = Top
           Height = 25.000000000000000000
-          Width = 384.000000000000000000
+          Width = 320.000000000000000000
           TabOrder = 1
           DataSource = MasterBS
           VisibleButtons = [nbEdit, nbPost, nbCancel]

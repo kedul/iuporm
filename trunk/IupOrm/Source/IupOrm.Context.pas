@@ -49,6 +49,10 @@ type
     property ObjectStatus:TIupOrmObjectStatus read GetObjectStatus write SetObjectStatus;
     // Where
     property Where:TioWhere read GetWhere write SetWhere;
+    // GroupBy
+    function GetGroupBySql: String;
+    // Join
+    function GetJoin: IioJoins;
   end;
 
 implementation
@@ -82,7 +86,7 @@ begin
     FSelfCreatedWhere := True;
     AWhere := TioContextFactory.Where;
     if Assigned(FDataObject)
-      then AWhere.Add(Self.GetProperties.GetIdProperty.GetSqlFieldName + TioDbFactory.CompareOperator._Equal.GetSql + Self.GetProperties.GetIdProperty.GetSqlValue(FDataObject));
+      then AWhere.Add(Self.GetProperties.GetIdProperty.GetQualifiedSqlFieldName + TioDbFactory.CompareOperator._Equal.GetSql + Self.GetProperties.GetIdProperty.GetSqlValue(FDataObject));
   end;
   // Add ContextProperties to TioWhere and assign it to the field
   AWhere.SetContextProperties(Self.GetProperties);
@@ -104,6 +108,22 @@ end;
 function TioContext.GetDataObject: TObject;
 begin
   Result := FDataObject;
+end;
+
+function TioContext.GetGroupBySql: String;
+begin
+  Result := '';
+  // Ritorna il GroupBy fisso (attribute nella dichiarazione della classe)
+  if Assigned(Self.GetTable.GetGroupBy)
+    then Result := Self.GetTable.GetGroupBy.GetSql;
+  // Aggiungere qui l'eventuale futuro codice per aggiungere/sostituire
+  //  l'eventuale GroupBy specificato nel ioWhere e che quindi è nel
+  //  context e che sostituisce il GroupBy fisso
+end;
+
+function TioContext.GetJoin: IioJoins;
+begin
+  Result := Self.GetTable.GetJoin;
 end;
 
 function TioContext.GetObjectStatus: TIupOrmObjectStatus;
@@ -171,7 +191,7 @@ end;
 
 function TioContext.ObjStatusExist: Boolean;
 begin
-  Self.GetProperties.ObjStatusExist;
+  Result := Self.GetProperties.ObjStatusExist;
 end;
 
 end.

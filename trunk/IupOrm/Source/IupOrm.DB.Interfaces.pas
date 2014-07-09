@@ -7,13 +7,17 @@ uses
   IupOrm.Context.Interfaces,
   IupOrm.Interfaces,
   System.Classes,
-  System.Rtti, Data.DB, Data.SqlExpr;
+  System.Rtti, IupOrm.Context.Table.Interfaces,
+  FireDAC.Comp.Client, FireDAC.Stan.Param,
+  Data.DB;
 
 type
 
-  TioInternalSqlConnection = TSQLConnection;
+  TioInternalSqlConnection = TFDConnection;
+  TioInternalSqlQuery = TFDQuery;
   TioFields = TFields;
-  TioParams = TParams;
+  TioParam = TFDParam;
+  TioParams = TFDParams;
 
   TioCompareOperatorRef = class of TioCompareOperator;
   TioLogicRelationRef = class of TioLogicRelation;
@@ -74,6 +78,7 @@ type
     class function GenerateSqlInsert(AContext:IioContext): IioQuery; virtual; abstract;
     class function GenerateSqlUpdate(AContext:IioContext): IioQuery; virtual; abstract;
     class function GenerateSqlDelete(AContext:IioContext): IioQuery; virtual; abstract;
+    class function GenerateSqlJoinSectionItem(AJoinItem: IioJoinItem): String; virtual; abstract;
   end;
 
   // Interfaccia per le classi che devono generare le LogicRelations

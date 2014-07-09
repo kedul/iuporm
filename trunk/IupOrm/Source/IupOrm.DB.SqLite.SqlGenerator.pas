@@ -4,7 +4,7 @@ interface
 
 uses
   IupOrm.Context.Interfaces,
-  IupOrm.DB.Interfaces;
+  IupOrm.DB.Interfaces, IupOrm.Context.Table.Interfaces;
 
 type
 
@@ -18,13 +18,15 @@ type
     class function GenerateSqlInsert(AContext:IioContext): IioQuery; override;
     class function GenerateSqlUpdate(AContext:IioContext): IioQuery; override;
     class function GenerateSqlDelete(AContext:IioContext): IioQuery; override;
+    class function GenerateSqlJoinSectionItem(AJoinItem: IioJoinItem): String; override;
   end;
 
 implementation
 
 uses
   System.Classes, IupOrm.DB.Factory, IupOrm.Context.Properties.Interfaces,
-  IupOrm.Attributes;
+  IupOrm.Attributes, IupOrm.Exceptions, System.IOUtils
+  ;
 
 { TioSqlGeneratorSqLite }
 
@@ -121,6 +123,25 @@ begin
   end;
 end;
 
+class function TioSqlGeneratorSqLite.GenerateSqlJoinSectionItem(
+  AJoinItem: IioJoinItem): String;
+begin
+  // Join
+  case AJoinItem.GetJoinType of
+    ioCross:      Result := 'CROSS JOIN ';
+    ioInner:      Result := 'INNER JOIN ';
+    ioLeftOuter:  Result := 'LEFT OUTER JOIN ';
+    ioRightOuter: Result := 'RIGHT OUTER JOIN ';
+    ioFullOuter:  Result := 'FULL OUTER JOIN ';
+    else raise EIupOrmException.Create(Self.ClassName + ': Join type not valid.');
+  end;
+  // Joined table name
+  Result := Result + '[' + AJoinItem.GetJoinClassRef.ClassName + ']';
+  // Conditions
+  if AJoinItem.GetJoinType <> ioCross
+    then Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
+end;
+
 class function TioSqlGeneratorSqLite.GenerateSqlSelectForList(
   AContext: IioContext): IioQuery;
 var
@@ -129,17 +150,24 @@ begin
   Result := nil;
   SQL := TStringList.Create;
   try
-    // Compone l'SQL
-    SQL.Add('SELECT ' + AContext.GetProperties.GetSql);
+    // Select
+    SQL.Add('SELECT ' + AContext.GetProperties.GetSqlFullQualified);
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+    // From
     SQL.Add('FROM ' + AContext.GetTable.GetSql);
+    // Join
+    SQL.Add(AContext.GetJoin.GetSql);
+    //Where
     SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.ClassFromField));
+    // GroupBy
+    SQL.Add(AContext.GetGroupBySql);
     // Crea l'oggetto ioQuery
     Result := TioDbFactory.Query(SQL);
   finally
     // Alla fine devo distruggere la StringList sulla quale ho costruito la query
     // per non avere un memory leak
+//SQL.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'sql.sql'));
     SQL.Free;
   end;
 end;
@@ -152,12 +180,18 @@ begin
   Result := nil;
   SQL := TStringList.Create;
   try
-    // Compone l'SQL
-    SQL.Add('SELECT ' + AContext.GetProperties.GetSql);
+    // Select
+    SQL.Add('SELECT ' + AContext.GetProperties.GetSqlFullQualified);
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+    // From
     SQL.Add('FROM ' + AContext.GetTable.GetSql);
+    // Join
+    SQL.Add(AContext.GetJoin.GetSql);
+    // Where
     SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.ClassFromField));
+    // GroupBy
+    SQL.Add(AContext.GetGroupBySql);
     // Crea l'oggetto ioQuery
     Result := TioDbFactory.Query(SQL);
   finally

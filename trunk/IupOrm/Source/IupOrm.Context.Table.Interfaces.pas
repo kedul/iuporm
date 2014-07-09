@@ -3,9 +3,25 @@ unit IupOrm.Context.Table.Interfaces;
 interface
 
 uses
-  IupOrm.Interfaces;
+  IupOrm.Interfaces, IupOrm.Attributes, IupOrm.CommonTypes;
 
 type
+
+  IioGroupBy = interface(IioSqlItem)
+    ['{E57CDC09-3D2B-432B-9114-B7CCB1EDCCA3}']
+  end;
+
+  IioJoinItem = interface(IioSqlItem)
+    ['{93E0B456-6BD1-464C-BDA7-FF1F014F6B76}']
+    function GetJoinType: TioJoinType;
+    function GetJoinClassRef: TioClassRef;
+    function GetJoinCondition: String;
+  end;
+
+  IioJoins = interface(IioSqlItem)
+    ['{8BAACD49-D42C-4278-97AA-EAE00A5EEA52}']
+    procedure Add(AJoinItem:IioJoinItem);
+  end;
 
   IioClassFromField = interface
     ['{D15A9A28-FB90-4753-BE4A-7484A834CD2D}']
@@ -22,6 +38,8 @@ type
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
+    function GetJoin: IioJoins;
+    function GetGroupBy: IioGroupBy;
   end;
 
 implementation

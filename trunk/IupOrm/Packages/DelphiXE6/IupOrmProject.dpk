@@ -30,13 +30,14 @@ package IupOrmProject;
 
 requires
   rtl,
-  DbxCommonDriver,
   dbrtl,
-  dbexpress,
   fmx,
   bindengine,
   bindcomp,
-  DBXSqliteDriver;
+  FireDACCommon,
+  FireDAC,
+  FireDACCommonDriver,
+  fmxFireDAC;
 
 contains
   IupOrm.Attributes in '..\..\Source\IupOrm.Attributes.pas',
