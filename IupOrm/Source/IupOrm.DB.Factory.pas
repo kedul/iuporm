@@ -7,7 +7,7 @@ uses
   IupOrm.ObjectsForge.Interfaces,
   IupOrm.DB.Interfaces,
   System.Classes,
-  System.Rtti;
+  System.Rtti, IupOrm.DB.ConnectionContainer;
 
 type
 
@@ -27,6 +27,7 @@ type
     class function GetDBFolder: String;
     class procedure SetDBFolder(AFolderName: String);
     class procedure SetDBFolderIntoDocuments(AFolderName: String);
+    class function ConnectionContainer: TioConnectionContainerRef;
   end;
 
 implementation
@@ -39,7 +40,6 @@ uses
 
 var
   ioDBFolder: String;
-  ioDBConnection: IioConnection;
 
 { TioDbBuilder }
 
@@ -50,8 +50,14 @@ end;
 
 class function TioDbFactory.Connection: IioConnection;
 begin
-  if not Assigned(ioDBConnection) then TioDBFactory.NewConnection;
-  Result := ioDBConnection;
+  if not Self.ConnectionContainer.ConnectionExist
+    then Self.ConnectionContainer.AddConnection(Self.NewConnection);
+  Result := Self.ConnectionContainer.GetConnection;
+end;
+
+class function TioDbFactory.ConnectionContainer: TioConnectionContainerRef;
+begin
+  Result := TioConnectionContainer;
 end;
 
 class function TioDbFactory.GetDBFolder: String;
@@ -96,7 +102,7 @@ begin
   LConnection.Open;
   // Crea la ioCOnnection da ritornare, la assegna alla variabile globale
   //  e richiama se stessa
-  ioDBConnection := TioConnection.Create(LConnection);
+  Result := TioConnection.Create(LConnection);
 end;
 
 class function TioDbFactory.Query(SQL: TStrings): IioQuery;

@@ -35,13 +35,17 @@ type
 
 implementation
 
+uses
+  IupOrm.DB.Factory;
+
 { TioConnectionSqLite }
 
 procedure TioConnection.Commit;
 begin
   Dec(FTransactionCounter);
-  if FTransactionCounter = 0
-    then FConnection.Commit;
+  if FTransactionCounter > 0 then Exit;
+  FConnection.Commit;
+  TioDBFactory.ConnectionContainer.FreeConnection;
 end;
 
 constructor TioConnection.Create(AConnection: TioInternalSqlConnection);
@@ -74,6 +78,7 @@ procedure TioConnection.Rollback;
 begin
   FConnection.Rollback;
   FTransactionCounter := 0;
+  TioDBFactory.ConnectionContainer.FreeConnection;
 end;
 
 procedure TioConnection.StartTransaction;
