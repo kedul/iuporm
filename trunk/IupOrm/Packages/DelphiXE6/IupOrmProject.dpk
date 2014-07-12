@@ -92,6 +92,7 @@ contains
   IupOrm.LiveBindings.PrototypeBindSource in '..\..\Source\IupOrm.LiveBindings.PrototypeBindSource.pas',
   IupOrm.SqlTranslator in '..\..\Source\IupOrm.SqlTranslator.pas',
   IupOrm.Context.Map in '..\..\Source\IupOrm.Context.Map.pas',
-  IupOrm.Context.Map.Interfaces in '..\..\Source\IupOrm.Context.Map.Interfaces.pas';
+  IupOrm.Context.Map.Interfaces in '..\..\Source\IupOrm.Context.Map.Interfaces.pas',
+  IupOrm.DB.ConnectionContainer in '..\..\Source\IupOrm.DB.ConnectionContainer.pas';
 
 end.
