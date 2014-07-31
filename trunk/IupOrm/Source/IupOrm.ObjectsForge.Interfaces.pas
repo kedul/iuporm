@@ -31,7 +31,7 @@ implementation
 uses
   System.TypInfo, IupOrm.Exceptions, IupOrm, IupOrm.RttiContext.Factory,
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory, System.Classes,
-  Data.DB;
+  Data.DB, IupOrm.LazyLoad.Interfaces, System.SysUtils, IupOrm.Attributes;
 
 { TioObjectMakerIntf }
 
@@ -137,14 +137,26 @@ end;
 
 class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;
   AQuery: IioQuery; AProperty: IioContextProperty): TObject;
+var
+  ALazyLoadableObj: IioLazyLoadable;
 begin
-  // Create the list
-  Result := Self.CreateListByRttiType(   AProperty.GetRttiProperty.PropertyType   );
-  // Fill the list
-  TIupOrm.Load(AProperty.GetRelationChildClassRef)._Where
-                                                  ._Property(AProperty.GetRelationChildPropertyName)
-                                                  ._EqualTo(AQuery.GetValue(AContext.GetProperties.GetIdProperty))
-                                                  .ToList(Result);
+  // Create the list if it isn't not already created by the master class constructor
+  Result := AProperty.GetValue(AContext.DataObject).AsObject;
+  if not Assigned(Result)
+    then Result := Self.CreateListByRttiType(   AProperty.GetRttiProperty.PropertyType   );
+  // If LazyLoadable then set LazyLoad data
+  if (AProperty.GetRelationLoadType = ioLazyLoad)
+  and Supports(Result, IioLazyLoadable, ALazyLoadableObj)
+    // Set the lazy load relation data
+    then ALazyLoadableObj.SetRelationInfo(AProperty.GetRelationChildClassRef
+                                         ,AProperty.GetRelationChildPropertyName
+                                         ,AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger
+                                         )
+    // Fill the list
+    else TIupOrm.Load(AProperty.GetRelationChildClassRef)._Where
+                                                         ._Property(AProperty.GetRelationChildPropertyName)
+                                                         ._EqualTo(AQuery.GetValue(AContext.GetProperties.GetIdProperty))
+                                                         .ToList(Result);
 end;
 
 class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext;
@@ -156,5 +168,6 @@ begin
                                                             ._EqualTo(AQuery.GetValue(AContext.GetProperties.GetIdProperty))
                                                             .ToObject;
 end;
+
 
 end.

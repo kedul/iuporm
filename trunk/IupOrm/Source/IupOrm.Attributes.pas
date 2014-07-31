@@ -10,6 +10,9 @@ type
   // Relation types
   TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne);
 
+  // LazyLoad
+  TioLoadType = (ioImmediateLoad = 0, ioLazyLoad);
+
   // Join types
   TioJoinType = (ioInner, ioCross, ioLeftOuter, ioRightOuter, ioFullOuter);
 
@@ -49,6 +52,7 @@ type
   // ===========================================================================
   // START PROPERTY ATTRIBUTES
   // ---------------------------------------------------------------------------
+
   // Transient attribute
   ioSkip = class(TioCustomAttribute)
   end;
@@ -73,13 +77,23 @@ type
   ioHasMany = class(TCustomRelationAttribute)
   strict private
     FChildPropertyName: String;
+    FLoadType: TioLoadType;
   public
-    constructor Create(const AChildClassRef:TioClassRef; AChildPropertyName:String);
+    constructor Create(const AChildClassRef:TioClassRef; AChildPropertyName:String; ALoadType:TioLoadType=ioImmediateLoad);
     property ChildPropertyName: String read FChildPropertyName;
+    property LoadType: TioLoadType read FLoadType;
   end;
 
   // Relation BelongsTo attribute
   ioHasOne = class(ioHasMany)
+  end;
+
+  // ReadOnly attribute
+  ioReadOnly = class(TioCustomAttribute)
+  end;
+
+  // WriteOnly attribute
+  ioWriteOnly = class(TioCustomAttribute)
   end;
 
   // ---------------------------------------------------------------------------
@@ -144,10 +158,11 @@ end;
 { ioHasMany }
 
 constructor ioHasMany.Create(const AChildClassRef: TioClassRef;
-  AChildPropertyName: String);
+  AChildPropertyName: String; ALoadType:TioLoadType=ioImmediateLoad);
 begin
   inherited Create(AChildClassRef);
   FChildPropertyName := AChildPropertyName;
+  FLoadType := ALoadType;
 end;
 
 

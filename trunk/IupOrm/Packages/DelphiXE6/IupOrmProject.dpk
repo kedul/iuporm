@@ -93,6 +93,11 @@ contains
   IupOrm.SqlTranslator in '..\..\Source\IupOrm.SqlTranslator.pas',
   IupOrm.Context.Map in '..\..\Source\IupOrm.Context.Map.pas',
   IupOrm.Context.Map.Interfaces in '..\..\Source\IupOrm.Context.Map.Interfaces.pas',
-  IupOrm.DB.ConnectionContainer in '..\..\Source\IupOrm.DB.ConnectionContainer.pas';
+  IupOrm.DB.ConnectionContainer in '..\..\Source\IupOrm.DB.ConnectionContainer.pas',
+  IupOrm.LazyLoad.Generics.List in '..\..\Source\IupOrm.LazyLoad.Generics.List.pas',
+  IupOrm.LazyLoad.Generics.ObjectList in '..\..\Source\IupOrm.LazyLoad.Generics.ObjectList.pas',
+  IupOrm.LazyLoad.Interfaces in '..\..\Source\IupOrm.LazyLoad.Interfaces.pas',
+  IupOrm.LazyLoad.LazyLoader in '..\..\Source\IupOrm.LazyLoad.LazyLoader.pas',
+  IupOrm.LazyLoad.Factory in '..\..\Source\IupOrm.LazyLoad.Factory.pas';
 
 end.

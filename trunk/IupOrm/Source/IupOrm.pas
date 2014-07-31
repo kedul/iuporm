@@ -152,6 +152,8 @@ begin
   // Loop for all properties
   for Prop in AContext.GetProperties do
   begin
+    // If the property is not WriteEnabled then skip it
+    if not Prop.IsWriteEnabled then Continue;
     case Prop.GetRelationType of
       // If relation BelongsTo: persist the child object to retrieve the ID (if new object or ID changed)
       ioRTBelongsTo: begin
@@ -173,6 +175,8 @@ begin
   // Loop for all properties
   for Prop in AContext.GetProperties do
   begin
+    // If the property is not WriteEnabled then skip it
+    if not Prop.IsWriteEnabled then Continue;
     case Prop.GetRelationType of
       // If relation HasBelongsToOne
       ioRTBelongsTo: {Nothing};
@@ -189,7 +193,9 @@ begin
   TioDbFactory.Connection.StartTransaction;
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
-    if (ARelationPropertyName <> '') and (ARelationOID <> 0)
+    if  (ARelationPropertyName <> '')
+    and (ARelationOID <> 0)
+    and (AContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = ioRTNone) // Altrimenti in alcuni gìcasi particolare dava errori
       then AContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(AContext.DataObject, ARelationOID);
     // PreProcess (persist) relation childs (BelongsTo)
     Self.PreProcessRelationChild(AContext);

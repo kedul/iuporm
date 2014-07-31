@@ -11,6 +11,12 @@ uses
 
 type
 
+  // ReadWrite options (for properties and even classes)
+  TioReadWrite = (iorwReadOnly, iorwReadWrite, iorwWriteOnly);
+
+  // Options set for GetSql functions parameter
+  TioSqlRequestType = (ioAll=0, ioSelect, ioUpdate, ioInsert);
+
   IioContextProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
     function GetName: string;
@@ -28,10 +34,16 @@ type
     function GetRelationType: TioRelationType;
     function GetRelationChildClassRef: TioClassRef;
     function GetRelationChildPropertyName: String;
+    function GetRelationLoadType: TioLoadType;
     function GetRelationChildObject(Instance: Pointer): TObject;
     function GetRelationChildObjectID(Instance: Pointer): String;
     procedure SetTable(ATable:IioContextTable);
     procedure SetFieldData;
+    function IsSqlRequestCompliant(ASqlRequestType:TioSqlRequestType): Boolean;
+    procedure SetIsID(AValue:Boolean);
+    function IsID: Boolean;
+    function IsWriteEnabled: Boolean;
+    function IsReadEnabled: Boolean;
   end;
 
   IioContextProperties = interface(IioSqlItem)
@@ -41,8 +53,9 @@ type
     function GetIdProperty: IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
     procedure SetTable(ATable:IioContextTable);
-    function GetSqlQualified: String;
-    function GetSqlFullQualified: String;
+    function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
+    function GetSqlQualified(ASqlRequestType:TioSqlRequestType=ioAll): String;
+    function GetSqlFullQualified(ASqlRequestType:TioSqlRequestType=ioAll): String;
     procedure SetFieldData;
     // Blob field present
     function BlobFieldExists: Boolean;

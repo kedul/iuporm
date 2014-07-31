@@ -33,6 +33,7 @@ type
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     procedure Loaded; override;
   public
+    procedure Append;
     procedure Persist(ReloadData:Boolean=False);
     procedure ioSetBindSourceAdapter(AAdapter: TBindSourceAdapter);
   published
@@ -51,6 +52,11 @@ uses
   IupOrm.RttiContext.Factory, IupOrm.Exceptions, IupOrm.Context.Container;
 
 { TioPrototypeBindSource }
+
+procedure TioPrototypeBindSource.Append;
+begin
+  InternalAdapter.Append;
+end;
 
 constructor TioPrototypeBindSource.Create(AOwner: TComponent);
 begin

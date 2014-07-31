@@ -41,7 +41,8 @@ implementation
 
 uses
   IupOrm, System.Rtti, IupOrm.LiveBindings.Factory, IupOrm.Context.Factory,
-  IupOrm.Context.Interfaces, System.SysUtils;
+  IupOrm.Context.Interfaces, System.SysUtils, IupOrm.LazyLoad.Interfaces,
+  FMX.Dialogs;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -139,9 +140,16 @@ begin
 end;
 
 procedure TioActiveListBindSourceAdapter.SetDataObject(AObj: TList<TObject>);
+var
+  ALazyLoadableObj: IioLazyLoadable;
 begin
   Self.First;  // Bug
   Self.Active := False;
+  // If is a LazyLoadable list then set the internal List
+  //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
+  //       normali dava dei problemi (non dava errori ma non usciva nulla)
+  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
+    then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
   Self.SetList(AObj, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
   Self.Active := True;
 end;
