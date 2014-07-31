@@ -38,6 +38,8 @@ begin
   // Load properties values
   for CurrProp in AContext.GetProperties do
   begin
+    // If the property is not ReadEnabled then skip it
+    if not CurrProp.IsReadEnabled then Continue;
     case CurrProp.GetRelationType of
       // If RelationType = ioRTNone then load normal property value
       ioRTNone: CurrProp.SetValue(Result, AQuery.GetValue(CurrProp));

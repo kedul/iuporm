@@ -63,7 +63,7 @@ begin
     // Compone l'SQL
     SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql);
     SQL.Add('(');
-    SQL.Add(AContext.GetProperties.GetSql);
+    SQL.Add(AContext.GetProperties.GetSql(ioInsert));
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
     SQL.Add(') VALUES (');
@@ -71,18 +71,16 @@ begin
     Comma := ' ';
     for Prop in AContext.GetProperties do
     begin
+      // If the current property is ReadOnly then skip it
+      if not Prop.IsSqlRequestCompliant(ioInsert) then Continue;
       // If current property is the ID property then skip its value (always NULL)
-      if Prop = AContext.GetProperties.GetIdProperty then begin
+      if Prop.IsID then begin
         SQL.Add(Comma + 'NULL');
         Comma := ',';
         Continue;
       end;
       // Relation type
       case Prop.GetRelationType of
-
-
-
-        // #####BLOB
         // If RelationType = ioRTNone save the current property value normally
         ioRTNone: begin
           if Prop.IsBlob
@@ -90,9 +88,6 @@ begin
             else SQL.Add(Comma + Prop.GetSqlValue(AContext.DataObject));
           Comma := ',';
         end;
-
-
-
         //  NB: First save the related child object (for ID if it's a new child object)
         ioRTBelongsTo: begin
           SQL.Add(Comma + Prop.GetRelationChildObjectID(AContext.DataObject));
@@ -107,15 +102,8 @@ begin
     SQL.Add(')');
     // Crea l'oggetto ioQuery
     Result := TioDbFactory.QueryInsert(SQL);
-
-
-
-    // #####BLOB
     // If some blob fields exist then load data on the relative parameters
     if AContext.BlobFieldExists then Self.LoadSqlParamsFromContext(Result, AContext);
-
-
-
   finally
     // Alla fine devo distruggere la StringList sulla quale ho costruito la query
     // per non avere un memory leak
@@ -151,7 +139,7 @@ begin
   SQL := TStringList.Create;
   try
     // Select
-    SQL.Add('SELECT ' + AContext.GetProperties.GetSqlFullQualified);
+    SQL.Add('SELECT ' + AContext.GetProperties.GetSqlFullQualified(ioSelect));
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
     // From
@@ -181,7 +169,7 @@ begin
   SQL := TStringList.Create;
   try
     // Select
-    SQL.Add('SELECT ' + AContext.GetProperties.GetSqlFullQualified);
+    SQL.Add('SELECT ' + AContext.GetProperties.GetSqlFullQualified(ioSelect));
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
     // From
@@ -216,11 +204,10 @@ begin
     Comma := ' ';
     for Prop in AContext.GetProperties do
     begin
+      // If the current property is ReadOnly then skip it
+      if not Prop.IsSqlRequestCompliant(ioUpdate) then Continue;
       // Relation type
       case Prop.GetRelationType of
-
-
-        // #####BLOB
         // If RelationType = ioRTNone save the current property value normally
         ioRTNone: begin
           if Prop.IsBlob
@@ -228,9 +215,6 @@ begin
             else SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetSqlValue(AContext.DataObject));
           Comma := ',';
         end;
-
-
-
         //  NB: First save the related child object (for ID if it's a new child object)
         ioRTBelongsTo: begin
           SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetRelationChildObjectID(AContext.DataObject));
@@ -247,15 +231,8 @@ begin
     SQL.Add(AContext.Where.GetSql);
     // Create ioQuery object
     Result := TioDbFactory.Query(SQL);
-
-
-
-    // #####BLOB
     // If some blob fields exist then load data on the relative parameters
     if AContext.BlobFieldExists then Self.LoadSqlParamsFromContext(Result, AContext);
-
-
-
   finally
     // Alla fine devo distruggere la StringList sulla quale ho costruito la query
     // per non avere un memory leak
@@ -268,7 +245,6 @@ class procedure TioSqlGeneratorSqLite.LoadSqlParamsFromContext(AQuery: IioQuery;
 var
   Prop: IioContextProperty;
 begin
-  // #####BLOB
   // Load query parameters from context
   for Prop in AContext.GetProperties do
     if Prop.IsBlob then

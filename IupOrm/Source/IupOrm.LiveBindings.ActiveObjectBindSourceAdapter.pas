@@ -108,6 +108,9 @@ var
   AValue: TValue;
 begin
   ADetailObj := nil;
+  // Check parameter
+  if not Assigned(AMasterObj)
+    then Exit;
   // Extract master property value
   AValue := FMasterProperty.GetValue(AMasterObj);
   // if not empty extract the detail object
