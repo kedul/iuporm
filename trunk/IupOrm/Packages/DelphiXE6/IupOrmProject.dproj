@@ -203,6 +203,7 @@
         <DCCReference Include="..\..\Source\IupOrm.LazyLoad.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.LazyLoad.LazyLoader.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.LazyLoad.Factory.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.LiveBindings.Notification.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

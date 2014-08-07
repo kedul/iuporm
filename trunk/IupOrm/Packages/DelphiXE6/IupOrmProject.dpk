@@ -98,6 +98,7 @@ contains
   IupOrm.LazyLoad.Generics.ObjectList in '..\..\Source\IupOrm.LazyLoad.Generics.ObjectList.pas',
   IupOrm.LazyLoad.Interfaces in '..\..\Source\IupOrm.LazyLoad.Interfaces.pas',
   IupOrm.LazyLoad.LazyLoader in '..\..\Source\IupOrm.LazyLoad.LazyLoader.pas',
-  IupOrm.LazyLoad.Factory in '..\..\Source\IupOrm.LazyLoad.Factory.pas';
+  IupOrm.LazyLoad.Factory in '..\..\Source\IupOrm.LazyLoad.Factory.pas',
+  IupOrm.LiveBindings.Notification in '..\..\Source\IupOrm.LiveBindings.Notification.pas';
 
 end.

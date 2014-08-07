@@ -6,7 +6,7 @@ uses
   Data.Bind.ObjectScope, IupOrm.Where, System.Classes,
   System.Generics.Collections, IupOrm.Where.SqlItems.Interfaces,
   IupOrm.CommonTypes, IupOrm.Context.Properties.Interfaces,
-  IupOrm.LiveBindings.Interfaces;
+  IupOrm.LiveBindings.Interfaces, IupOrm.LiveBindings.Notification;
 
 type
 
@@ -18,23 +18,33 @@ type
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
     FMasterProperty: IioContextProperty;
+    FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    FBindSource: IioNotifiableBindSource;
+    FonNotify: TioBSANotificationEvent;
   strict protected
     function _Release: Integer; stdcall;
     procedure DoBeforeOpen; override;
     procedure DoBeforeRefresh; override;
     procedure DoBeforeDelete; override;
+    procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterScroll; override;
     procedure SetDataObject(AObj: TList<TObject>);
     procedure SetObjStatus(AObjStatus: TIupOrmObjectStatus);
     function UseObjStatus: Boolean;
+    procedure DoNotify(ANotification:IioBSANotification);
   public
     constructor Create(AClassRef:TioClassRef; AWhereStr:String; AOwner: TComponent; AList: TList<TObject>; AutoLoadData, AUseObjStatus: Boolean; AOwnsObject: Boolean = True); overload;
+    procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
+    procedure SetBindSource(ABindSource:TObject);
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure Persist(ReloadData:Boolean=False);
     function GetDetailBindSourceAdapter(AMasterPropertyName:String): TBindSourceAdapter;
+    procedure Notify(Sender:TObject; ANotification:IioBSANotification);
+
+    property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
   end;
 
 implementation
@@ -56,7 +66,19 @@ begin
   FLocalOwnsObject := AOwnsObject;
   FWhereStr := AWhereStr;
   FClassRef := AClassRef;
-  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer;
+  // Set Master & Details adapters reference
+  FMasterAdaptersContainer := nil;
+  FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+end;
+
+procedure TioActiveListBindSourceAdapter.DoAfterDelete;
+begin
+  inherited;
+  // Send a notification to other ActiveBindSourceAdapters & BindSource
+  Notify(
+         Self,
+         TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
+        );
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterPost;
@@ -65,6 +87,11 @@ begin
   if Self.UseObjStatus
     then Self.SetObjStatus(osDirty)
     else TIupOrm.Persist(Self.Current);
+  // Send a notification to other ActiveBindSourceAdapters & BindSource
+  Notify(
+         Self,
+         TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterPost)
+        );
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterScroll;
@@ -100,6 +127,13 @@ begin
 end;
 
 
+procedure TioActiveListBindSourceAdapter.DoNotify(
+  ANotification: IioBSANotification);
+begin
+  if Assigned(FonNotify)
+    then FonNotify(ANotification);
+end;
+
 procedure TioActiveListBindSourceAdapter.ExtractDetailObject(
   AMasterObj: TObject);
 var
@@ -127,6 +161,23 @@ begin
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
 end;
 
+procedure TioActiveListBindSourceAdapter.Notify(Sender: TObject;
+  ANotification: IioBSANotification);
+begin
+  // Fire the event handler
+  if Sender <> Self
+    then Self.DoNotify(ANotification);
+  // Replicate notification to the BindSource
+  if Assigned(FBindSource) and (Sender <> TObject(FBindSource))
+    then FBindSource.Notify(Self, ANotification);
+  // Replicate notification to the DetailAdaptersContainer
+  if Sender <> TObject(FDetailAdaptersContainer)
+    then FDetailAdaptersContainer.Notify(Self, ANotification);
+  // Replicate notification to the MasterAdaptersContainer
+  if Assigned(FMasterAdaptersContainer) and (Sender <> TObject(FMasterAdaptersContainer))
+    then FMasterAdaptersContainer.Notify(Self, ANotification);
+end;
+
 procedure TioActiveListBindSourceAdapter.Persist(ReloadData:Boolean=False);
 begin
   // Persist
@@ -137,6 +188,15 @@ begin
     Self.DoBeforeOpen;
     Self.Refresh;
   end;
+end;
+
+procedure TioActiveListBindSourceAdapter.SetBindSource(ABindSource: TObject);
+var
+  ANotifiableBindSource: IioNotifiableBindSource;
+begin
+  if Supports(ABindSource, IioNotifiableBindSource, ANotifiableBindSource)
+    then FBindSource := ANotifiableBindSource
+    else FBindSource := nil;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetDataObject(AObj: TList<TObject>);
@@ -152,6 +212,12 @@ begin
     then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
   Self.SetList(AObj, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
   Self.Active := True;
+end;
+
+procedure TioActiveListBindSourceAdapter.SetMasterAdapterContainer(
+  AMasterAdapterContainer: IioDetailBindSourceAdaptersContainer);
+begin
+  FMasterAdaptersContainer := AMasterAdapterContainer;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetMasterProperty(
