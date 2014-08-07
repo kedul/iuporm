@@ -3,7 +3,7 @@ unit IupOrm.Helpers.BindSourceHelperTools.Interfaces;
 interface
 
 uses
-  Data.Bind.ObjectScope;
+  Data.Bind.ObjectScope, System.Classes;
 
 type
 

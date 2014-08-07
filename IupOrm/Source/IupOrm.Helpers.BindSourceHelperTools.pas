@@ -4,7 +4,7 @@ interface
 
 uses
   IupOrm.Helpers.BindSourceHelperTools.Interfaces,
-  IupOrm.LiveBindings.Interfaces, Data.Bind.ObjectScope;
+  IupOrm.LiveBindings.Interfaces, Data.Bind.ObjectScope, System.Classes;
 
 type
 

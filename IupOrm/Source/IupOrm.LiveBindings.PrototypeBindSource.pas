@@ -4,7 +4,7 @@ interface
 
 uses
   Data.Bind.ObjectScope, IupOrm.CommonTypes, IupOrm.LiveBindings.Interfaces,
-  System.Classes;
+  System.Classes, IupOrm.LiveBindings.Notification;
 
 type
 
@@ -12,12 +12,13 @@ type
 
   TioMasterBindSource = TioPrototypeBindSource;
 
-  TioPrototypeBindSource = class (TPrototypeBindSource)
+  TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource)
   strict private
     FioClassName: String;
     FioMasterBindSource: TioMasterBindSource;
     FioMasterPropertyName: String;
     FioWhere: TStrings;
+    FonNotify: TioBSANotificationEvent;
     // FioLoaded flag for IupOrm DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
@@ -32,6 +33,7 @@ type
     procedure SetIoMasterPropertyName(const Value: String);
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     procedure Loaded; override;
+    procedure DoNotify(ANotification:IioBSANotification);
   public
     procedure Append;
     procedure Persist(ReloadData:Boolean=False);
@@ -39,10 +41,21 @@ type
   published
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure Notify(Sender:TObject; ANotification:IioBSANotification);
+
+    property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
+
     property ioClassName:String read GetIoClassName write SetIoClassName;
     property ioWhere:TStrings read GetIoWhere write SetIoWhere;
     property ioMasterBindSource:TioMasterBindSource read GetIoMasterBindSource write SetIoMasterBindSource;
     property ioMasterPropertyName:String read GetIoMasterPropertyName write SetIoMasterPropertyName;
+    // =========================================================================
+    // Part for the support of the IioNotifiableBindSource interfaces (Added by IupOrm)
+    //  because is not implementing IInterface (NB: RefCount DISABLED)
+    function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+    // =========================================================================
   end;
 
 implementation
@@ -73,6 +86,8 @@ end;
 
 procedure TioPrototypeBindSource.DoCreateAdapter(
   var ADataObject: TBindSourceAdapter);
+var
+  AContainedBSA: IioContainedBindSourceAdapter;
 begin
   inherited;
   // If in DesignTime then Exit
@@ -92,6 +107,15 @@ begin
     else ADataObject := TIupOrm.Load(   TioMapContainer.GetClassRef(FioClassName)   )
            ._Where(Self.ioWhere.Text)
            .ToActiveListBindSourceAdapter(Self);
+  // Set the reference to the ProrotypeBindSource for notification purposes
+  if Supports(ADataObject, IioContainedBindSourceAdapter, AContainedBSA)
+    then AContainedBSA.SetBindSource(Self);
+end;
+
+procedure TioPrototypeBindSource.DoNotify(ANotification:IioBSANotification);
+begin
+  if Assigned(FonNotify)
+    then ioOnNotify(ANotification);
 end;
 
 function TioPrototypeBindSource.GetIoClassName: String;
@@ -138,6 +162,12 @@ begin
   inherited;
 end;
 
+procedure TioPrototypeBindSource.Notify(Sender: TObject;
+  ANotification: IioBSANotification);
+begin
+  Self.DoNotify(ANotification);
+end;
+
 procedure TioPrototypeBindSource.Persist(ReloadData: Boolean);
 var
  AioActiveBindSourceAdapter: IioActiveBindSourceAdapter;
@@ -146,6 +176,16 @@ begin
   //  then call the Adapter Persist method
   if Supports(Self.InternalAdapter, IioActiveBindSourceAdapter, AioActiveBindSourceAdapter)
     then AioActiveBindSourceAdapter.Persist(ReloadData);
+end;
+
+function TioPrototypeBindSource.QueryInterface(const IID: TGUID;
+  out Obj): HResult;
+begin
+  // The interfaces support is intended only as LazyLoadable support flag
+  if GetInterface(IID, Obj) then
+    Result := 0
+  else
+    Result := E_NOINTERFACE;
 end;
 
 procedure TioPrototypeBindSource.SetIoClassName(const Value: String);
@@ -167,6 +207,16 @@ end;
 procedure TioPrototypeBindSource.SetIoWhere(const Value: TStrings);
 begin
   FioWhere.Assign(Value);
+end;
+
+function TioPrototypeBindSource._AddRef: Integer;
+begin
+  // Nothing, the interfaces support is intended only as LazyLoadable support flag
+end;
+
+function TioPrototypeBindSource._Release: Integer;
+begin
+  // Nothing, the interfaces support is intended only as LazyLoadable support flag
 end;
 
 end.

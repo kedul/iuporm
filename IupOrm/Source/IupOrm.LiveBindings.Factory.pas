@@ -10,9 +10,10 @@ type
 
   TioLiveBindingsFactory = class
   public
-    class function DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+    class function DetailAdaptersContainer(AMasterAdapter:IioContainedBindSourceAdapter): IioDetailBindSourceAdaptersContainer;
     class function ContainedListBindSourceAdapter(AMasterProperty:IioContextProperty): IioContainedBindSourceAdapter;
     class function ContainedObjectBindSourceAdapter(AMasterProperty:IioContextProperty): IioContainedBindSourceAdapter;
+    class function Notification(ASender:TObject; ASubject:TObject; ANotificationType:TioBSANotificationType): IioBSANotification;
   end;
 
 implementation
@@ -20,7 +21,8 @@ implementation
 uses
   IupOrm.LiveBindings.DetailAdaptersContainer,
   IupOrm.LiveBindings.ActiveListBindSourceAdapter,
-  IupOrm.LiveBindings.ActiveObjectBindSourceAdapter;
+  IupOrm.LiveBindings.ActiveObjectBindSourceAdapter,
+  IupOrm.LiveBindings.Notification;
 
 { TioLiveBindingsFactory }
 
@@ -48,14 +50,20 @@ begin
   Result.SetMasterProperty(AMasterProperty);
 end;
 
-class function TioLiveBindingsFactory.DetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
+class function TioLiveBindingsFactory.DetailAdaptersContainer(AMasterAdapter:IioContainedBindSourceAdapter): IioDetailBindSourceAdaptersContainer;
 begin
-  Result := TioDetailAdaptersContainer.Create;
+  Result := TioDetailAdaptersContainer.Create(AMasterAdapter);
 end;
 
 
 
 
 
+
+class function TioLiveBindingsFactory.Notification(ASender, ASubject: TObject;
+  ANotificationType: TioBSANotificationType): IioBSANotification;
+begin
+  Result := TioBSANotification.Create(ASender, ASubject, ANotificationType);
+end;
 
 end.
