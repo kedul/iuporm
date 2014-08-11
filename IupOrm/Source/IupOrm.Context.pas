@@ -86,7 +86,7 @@ begin
     FSelfCreatedWhere := True;
     AWhere := TioContextFactory.Where;
     if Assigned(FDataObject)
-      then AWhere.Add(Self.GetProperties.GetIdProperty.GetQualifiedSqlFieldName + TioDbFactory.CompareOperator._Equal.GetSql + Self.GetProperties.GetIdProperty.GetSqlValue(FDataObject));
+      then AWhere.Add(Self.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + TioDbFactory.CompareOperator._Equal.GetSql + Self.GetProperties.GetIdProperty.GetSqlValue(FDataObject));
   end;
   // Add ContextProperties to TioWhere and assign it to the field
   AWhere.SetContextProperties(Self.GetProperties);

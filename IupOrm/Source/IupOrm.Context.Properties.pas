@@ -20,6 +20,7 @@ type
     FFieldDefinitionString, FSqlFieldTableName, FSqlFieldName, FSqlFieldAlias: String;
     FQualifiedSqlFieldName: String;
     FFullQualifiedSqlFieldName: String;
+    FLoadSql: String;
     FFieldType: String;
     FRelationType: TioRelationType;
     FRelationChildClassRef: TioClassRef;
@@ -28,10 +29,12 @@ type
     FTable:IioContextTable;
     FReadWrite: TioReadWrite;
   public
-    constructor Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; AFieldType:String; AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationLoadType:TioLoadType);
+    constructor Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; ALoadSql:String; AFieldType:String; AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationLoadType:TioLoadType);
+    function GetLoadSql: String;
+    function LoadSqlExist: Boolean;
     function GetName: String;
-    function GetQualifiedSqlFieldName: String;
-    function GetFullQualifiedSqlFieldName: String;
+    function GetSqlQualifiedFieldName: String;
+    function GetSqlFullQualifiedFieldName: String;
     function GetSqlFieldTableName: String;
     function GetSqlFieldName: String;
     function GetSqlFieldAlias: String;
@@ -50,6 +53,7 @@ type
     function GetRelationChildObjectID(Instance: Pointer): String;
     procedure SetTable(ATable:IioContextTable);
     procedure SetFieldData;
+    procedure SetLoadSqlData;
     function IsSqlRequestCompliant(ASqlRequestType:TioSqlRequestType): Boolean;
     procedure SetIsID(AValue:Boolean);
     function IsID: Boolean;
@@ -77,13 +81,12 @@ type
       : TEnumerator<IioContextProperty>;
     function GetSql: String; overload;
     function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
-    function GetSqlQualified(ASqlRequestType:TioSqlRequestType=ioAll): String;
-    function GetSqlFullQualified(ASqlRequestType:TioSqlRequestType=ioAll): String;
     procedure Add(AProperty:IioContextProperty; AIsId:Boolean=False);
     function GetIdProperty:IioContextProperty;
     function GetPropertyByName(APropertyName:String): IioContextProperty;
     procedure SetTable(ATable:IioContextTable);
     procedure SetFieldData;
+    procedure SetLoadSqlData;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
@@ -102,7 +105,7 @@ uses
 
 { TioProperty }
 
-constructor TioProperty.Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; AFieldType:String;
+constructor TioProperty.Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; ALoadSql:String; AFieldType:String;
 AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef;
 ARelationChildPropertyName:String; ARelationLoadType:TioLoadType);
 begin
@@ -110,6 +113,7 @@ begin
   FFieldDefinitionString := AFieldDefinitionString;
   FFieldType := AFieldType;
   FReadWrite := AReadWrite;
+  FLoadSql := ALoadSql;
   // Relation fields
   FRelationType := ARelationType;
   FRelationChildClassRef := ARelationChildClassRef;
@@ -124,7 +128,12 @@ begin
     else Result := FFieldType;
 end;
 
-function TioProperty.GetFullQualifiedSqlFieldName: String;
+function TioProperty.GetLoadSql: String;
+begin
+  Result := '(' + Self.FLoadSql + ') AS ' + Self.GetSqlFieldAlias;
+end;
+
+function TioProperty.GetSqlFullQualifiedFieldName: String;
 begin
   Result := FFullQualifiedSqlFieldName;
 end;
@@ -205,7 +214,7 @@ begin
   Result := FSqlFieldTableName;
 end;
 
-function TioProperty.GetQualifiedSqlFieldName: String;
+function TioProperty.GetSqlQualifiedFieldName: String;
 begin
   Result := FQualifiedSqlFieldName;
 end;
@@ -257,6 +266,11 @@ begin
   Result := (FReadWrite >= iorwReadWrite);
 end;
 
+function TioProperty.LoadSqlExist: Boolean;
+begin
+  Result := Self.FLoadSql <> '';
+end;
+
 procedure TioProperty.SetFieldData;
 var
   DotPos, AsPos: Smallint;
@@ -286,6 +300,13 @@ end;
 procedure TioProperty.SetIsID(AValue: Boolean);
 begin
   FisID := AValue;
+end;
+
+procedure TioProperty.SetLoadSqlData;
+begin
+  // Set LoadSql statement (if exist)
+  if Self.FLoadSql <> ''
+    then FLoadSql := TioSqlTranslator.Translate(FLoadSql);
 end;
 
 procedure TioProperty.SetTable(ATable: IioContextTable);
@@ -369,39 +390,24 @@ end;
 
 
 function TioProperties.GetSql(ASqlRequestType: TioSqlRequestType): String;
+var
+  AFunc: TioPropertiesGetSqlFunction;
 begin
+  // Get the function by ASqlRequestType value
+  case ASqlRequestType of
+    ioSelect: AFunc := function (AProp:IioCOntextProperty): String
+                       begin
+                         if AProp.LoadSqlExist
+                           then Result := AProp.GetLoadSql
+                           else Result := AProp.GetSqlFullQualifiedFieldName;
+                       end;
+    else      AFunc := function (AProp:IioCOntextProperty): String
+                       begin
+                         Result := AProp.GetSqlFieldName;
+                       end;
+  end;
   // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(
-    ASqlRequestType,
-    function (AProp:IioCOntextProperty): String
-    begin
-      Result := AProp.GetSqlFieldName;
-    end
-  );
-end;
-
-function TioProperties.GetSqlFullQualified(ASqlRequestType: TioSqlRequestType): String;
-begin
-  // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(
-    ASqlRequestType,
-    function (AProp:IioCOntextProperty): String
-    begin
-      Result := AProp.GetFullQualifiedSqlFieldName;
-    end
-  );
-end;
-
-function TioProperties.GetSqlQualified(ASqlRequestType: TioSqlRequestType): String;
-begin
-  // Use Internal function with an anonomous method
-  Result := Self.InternalGetSql(
-    ASqlRequestType,
-    function (AProp:IioCOntextProperty): String
-    begin
-      Result := AProp.GetQualifiedSqlFieldName;
-    end
-  );
+  Result := Self.InternalGetSql(ASqlRequestType, AFunc);
 end;
 
 function TioProperties.InternalGetSql(ASqlRequestType:TioSqlRequestType;
@@ -432,6 +438,14 @@ var
 begin
   for AProperty in FPropertyItems
     do AProperty.SetFieldData;
+end;
+
+procedure TioProperties.SetLoadSqlData;
+var
+  AProperty: IioContextProperty;
+begin
+  for AProperty in FPropertyItems
+    do AProperty.SetLoadSqlData;
 end;
 
 procedure TioProperties.SetObjStatusProperty(AValue: IioContextProperty);

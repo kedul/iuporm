@@ -19,9 +19,11 @@ type
 
   IioContextProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
+    function GetLoadSql: String;
+    function LoadSqlExist: Boolean;
     function GetName: string;
-    function GetQualifiedSqlFieldName: string;
-    function GetFullQualifiedSqlFieldName: String;
+    function GetSqlQualifiedFieldName: String;
+    function GetSqlFullQualifiedFieldName: String;
     function GetSqlFieldName: String;
     function GetSqlFieldAlias: String;
     function GetSqlParamName: String;
@@ -39,6 +41,7 @@ type
     function GetRelationChildObjectID(Instance: Pointer): String;
     procedure SetTable(ATable:IioContextTable);
     procedure SetFieldData;
+    procedure SetLoadSqlData;
     function IsSqlRequestCompliant(ASqlRequestType:TioSqlRequestType): Boolean;
     procedure SetIsID(AValue:Boolean);
     function IsID: Boolean;
@@ -54,9 +57,8 @@ type
     function GetPropertyByName(APropertyName:String): IioContextProperty;
     procedure SetTable(ATable:IioContextTable);
     function GetSql(ASqlRequestType:TioSqlRequestType=ioAll): String; overload;
-    function GetSqlQualified(ASqlRequestType:TioSqlRequestType=ioAll): String;
-    function GetSqlFullQualified(ASqlRequestType:TioSqlRequestType=ioAll): String;
     procedure SetFieldData;
+    procedure SetLoadSqlData;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjectStatus Exist
