@@ -79,7 +79,7 @@ end;
 function TioSqlItemsWhereProperty.GetSql: String;
 begin
   // NB: No inherited
-  Result := FContextProperties.GetPropertyByName(Self.FSqlText).GetQualifiedSqlFieldName;
+  Result := FContextProperties.GetPropertyByName(Self.FSqlText).GetSqlQualifiedFieldName;
 end;
 
 { TioSqlItemsWhere }
@@ -99,7 +99,7 @@ end;
 
 function TioSqlItemsWherePropertyOID.GetSql: String;
 begin
-  Result := FContextProperties.GetIdProperty.GetQualifiedSqlFieldName;
+  Result := FContextProperties.GetIdProperty.GetSqlQualifiedFieldName;
 end;
 
 { TioSqlItemsWhereText }

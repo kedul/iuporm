@@ -139,7 +139,7 @@ begin
   SQL := TStringList.Create;
   try
     // Select
-    SQL.Add('SELECT ' + AContext.GetProperties.GetSqlFullQualified(ioSelect));
+    SQL.Add('SELECT ' + AContext.GetProperties.GetSql(ioSelect));
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
     // From
@@ -169,7 +169,7 @@ begin
   SQL := TStringList.Create;
   try
     // Select
-    SQL.Add('SELECT ' + AContext.GetProperties.GetSqlFullQualified(ioSelect));
+    SQL.Add('SELECT ' + AContext.GetProperties.GetSql(ioSelect));
     if AContext.IsClassFromField
       then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
     // From

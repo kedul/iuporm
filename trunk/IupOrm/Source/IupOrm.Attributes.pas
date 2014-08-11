@@ -65,6 +65,10 @@ type
   ioField = class(TioCustomStringAttribute)
   end;
 
+  // FieldName attribute
+  ioLoadSQL = class(TioCustomStringAttribute)
+  end;
+
   // FieldType attribute
   ioFieldType = class(TioCustomStringAttribute)
   end;

@@ -16,7 +16,7 @@ type
   TioContextFactory = class
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(ARttiProperty:TRttiProperty; ASqlFieldName:String; AFieldType:String; AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationLoadType:TioLoadType): IioContextProperty;
+    class function GetProperty(ARttiProperty:TRttiProperty; ASqlFieldName:String; ALoadSql:String; AFieldType:String; AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationLoadType:TioLoadType): IioContextProperty;
     class function Properties(Typ: TRttiInstanceType): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; ASqlFieldName:String=IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Joins: IioJoins;
@@ -68,12 +68,13 @@ begin
 end;
 
 class function TioContextFactory.GetProperty(ARttiProperty: TRttiProperty;
-  ASqlFieldName, AFieldType: String; AReadWrite:TioReadWrite; ARelationType: TioRelationType;
+  ASqlFieldName, ALoadSql, AFieldType: String; AReadWrite:TioReadWrite; ARelationType: TioRelationType;
   ARelationChildClassRef: TioClassRef; ARelationChildPropertyName: String;
   ARelationLoadType:TioLoadType): IioContextProperty;
 begin
   Result :=  TioProperty.Create(ARttiProperty
                                ,ASqlFieldName
+                               ,ALoadSql
                                ,AFieldType
                                ,AReadWrite
                                ,ARelationType
@@ -127,6 +128,7 @@ var
   PropID: Boolean;
   PropFieldName: String;
   PropFieldType: String;
+  PropLoadSql: String;
   PropSkip: Boolean;
   PropReadWrite: TioReadWrite;
   PropRelationType: TioRelationType;
@@ -146,12 +148,13 @@ begin
     // ObjStatus property
     if Prop.Name = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(Prop, '', '', iorwReadOnly, ioRTNone, nil, '', ioImmediateLoad);
+      Result.ObjStatusProperty := Self.GetProperty(Prop, '', '', '', iorwReadOnly, ioRTNone, nil, '', ioImmediateLoad);
       Continue;
     end;
     // Prop Init
     PropId := (Prop.Name = 'ID');  // Is a OID property if the name of the property itself is 'ID'
     PropFieldName := Prop.Name;
+    PropLoadSql := '';
     PropSkip := False;
     PropReadWrite := iorwReadWrite;
     PropRelationType := ioRTNone;
@@ -162,6 +165,7 @@ begin
       if Attr is ioOID then PropID := True;
       if Attr is ioField then PropFieldName := ioField(Attr).Value;
       if Attr is ioFieldType then PropFieldType := ioFieldType(Attr).Value;
+      if Attr is ioLoadSql then PropLoadSql := ioLoadSql(Attr).Value;
       if Attr is ioSkip then PropSkip := True;
       if Attr is ioReadOnly then PropReadWrite := iorwReadOnly;
       if Attr is ioWriteOnly then PropReadWrite := iorwWriteOnly;
@@ -187,6 +191,7 @@ begin
     // Create and add property
     if not PropSkip then Result.Add(Self.GetProperty(Prop
                                                     ,PropFieldName
+                                                    ,PropLoadSql
                                                     ,PropFieldType
                                                     ,PropReadWrite
                                                     ,PropRelationType

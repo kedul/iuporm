@@ -173,10 +173,12 @@ begin
   TInternalObjType.Error(Msg, Data);
 end;
 
+{$IFNDEF NEXTGEN}
 class procedure TioList<T>.Error(Msg: PResStringRec; Data: NativeInt);
 begin
   TInternalObjType.Error(Msg, Data);
 end;
+{$ENDIF  NEXTGEN}
 
 procedure TioList<T>.Exchange(Index1, Index2: Integer);
 begin
