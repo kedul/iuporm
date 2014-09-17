@@ -23,11 +23,8 @@ var
 begin
   AList := TIupOrm.Load<TPerson>.ToList<TObjectList<TPerson>>;
   try
-    if (AList.Count > 0 )
-    or (MessageDlg('The database is empty!'#13#13'If you want I can create sample data.', TMsgDlgType.mtInformation, mbYesNo, 0) <> mrYes)
-      then Exit;
-    Self.CreateSampleData;
-    ShowMessage('Sample data was created.');
+    if AList.Count = 0
+      then Self.CreateSampleData;
   finally
     AList.Free;
   end;

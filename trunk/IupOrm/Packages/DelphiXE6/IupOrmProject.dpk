@@ -99,6 +99,7 @@ contains
   IupOrm.LazyLoad.Interfaces in '..\..\Source\IupOrm.LazyLoad.Interfaces.pas',
   IupOrm.LazyLoad.LazyLoader in '..\..\Source\IupOrm.LazyLoad.LazyLoader.pas',
   IupOrm.LazyLoad.Factory in '..\..\Source\IupOrm.LazyLoad.Factory.pas',
-  IupOrm.LiveBindings.Notification in '..\..\Source\IupOrm.LiveBindings.Notification.pas';
+  IupOrm.LiveBindings.Notification in '..\..\Source\IupOrm.LiveBindings.Notification.pas',
+  IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas';
 
 end.

@@ -10,20 +10,27 @@ uses
 
 type
 
-  TioActiveListBindSourceAdapter = class(TListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter)
+  TioActiveListBindSourceAdapter = class(TListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
   strict private
     FWhereStr: String;
     FClassRef: TioClassRef;
     FUseObjStatus: Boolean;  // Not use directly, use UseObjStatus function or property even for internal use
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
+    FReloadDataOnRefresh: Boolean;
     FMasterProperty: IioContextProperty;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FBindSource: IioNotifiableBindSource;
     FonNotify: TioBSANotificationEvent;
   strict protected
+    // =========================================================================
+    // Part for the support of the IioNotifiableBindSource interfaces (Added by IupOrm)
+    //  because is not implementing IInterface (NB: RefCount DISABLED)
+    function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
+    function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
+    // =========================================================================
     procedure DoBeforeOpen; override;
     procedure DoBeforeRefresh; override;
     procedure DoBeforeDelete; override;
@@ -36,13 +43,16 @@ type
     procedure DoNotify(ANotification:IioBSANotification);
   public
     constructor Create(AClassRef:TioClassRef; AWhereStr:String; AOwner: TComponent; AList: TList<TObject>; AutoLoadData, AUseObjStatus: Boolean; AOwnsObject: Boolean = True); overload;
+    destructor Destroy; override;
     procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
-    procedure SetBindSource(ABindSource:TObject);
+    procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
     procedure ExtractDetailObject(AMasterObj: TObject);
     procedure Persist(ReloadData:Boolean=False);
-    function GetDetailBindSourceAdapter(AMasterPropertyName:String): TBindSourceAdapter;
-    procedure Notify(Sender:TObject; ANotification:IioBSANotification);
+    function GetDetailBindSourceAdapter(AOwner:TComponent; AMasterPropertyName:String): TBindSourceAdapter;
+    function GetNaturalObjectBindSourceAdapter(AOwner:TComponent): TBindSourceAdapter;
+    procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
+    procedure Refresh(ReloadData:Boolean); overload;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
   end;
@@ -52,7 +62,7 @@ implementation
 uses
   IupOrm, System.Rtti, IupOrm.LiveBindings.Factory, IupOrm.Context.Factory,
   IupOrm.Context.Interfaces, System.SysUtils, IupOrm.LazyLoad.Interfaces,
-  FMX.Dialogs;
+  FMX.Dialogs, IupOrm.Exceptions;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -61,6 +71,7 @@ constructor TioActiveListBindSourceAdapter.Create(AClassRef: TioClassRef;
   AUseObjStatus, AOwnsObject: Boolean);
 begin
   FAutoLoadData := AutoLoadData;
+  FReloadDataOnRefresh := True;
   FUseObjStatus := AUseObjStatus;
   inherited Create(AOwner, AList, AClassRef, AOwnsObject);
   FLocalOwnsObject := AOwnsObject;
@@ -69,6 +80,16 @@ begin
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+end;
+
+destructor TioActiveListBindSourceAdapter.Destroy;
+begin
+  // Detach itself from MasterAdapterContainer (if it's contained)
+  if Assigned(FMasterAdaptersContainer) then
+    FMasterAdaptersContainer.RemoveBindSourceAdapter(Self);
+  // Free the DetailAdaptersContainer
+  FDetailAdaptersContainer.Free;
+  inherited;
 end;
 
 procedure TioActiveListBindSourceAdapter.DoAfterDelete;
@@ -120,18 +141,24 @@ end;
 procedure TioActiveListBindSourceAdapter.DoBeforeRefresh;
 begin
   inherited;
-  Self.First;  // Bug
-  Self.Active := False;
-  Self.List.Clear;
-  Self.Active := True;
+  // Per fare l reload dei dati dal DB anche FAutoLoadData deve essere True
+  //  perchè altrimenti dopo aver riattivato se stesso non farebbe
+  // alcun caricamento nel DoBeforeOpen e quindi si otterrebbe una lista
+  // completamente vuota
+  if FReloadDataOnRefresh and FAutoLoadData then
+  begin
+    Self.First;  // Bug
+    Self.Active := False;
+    Self.List.Clear;
+    Self.Active := True;
+  end;
 end;
-
 
 procedure TioActiveListBindSourceAdapter.DoNotify(
   ANotification: IioBSANotification);
 begin
   if Assigned(FonNotify)
-    then FonNotify(ANotification);
+    then FonNotify(Self, ANotification);
 end;
 
 procedure TioActiveListBindSourceAdapter.ExtractDetailObject(
@@ -153,12 +180,18 @@ begin
   Self.SetDataObject(ADetailObj);
 end;
 
-function TioActiveListBindSourceAdapter.GetDetailBindSourceAdapter(
+function TioActiveListBindSourceAdapter.GetDetailBindSourceAdapter(AOwner:TComponent;
   AMasterPropertyName: String): TBindSourceAdapter;
 begin
   // Return the requested DetailBindSourceAdapter and set the current master object
-  Result := FDetailAdaptersContainer.GetBindSourceAdapter(Self.FClassRef.ClassName, AMasterPropertyName);
+  Result := FDetailAdaptersContainer.GetBindSourceAdapter(AOwner, Self.FClassRef.ClassName, AMasterPropertyName);
   FDetailAdaptersContainer.SetMasterObject(Self.Current);
+end;
+
+function TioActiveListBindSourceAdapter.GetNaturalObjectBindSourceAdapter(
+  AOwner: TComponent): TBindSourceAdapter;
+begin
+  Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, Self);
 end;
 
 procedure TioActiveListBindSourceAdapter.Notify(Sender: TObject;
@@ -190,13 +223,29 @@ begin
   end;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetBindSource(ABindSource: TObject);
-var
-  ANotifiableBindSource: IioNotifiableBindSource;
+function TioActiveListBindSourceAdapter.QueryInterface(const IID: TGUID;
+  out Obj): HResult;
 begin
-  if Supports(ABindSource, IioNotifiableBindSource, ANotifiableBindSource)
-    then FBindSource := ANotifiableBindSource
-    else FBindSource := nil;
+  // RefCount disabled
+  if GetInterface(IID, Obj) then
+    Result := 0
+  else
+    Result := E_NOINTERFACE;
+end;
+
+procedure TioActiveListBindSourceAdapter.Refresh(ReloadData: Boolean);
+var
+  PrecReloadData: Boolean;
+begin
+  PrecReloadData := FReloadDataOnRefresh;
+  Self.FReloadDataOnRefresh := ReloadData;
+  inherited Refresh;
+  Self.FReloadDataOnRefresh := PrecReloadData;
+end;
+
+procedure TioActiveListBindSourceAdapter.SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
+begin
+  FBindSource := ANotifiableBindSource;
 end;
 
 procedure TioActiveListBindSourceAdapter.SetDataObject(AObj: TList<TObject>);
@@ -237,9 +286,14 @@ begin
   Result := FUseObjStatus;
 end;
 
+function TioActiveListBindSourceAdapter._AddRef: Integer;
+begin
+  // Nothing, the interfaces support is intended only as LazyLoadable support flag
+end;
+
 function TioActiveListBindSourceAdapter._Release: Integer;
 begin
-  // Nothing
+  // Nothing, the interfaces support is intended only as LazyLoadable support flag
 end;
 
 end.

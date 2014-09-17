@@ -7,7 +7,7 @@ uses
 
 type
 
-  TioBSANotificationEvent = procedure(const ANotification:IioBSANotification) of object;
+  TioBSANotificationEvent = procedure(Sender:TObject; const ANotification:IioBSANotification) of object;
 
   TioBSANotification = class(TInterfacedObject, IioBSANotification)
   strict protected

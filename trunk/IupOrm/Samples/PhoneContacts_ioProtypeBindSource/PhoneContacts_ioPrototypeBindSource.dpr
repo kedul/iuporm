@@ -13,6 +13,7 @@ uses
 {$STRONGLINKTYPES ON}
 
 begin
+  ReportMemoryLeaksOnShutdown := True;
 
 
   // ============ IupOrm initialization ====================
