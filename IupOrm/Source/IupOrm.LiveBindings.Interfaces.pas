@@ -8,8 +8,15 @@ uses
 
 type
 
+  // Forward declaration
+  IioContainedBindSourceAdapter = interface;
+
+
   // Bind source adapters notification type
   TioBSANotificationType = (ntAfterPost, ntAfterDelete);
+
+  // BindSource AutoRefresh type after notification
+  TioAutoRefreshType = (arDisabled, arEnabledNoReload, arEnabledReload);
 
   // Bind source adapters notification interface
   IioBSANotification = interface
@@ -33,29 +40,44 @@ type
   // Bind source adapter container
   IioDetailBindSourceAdaptersContainer = interface
     ['{B374E226-D7A9-4A44-9BB6-DF85AC283598}']
+    procedure Free;
     procedure SetMasterObject(AMasterObj: TObject);
-    function GetBindSourceAdapter(AMasterClassName:String; AMasterPropertyName:String): TBindSourceAdapter;
+    function GetBindSourceAdapter(AOwner:TComponent; AMasterClassName:String; AMasterPropertyName:String): TBindSourceAdapter;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
+    procedure RemoveBindSourceAdapter(ABindSourceAdapter: IioContainedBindSourceAdapter);
   end;
 
   IioActiveBindSourceAdapter = interface
     ['{F407B515-AE0B-48FD-B8C3-0D0C81774A58}']
     procedure Persist(ReloadData:Boolean=False);
+    procedure Notify(Sender:TObject; ANotification:IioBSANotification);
+    procedure Refresh(ReloadData:Boolean); overload;
+    procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
+    function GetCurrent: TObject;
+    function UseObjStatus: Boolean;
+    function GetNaturalObjectBindSourceAdapter(AOwner:TComponent): TBindSourceAdapter;
   end;
 
   IioContainedBindSourceAdapter = interface
     ['{66AF6AD7-9093-4526-A18C-54447FB220A3}']
-    procedure Free;
-    procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
+    procedure Free;    procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
-    procedure SetBindSource(ABindSource:TObject);
     procedure ExtractDetailObject(AMasterObj: TObject); overload;
-    function GetDetailBindSourceAdapter(AMasterPropertyName:String): TBindSourceAdapter;
+    function GetDetailBindSourceAdapter(AOwner:TComponent; AMasterPropertyName:String): TBindSourceAdapter;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
   end;
 
+  IioNaturalBindSourceAdapterSource = interface
+    ['{892D8DAE-96F3-48FC-925C-F3F5CD5C0F68}']
+    procedure Notify(Sender:TObject; ANotification:IioBSANotification);
+    procedure Refresh(ReloadData:Boolean); overload;
+    function GetCurrent: TObject;
+    function UseObjStatus: Boolean;
+    function GetNaturalObjectBindSourceAdapter(AOwner:TComponent): TBindSourceAdapter;
+  end;
+
   // BindSourceAdapter List
-  TioDetailAdapters = TDictionary<String, IioContainedBindSourceAdapter>;
+  TioDetailAdapters = TList<IioContainedBindSourceAdapter>;
 
 implementation
 

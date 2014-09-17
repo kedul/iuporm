@@ -13,7 +13,8 @@ type
     FBindSource: TioBaseBindSource;
   public
     constructor Create(ABindSource: TioBaseBindSource);
-    function GetDetailBindSourceAdapter(AMasterPropertyName:String): TBindSourceAdapter;
+    function GetDetailBindSourceAdapter(AOwner:TComponent; AMasterPropertyName:String): TBindSourceAdapter;
+    function GetNaturalObjectBindSourceAdapter(AOwner:TComponent): TBindSourceAdapter;
   end;
 
 implementation
@@ -26,10 +27,16 @@ begin
   FBindSource := ABindSource;
 end;
 
-function TioBindSourceHelperTools.GetDetailBindSourceAdapter(
+function TioBindSourceHelperTools.GetDetailBindSourceAdapter(AOwner:TComponent;
   AMasterPropertyName: String): TBindSourceAdapter;
 begin
-  Result := (FBindSource.InternalAdapter as IioContainedBindSourceAdapter).GetDetailBindSourceAdapter(AMasterPropertyName);
+  Result := (FBindSource.InternalAdapter as IioContainedBindSourceAdapter).GetDetailBindSourceAdapter(AOwner, AMasterPropertyName);
+end;
+
+function TioBindSourceHelperTools.GetNaturalObjectBindSourceAdapter(
+  AOwner: TComponent): TBindSourceAdapter;
+begin
+  Result := (FBindSource.InternalAdapter as IioNaturalBindSourceAdapterSource).GetNaturalObjectBindSourceAdapter(AOwner);
 end;
 
 end.
