@@ -23,7 +23,7 @@ type
     // FioLoaded flag for IupOrm DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
-  strict protected
+    strict protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by IupOrm)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
@@ -43,9 +43,11 @@ type
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
   public
-    procedure Append;
+    procedure Append; overload;
+    procedure Append(AObject:TObject); overload;
     procedure Persist(ReloadData:Boolean=False);
     procedure ioSetBindSourceAdapter(AAdapter: TBindSourceAdapter);
+    function Current: TObject;
   published
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -71,7 +73,20 @@ uses
 
 procedure TioPrototypeBindSource.Append;
 begin
-  InternalAdapter.Append;
+  if CheckAdapter then
+    GetInternalAdapter.Append;
+end;
+
+procedure TioPrototypeBindSource.Append(AObject: TObject);
+var
+  AnActiveBSA: IioActiveBindSourceAdapter;
+begin
+  if CheckAdapter and Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA) then
+  begin
+    AnActiveBSA.Append(AObject);
+    AnActiveBSA.Refresh(False);
+  end
+  else raise EIupOrmException.Create(Self.ClassName + ': Internal adapter is not an ActiveBindSourceAdapter!');
 end;
 
 constructor TioPrototypeBindSource.Create(AOwner: TComponent);
@@ -138,6 +153,12 @@ begin
   // If enabled perform an AutoRefresh operation
   if Self.ioAutoRefreshOnNotification > arDisabled
     then Self.Refresh(Self.ioAutoRefreshOnNotification = arEnabledReload);
+end;
+
+function TioPrototypeBindSource.Current: TObject;
+begin
+  Result := nil;
+  if Self.CheckAdapter then Result := Self.InternalAdapter.Current
 end;
 
 function TioPrototypeBindSource.GetIoClassName: String;

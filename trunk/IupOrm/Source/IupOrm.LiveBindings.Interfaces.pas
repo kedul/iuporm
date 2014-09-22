@@ -51,8 +51,10 @@ type
     ['{F407B515-AE0B-48FD-B8C3-0D0C81774A58}']
     procedure Persist(ReloadData:Boolean=False);
     procedure Notify(Sender:TObject; ANotification:IioBSANotification);
-    procedure Refresh(ReloadData:Boolean); overload;
+    procedure Refresh(ReloadData:Boolean);
     procedure SetBindSource(ANotifiableBindSource:IioNotifiableBindSource);
+    procedure Append(AObject:TObject);
+    procedure Insert(AObject:TObject);
     function GetCurrent: TObject;
     function UseObjStatus: Boolean;
     function GetNaturalObjectBindSourceAdapter(AOwner:TComponent): TBindSourceAdapter;
