@@ -247,6 +247,14 @@ object MainForm: TMainForm
               StyleLookup = 'priortoolbutton'
               Width = 44.000000000000000000
             end
+            object SpeedButton5: TSpeedButton
+              Action = acCostDelete
+              Align = Right
+              Height = 44.000000000000000000
+              Position.X = 276.000000000000000000
+              StyleLookup = 'trashtoolbutton'
+              Width = 44.000000000000000000
+            end
           end
         end
         object TabItemTravel: TTabItem
@@ -348,8 +356,9 @@ object MainForm: TMainForm
                   'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
                   'por, velit sit'
                 Position.X = 106.000000000000000000
+                Position.Y = 7.000000000000000000
                 Width = 199.000000000000000000
-                Height = 44.000000000000000000
+                Height = 30.000000000000000000
                 Margins.Right = 10.000000000000000000
               end
             end
@@ -419,8 +428,9 @@ object MainForm: TMainForm
                 KeyboardType = NumberPad
                 Text = '67'
                 Position.X = 106.000000000000000000
+                Position.Y = 7.000000000000000000
                 Width = 199.000000000000000000
-                Height = 44.000000000000000000
+                Height = 30.000000000000000000
                 Margins.Right = 10.000000000000000000
               end
             end
@@ -439,8 +449,9 @@ object MainForm: TMainForm
                 KeyboardType = NumberPad
                 Text = '67'
                 Position.X = 106.000000000000000000
+                Position.Y = 7.000000000000000000
                 Width = 199.000000000000000000
-                Height = 44.000000000000000000
+                Height = 30.000000000000000000
                 Margins.Right = 10.000000000000000000
               end
             end
@@ -504,7 +515,7 @@ object MainForm: TMainForm
           IsSelected = False
           TabOrder = 0
           Text = 'Cost'
-          Width = 51.000000000000000000
+          Width = 53.000000000000000000
         end
       end
     end
@@ -565,7 +576,7 @@ object MainForm: TMainForm
       StyleLookup = 'tabitembookmarks'
       TabOrder = 0
       Text = 'TabItem4'
-      Width = 78.000000000000000000
+      Width = 80.000000000000000000
       object ToolBar5: TToolBar
         Height = 44.000000000000000000
         TabOrder = 0
@@ -632,6 +643,9 @@ object MainForm: TMainForm
     object acCostShow: TAction
       Text = 'acCostShow'
       OnExecute = acCostShowExecute
+    end
+    object acCostDelete: TAction
+      OnExecute = acCostDeleteExecute
     end
   end
   object GestureManager1: TGestureManager
