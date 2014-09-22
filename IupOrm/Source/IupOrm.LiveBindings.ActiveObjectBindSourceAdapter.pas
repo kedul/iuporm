@@ -23,6 +23,8 @@ type
     FBindSource: IioNotifiableBindSource;
     FonNotify: TioBSANotificationEvent;
     FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
+    FInsertObj_Enabled: Boolean;
+    FInsertObj_NewObj: TObject;
  strict protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by IupOrm)
@@ -37,6 +39,7 @@ type
     procedure DoAfterDelete; override;
     procedure DoAfterPost; override;
     procedure DoAfterScroll; override;
+    procedure DoAfterInsert; override;
     procedure SetDataObject(AObj: TObject);
     procedure SetObjStatus(AObjStatus: TIupOrmObjectStatus);
     function UseObjStatus: Boolean;
@@ -51,6 +54,8 @@ type
     procedure Persist(ReloadData:Boolean=False);
     function GetDetailBindSourceAdapter(AOwner:TComponent; AMasterPropertyName:String): TBindSourceAdapter;
     function GetNaturalObjectBindSourceAdapter(AOwner:TComponent): TBindSourceAdapter;
+    procedure Append(AObject:TObject); overload;
+    procedure Insert(AObject:TObject); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
     procedure NaturalBSA_SetMasterBindSourceAdapter(AActiveBindSourceAdapter:IioActiveBindSourceAdapter);
@@ -66,6 +71,15 @@ uses
 
 { TioActiveListBindSourceAdapter<T> }
 
+procedure TioActiveObjectBindSourceAdapter.Append(AObject: TObject);
+begin
+  // Set sone InsertObj subsystem variables
+  // Then call the standard code
+  FInsertObj_NewObj := AObject;
+  FInsertObj_Enabled := True;
+  Self.Append;
+end;
+
 constructor TioActiveObjectBindSourceAdapter.Create(AClassRef:TioClassRef; AWhereStr: String;
   AOwner: TComponent; AObject: TObject; AutoLoadData, AUseObjStatus: Boolean; AOwnsObject: Boolean);
 begin
@@ -79,6 +93,9 @@ begin
   // Set Master & Details adapters reference
   FMasterAdaptersContainer := nil;
   FDetailAdaptersContainer := TioLiveBindingsFactory.DetailAdaptersContainer(Self);
+  // Init InsertObj subsystem values
+  FInsertObj_Enabled := False;
+  FInsertObj_NewObj := nil;
 end;
 
 destructor TioActiveObjectBindSourceAdapter.Destroy;
@@ -99,6 +116,28 @@ begin
          Self,
          TioLiveBindingsFactory.Notification(Self, Self.Current, ntAfterDelete)
         );
+end;
+
+procedure TioActiveObjectBindSourceAdapter.DoAfterInsert;
+var
+  ObjToFree: TObject;
+begin
+  // If enabled subsitute the new object with the FInsertObj_NewObj (Append(AObject:TObject))
+  //  then destroy the "olr" new object
+  if FInsertObj_Enabled then
+  begin
+    try
+      ObjToFree := Self.DataObject;
+      ObjToFree.Free;
+      Self.SetDataObject(FInsertObj_NewObj);
+    finally
+      // Reset InsertObj subsystem
+      FInsertObj_Enabled := False;
+      FInsertObj_NewObj := nil;
+    end;
+  end;
+  // Execute AfterInsert event handler
+  inherited;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.DoAfterPost;
@@ -195,6 +234,15 @@ function TioActiveObjectBindSourceAdapter.GetNaturalObjectBindSourceAdapter(
   AOwner: TComponent): TBindSourceAdapter;
 begin
   Result := TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(AOwner, Self);
+end;
+
+procedure TioActiveObjectBindSourceAdapter.Insert(AObject: TObject);
+begin
+  // Set sone InsertObj subsystem variables
+  // Then call the standard code
+  FInsertObj_NewObj := AObject;
+  FInsertObj_Enabled := True;
+  Self.Insert;
 end;
 
 procedure TioActiveObjectBindSourceAdapter.NaturalBSA_SetMasterBindSourceAdapter(
