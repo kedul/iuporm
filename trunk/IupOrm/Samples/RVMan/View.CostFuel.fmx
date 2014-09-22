@@ -1,6 +1,6 @@
 inherited ViewCostFuel: TViewCostFuel
   inherited ListBox1: TListBox
-    object GroupDettagli: TListBoxGroupHeader [3]
+    object GroupDettagli: TListBoxGroupHeader
       Height = 19.000000000000000000
       Position.Y = 137.000000000000000000
       StyleLookup = 'listboxgroupheader'
@@ -8,7 +8,7 @@ inherited ViewCostFuel: TViewCostFuel
       Text = 'Dettagli'
       Width = 389.000000000000000000
     end
-    object ListBoxItem4: TListBoxItem [4]
+    object ListBoxItem4: TListBoxItem
       Height = 49.000000000000000000
       Position.Y = 156.000000000000000000
       StyleLookup = 'listboxitemnodetail'
@@ -26,13 +26,6 @@ inherited ViewCostFuel: TViewCostFuel
         Height = 49.000000000000000000
         Margins.Right = 10.000000000000000000
       end
-    end
-    inherited ListBoxItemSeparator: TListBoxItem
-      Position.Y = 205.000000000000000000
-    end
-    inherited ListBoxItemElimina: TListBoxItem
-      Position.Y = 254.000000000000000000
-      TabOrder = 6
     end
   end
   inherited BSCost: TioPrototypeBindSource

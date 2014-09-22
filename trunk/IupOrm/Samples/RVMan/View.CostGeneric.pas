@@ -37,15 +37,10 @@ type
     acCancel: TAction;
     acPost: TAction;
     acEdit: TAction;
-    ListBoxItemSeparator: TListBoxItem;
-    ListBoxItemElimina: TListBoxItem;
-    ButtonElimina: TButton;
-    acDelete: TAction;
     procedure acBackExecute(Sender: TObject);
     procedure acCancelExecute(Sender: TObject);
     procedure acPostExecute(Sender: TObject);
     procedure acEditExecute(Sender: TObject);
-    procedure acDeleteExecute(Sender: TObject);
   private
     { Private declarations }
     FViewMode: TViewMode;
@@ -72,12 +67,6 @@ procedure TViewCostGeneric.acCancelExecute(Sender: TObject);
 begin
   BSCost.Cancel;
   Self.SetViewMode(VMNormal);
-end;
-
-procedure TViewCostGeneric.acDeleteExecute(Sender: TObject);
-begin
-  BSCost.Delete;
-  acBack.Execute;
 end;
 
 procedure TViewCostGeneric.acEditExecute(Sender: TObject);
@@ -107,14 +96,12 @@ begin
       acEdit.Visible := True;
       acPost.Visible := False;
       acCancel.Visible := False;
-      acDelete.Visible := False;
     end;
     VMEdit: Begin
       acBack.Visible := False;
       acEdit.Visible := False;
       acPost.Visible := True;
       acCancel.Visible := True;
-      acDelete.Visible := True;
     End;
   end;
 end;

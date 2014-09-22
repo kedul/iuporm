@@ -80,10 +80,7 @@ Coordinates=329,386,50,36
 [acCancel]
 Coordinates=491,87,68,36
 
-[ButtonElimina]
-Coordinates=538,1,94,58
-
 []
-Coordinates=439,160,138,36
+Coordinates=538,1,94,58
 Visible=True
 

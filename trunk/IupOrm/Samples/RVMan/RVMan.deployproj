@@ -215,13 +215,14 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="iOSDevice\Debug\RVMan.info.plist" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="iOSDevice\Debug\RVMan" Condition="'$(Config)'=='Debug'">
             <RemoteDir>RVMan.app\</RemoteDir>
-            <RemoteName>Info.plist</RemoteName>
+            <RemoteName>RVMan</RemoteName>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
+            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_50x50.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>RVMan.app\</RemoteDir>
@@ -231,14 +232,13 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="iOSDevice\Debug\RVMan" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="iOSDevice\Debug\RVMan.info.plist" Condition="'$(Config)'=='Debug'">
             <RemoteDir>RVMan.app\</RemoteDir>
-            <RemoteName>RVMan</RemoteName>
+            <RemoteName>Info.plist</RemoteName>
             <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
-            <Required>True</Required>
         </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_144x144.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>RVMan.app\</RemoteDir>

@@ -102,6 +102,8 @@ type
     SpeedButton4: TSpeedButton;
     acCostAdd: TAction;
     acCostShow: TAction;
+    SpeedButton5: TSpeedButton;
+    acCostDelete: TAction;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
@@ -123,6 +125,7 @@ type
       const AItem: TListViewItem);
     procedure LIstViewCostsItemClick(const Sender: TObject;
       const AItem: TListViewItem);
+    procedure acCostDeleteExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -152,6 +155,11 @@ begin
                                    ));
   TGlobalFactory.View.CostView(Self, BSCosts.Current, VMEdit).Parent := TabItemCost;
   ChangeTabActionToCostEdit.ExecuteTarget(TabItemCost);
+end;
+
+procedure TMainForm.acCostDeleteExecute(Sender: TObject);
+begin
+  BSCosts.Delete;
 end;
 
 procedure TMainForm.acCostShowExecute(Sender: TObject);

@@ -112,31 +112,6 @@ object ViewCostGeneric: TViewCostGeneric
         Margins.Right = 10.000000000000000000
       end
     end
-    object ListBoxItemSeparator: TListBoxItem
-      Height = 49.000000000000000000
-      Position.Y = 137.000000000000000000
-      StyleLookup = 'listboxitemnodetail'
-      TabOrder = 3
-      Width = 389.000000000000000000
-    end
-    object ListBoxItemElimina: TListBoxItem
-      Height = 49.000000000000000000
-      Position.Y = 186.000000000000000000
-      StyleLookup = 'listboxitemnodetail'
-      TabOrder = 4
-      Width = 389.000000000000000000
-      object ButtonElimina: TButton
-        Action = acDelete
-        Align = Client
-        StyledSettings = [Family, Style]
-        Height = 49.000000000000000000
-        StyleLookup = 'speedbuttonstyle'
-        TabOrder = 1
-        TextSettings.Font.Size = 18.000000000000000000
-        TextSettings.FontColor = claRed
-        Width = 389.000000000000000000
-      end
-    end
   end
   object BSCost: TioPrototypeBindSource
     AutoActivate = True
@@ -222,10 +197,6 @@ object ViewCostGeneric: TViewCostGeneric
     object acEdit: TAction
       Text = 'Edit'
       OnExecute = acEditExecute
-    end
-    object acDelete: TAction
-      Text = 'Delete'
-      OnExecute = acDeleteExecute
     end
   end
 end
