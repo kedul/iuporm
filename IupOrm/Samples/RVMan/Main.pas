@@ -153,7 +153,7 @@ begin
                                      (BSCostTypesSelection.Current as TCostType),
                                      Now
                                    ));
-  TGlobalFactory.View.CostView(Self, BSCosts.Current, VMEdit).Parent := TabItemCost;
+  TGlobalFactory.View.CostView(nil, BSCosts.Current, VMEdit).Parent := TabItemCost;
   ChangeTabActionToCostEdit.ExecuteTarget(TabItemCost);
 end;
 

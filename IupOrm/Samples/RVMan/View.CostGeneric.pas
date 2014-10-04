@@ -60,6 +60,7 @@ uses Main;
 procedure TViewCostGeneric.acBackExecute(Sender: TObject);
 begin
   MainForm.ChangeTabActionToCostList.ExecuteTarget(MainForm.TabItemCostList);
+  Self.Owner.RemoveComponent(Self);
   Self.Free;
 end;
 

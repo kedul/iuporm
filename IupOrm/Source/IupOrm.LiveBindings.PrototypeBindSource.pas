@@ -23,7 +23,7 @@ type
     // FioLoaded flag for IupOrm DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
-    strict protected
+  strict protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by IupOrm)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
@@ -110,7 +110,7 @@ var
 begin
   inherited;
   // If in DesignTime then Exit
-  // If a ClassName is non provided then exit
+  // If a ClassName is not provided then exit
   // FioLoaded flag for IupOrm DoCreateAdapter internal use only just before
   //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
   if (csDesigning in ComponentState)

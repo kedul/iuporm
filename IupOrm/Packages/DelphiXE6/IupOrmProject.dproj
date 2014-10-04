@@ -144,6 +144,7 @@
         <DCCReference Include="FireDAC.dcp"/>
         <DCCReference Include="FireDACCommonDriver.dcp"/>
         <DCCReference Include="fmxFireDAC.dcp"/>
+        <DCCReference Include="vcl.dcp"/>
         <DCCReference Include="..\..\Source\IupOrm.Attributes.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.CommonTypes.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Context.CassFromField.pas"/>
@@ -205,6 +206,13 @@
         <DCCReference Include="..\..\Source\IupOrm.LazyLoad.Factory.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.LiveBindings.Notification.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.MVVM.ViewModel.Interfaces.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.MVVM.ViewModel.ViewData.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.MVVM.ViewModel.pas">
+            <Form>ioViewModelBase</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

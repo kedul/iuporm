@@ -59,6 +59,7 @@ type
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
     procedure NaturalBSA_SetMasterBindSourceAdapter(AActiveBindSourceAdapter:IioActiveBindSourceAdapter);
+    function GetDataObject: TObject;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
   end;
@@ -220,6 +221,11 @@ begin
     then ADetailObj := AValue.AsObject;
   // Set it to the Adapter itself
   Self.SetDataObject(ADetailObj);
+end;
+
+function TioActiveObjectBindSourceAdapter.GetDataObject: TObject;
+begin
+  Result := Self.DataObject;
 end;
 
 function TioActiveObjectBindSourceAdapter.GetDetailBindSourceAdapter(AOwner:TComponent;

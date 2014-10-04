@@ -37,7 +37,8 @@ requires
   FireDACCommon,
   FireDAC,
   FireDACCommonDriver,
-  fmxFireDAC;
+  fmxFireDAC,
+  vcl;
 
 contains
   IupOrm.Attributes in '..\..\Source\IupOrm.Attributes.pas',
@@ -100,6 +101,9 @@ contains
   IupOrm.LazyLoad.LazyLoader in '..\..\Source\IupOrm.LazyLoad.LazyLoader.pas',
   IupOrm.LazyLoad.Factory in '..\..\Source\IupOrm.LazyLoad.Factory.pas',
   IupOrm.LiveBindings.Notification in '..\..\Source\IupOrm.LiveBindings.Notification.pas',
-  IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas';
+  IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter.pas',
+  IupOrm.MVVM.ViewModel.Interfaces in '..\..\Source\IupOrm.MVVM.ViewModel.Interfaces.pas',
+  IupOrm.MVVM.ViewModel.ViewData in '..\..\Source\IupOrm.MVVM.ViewModel.ViewData.pas',
+  IupOrm.MVVM.ViewModel in '..\..\Source\IupOrm.MVVM.ViewModel.pas' {ioViewModelBase: TDataModule};
 
 end.

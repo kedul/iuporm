@@ -56,6 +56,7 @@ type
     procedure Append(AObject:TObject);
     procedure Insert(AObject:TObject);
     function GetCurrent: TObject;
+    function GetDataObject: TObject;
     function UseObjStatus: Boolean;
     function GetNaturalObjectBindSourceAdapter(AOwner:TComponent): TBindSourceAdapter;
   end;
