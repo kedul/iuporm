@@ -58,6 +58,7 @@ type
     procedure Insert(AObject:TObject); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
+    function GetDataObject: TObject;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
   end;
@@ -217,6 +218,11 @@ begin
     then ADetailObj := TList<TObject>(AValue.AsObject);
   // Set it to the Adapter itself
   Self.SetDataObject(ADetailObj);
+end;
+
+function TioActiveListBindSourceAdapter.GetDataObject: TObject;
+begin
+  Result := Self.List;
 end;
 
 function TioActiveListBindSourceAdapter.GetDetailBindSourceAdapter(AOwner:TComponent;

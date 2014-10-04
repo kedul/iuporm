@@ -356,9 +356,8 @@ object MainForm: TMainForm
                   'Proin mattis interdum tempus. Etiam ac vehicula neque. Donec tem' +
                   'por, velit sit'
                 Position.X = 106.000000000000000000
-                Position.Y = 7.000000000000000000
                 Width = 199.000000000000000000
-                Height = 30.000000000000000000
+                Height = 44.000000000000000000
                 Margins.Right = 10.000000000000000000
               end
             end
@@ -428,9 +427,8 @@ object MainForm: TMainForm
                 KeyboardType = NumberPad
                 Text = '67'
                 Position.X = 106.000000000000000000
-                Position.Y = 7.000000000000000000
                 Width = 199.000000000000000000
-                Height = 30.000000000000000000
+                Height = 44.000000000000000000
                 Margins.Right = 10.000000000000000000
               end
             end
@@ -449,9 +447,8 @@ object MainForm: TMainForm
                 KeyboardType = NumberPad
                 Text = '67'
                 Position.X = 106.000000000000000000
-                Position.Y = 7.000000000000000000
                 Width = 199.000000000000000000
-                Height = 30.000000000000000000
+                Height = 44.000000000000000000
                 Margins.Right = 10.000000000000000000
               end
             end

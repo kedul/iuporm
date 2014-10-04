@@ -3,8 +3,14 @@
         <ProjectGuid>{39ABCB18-C20E-428C-9A69-8BA1BED36324}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
+        <Projects Include="..\..\Source\IupOrm.MVVM.VCL.dproj">
+            <Dependencies>IupOrmProject.dproj</Dependencies>
+        </Projects>
+        <Projects Include="..\..\Source\IupOrm.MVVM.FMX.dproj">
+            <Dependencies>IupOrmProject.dproj</Dependencies>
+        </Projects>
         <Projects Include="IupOrmProject_DesignTime.dproj">
-            <Dependencies/>
+            <Dependencies>IupOrmProject.dproj</Dependencies>
         </Projects>
         <Projects Include="IupOrmProject.dproj">
             <Dependencies/>
@@ -36,6 +42,9 @@
         <Projects Include="..\..\Samples\SpeedTest\SpeedTest.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\..\Samples\TestVM\TestVM.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -44,13 +53,31 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="IupOrmProject_DesignTime">
+    <Target Name="IupOrm_MVVM_VCL" DependsOnTargets="IupOrmProject">
+        <MSBuild Projects="..\..\Source\IupOrm.MVVM.VCL.dproj"/>
+    </Target>
+    <Target Name="IupOrm_MVVM_VCL:Clean" DependsOnTargets="IupOrmProject:Clean">
+        <MSBuild Projects="..\..\Source\IupOrm.MVVM.VCL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="IupOrm_MVVM_VCL:Make" DependsOnTargets="IupOrmProject:Make">
+        <MSBuild Projects="..\..\Source\IupOrm.MVVM.VCL.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="IupOrm_MVVM_FMX" DependsOnTargets="IupOrmProject">
+        <MSBuild Projects="..\..\Source\IupOrm.MVVM.FMX.dproj"/>
+    </Target>
+    <Target Name="IupOrm_MVVM_FMX:Clean" DependsOnTargets="IupOrmProject:Clean">
+        <MSBuild Projects="..\..\Source\IupOrm.MVVM.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="IupOrm_MVVM_FMX:Make" DependsOnTargets="IupOrmProject:Make">
+        <MSBuild Projects="..\..\Source\IupOrm.MVVM.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="IupOrmProject_DesignTime" DependsOnTargets="IupOrmProject">
         <MSBuild Projects="IupOrmProject_DesignTime.dproj"/>
     </Target>
-    <Target Name="IupOrmProject_DesignTime:Clean">
+    <Target Name="IupOrmProject_DesignTime:Clean" DependsOnTargets="IupOrmProject:Clean">
         <MSBuild Projects="IupOrmProject_DesignTime.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="IupOrmProject_DesignTime:Make">
+    <Target Name="IupOrmProject_DesignTime:Make" DependsOnTargets="IupOrmProject:Make">
         <MSBuild Projects="IupOrmProject_DesignTime.dproj" Targets="Make"/>
     </Target>
     <Target Name="IupOrmProject">
@@ -143,14 +170,23 @@
     <Target Name="SpeedTest:Make">
         <MSBuild Projects="..\..\Samples\SpeedTest\SpeedTest.dproj" Targets="Make"/>
     </Target>
+    <Target Name="TestVM">
+        <MSBuild Projects="..\..\Samples\TestVM\TestVM.dproj"/>
+    </Target>
+    <Target Name="TestVM:Clean">
+        <MSBuild Projects="..\..\Samples\TestVM\TestVM.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TestVM:Make">
+        <MSBuild Projects="..\..\Samples\TestVM\TestVM.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="IupOrmProject_DesignTime;IupOrmProject;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_ioPrototypeBindSource;Pizza_ioActiveBindSourceAdapter;PizzaWin_ioActiveBindSourceAdapter;Pizza_List;VRManagerClient;Pizza_ioPrototypeBindSource;RVMan;SpeedTest"/>
+        <CallTarget Targets="IupOrm_MVVM_VCL;IupOrm_MVVM_FMX;IupOrmProject_DesignTime;IupOrmProject;PhoneContacts_ioActiveBindSourceAdapter;PhoneContacts_ioPrototypeBindSource;Pizza_ioActiveBindSourceAdapter;PizzaWin_ioActiveBindSourceAdapter;Pizza_List;VRManagerClient;Pizza_ioPrototypeBindSource;RVMan;SpeedTest;TestVM"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="IupOrmProject_DesignTime:Clean;IupOrmProject:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_ioPrototypeBindSource:Clean;Pizza_ioActiveBindSourceAdapter:Clean;PizzaWin_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;VRManagerClient:Clean;Pizza_ioPrototypeBindSource:Clean;RVMan:Clean;SpeedTest:Clean"/>
+        <CallTarget Targets="IupOrm_MVVM_VCL:Clean;IupOrm_MVVM_FMX:Clean;IupOrmProject_DesignTime:Clean;IupOrmProject:Clean;PhoneContacts_ioActiveBindSourceAdapter:Clean;PhoneContacts_ioPrototypeBindSource:Clean;Pizza_ioActiveBindSourceAdapter:Clean;PizzaWin_ioActiveBindSourceAdapter:Clean;Pizza_List:Clean;VRManagerClient:Clean;Pizza_ioPrototypeBindSource:Clean;RVMan:Clean;SpeedTest:Clean;TestVM:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="IupOrmProject_DesignTime:Make;IupOrmProject:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_ioPrototypeBindSource:Make;Pizza_ioActiveBindSourceAdapter:Make;PizzaWin_ioActiveBindSourceAdapter:Make;Pizza_List:Make;VRManagerClient:Make;Pizza_ioPrototypeBindSource:Make;RVMan:Make;SpeedTest:Make"/>
+        <CallTarget Targets="IupOrm_MVVM_VCL:Make;IupOrm_MVVM_FMX:Make;IupOrmProject_DesignTime:Make;IupOrmProject:Make;PhoneContacts_ioActiveBindSourceAdapter:Make;PhoneContacts_ioPrototypeBindSource:Make;Pizza_ioActiveBindSourceAdapter:Make;PizzaWin_ioActiveBindSourceAdapter:Make;Pizza_List:Make;VRManagerClient:Make;Pizza_ioPrototypeBindSource:Make;RVMan:Make;SpeedTest:Make;TestVM:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
