@@ -19,7 +19,7 @@ object Form1: TForm1
     FullSize = True
     Height = 460.000000000000000000
     TabHeight = 49.000000000000000000
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 9
     TabPosition = None
     Width = 320.000000000000000000
@@ -28,7 +28,7 @@ object Form1: TForm1
         item
         end>
       Height = 8.000000000000000000
-      IsSelected = True
+      IsSelected = False
       TabOrder = 0
       Text = 'TabItem1'
       Width = 8.000000000000000000
@@ -92,7 +92,7 @@ object Form1: TForm1
         item
         end>
       Height = 8.000000000000000000
-      IsSelected = False
+      IsSelected = True
       TabOrder = 0
       Text = 'TabItem2'
       Width = 8.000000000000000000
@@ -105,20 +105,20 @@ object Form1: TForm1
         Width = 320.000000000000000000
       end
       object ToolBar2: TToolBar
-        Height = 48.000000000000000000
+        Height = 44.000000000000000000
         TabOrder = 4
         Width = 320.000000000000000000
         object ToolBar3: TToolBar
-          Height = 48.000000000000000000
+          Height = 44.000000000000000000
           TabOrder = 5
           Width = 320.000000000000000000
           object Button2: TButton
             Action = PreviousTabAction1
             Align = Left
-            Height = 48.000000000000000000
+            Height = 44.000000000000000000
             StyleLookup = 'priortoolbutton'
             TabOrder = 1
-            Width = 48.000000000000000000
+            Width = 44.000000000000000000
           end
         end
       end
@@ -144,7 +144,7 @@ object Form1: TForm1
       end
       object Panel1: TPanel
         Align = Client
-        Height = 214.000000000000000000
+        Height = 218.000000000000000000
         Width = 320.000000000000000000
         TabOrder = 7
         object MasterBindNavigator: TBindNavigator
@@ -165,7 +165,7 @@ object Form1: TForm1
           Position.X = 120.000000000000000000
           Position.Y = 42.000000000000000000
           Width = 97.000000000000000000
-          Height = 32.000000000000000000
+          Height = 30.000000000000000000
         end
         object Label3: TLabel
           Height = 23.000000000000000000
@@ -190,7 +190,7 @@ object Form1: TForm1
           Position.X = 120.000000000000000000
           Position.Y = 82.000000000000000000
           Width = 249.000000000000000000
-          Height = 32.000000000000000000
+          Height = 30.000000000000000000
         end
         object Label5: TLabel
           Height = 23.000000000000000000
@@ -227,7 +227,7 @@ object Form1: TForm1
           Position.X = 120.000000000000000000
           Position.Y = 122.000000000000000000
           Width = 249.000000000000000000
-          Height = 32.000000000000000000
+          Height = 30.000000000000000000
         end
         object Label6: TLabel
           Height = 23.000000000000000000
@@ -245,7 +245,7 @@ object Form1: TForm1
           Position.X = 120.000000000000000000
           Position.Y = 162.000000000000000000
           Width = 249.000000000000000000
-          Height = 32.000000000000000000
+          Height = 30.000000000000000000
           Visible = False
         end
         object Label7: TLabel
@@ -264,7 +264,7 @@ object Form1: TForm1
           Position.X = 120.000000000000000000
           Position.Y = 202.000000000000000000
           Width = 249.000000000000000000
-          Height = 32.000000000000000000
+          Height = 30.000000000000000000
           Visible = False
         end
         object Label8: TLabel
@@ -303,7 +303,7 @@ object Form1: TForm1
           Position.X = 120.000000000000000000
           Position.Y = 242.000000000000000000
           Width = 249.000000000000000000
-          Height = 32.000000000000000000
+          Height = 30.000000000000000000
           Visible = False
         end
       end
@@ -356,6 +356,7 @@ object Form1: TForm1
       end>
     ScopeMappings = <>
     ioClassName = 'TPerson'
+    ioAutoRefreshOnNotification = arEnabledNoReload
     Left = 240
     Top = 120
   end
@@ -391,6 +392,7 @@ object Form1: TForm1
       '')
     ioMasterBindSource = MasterBS
     ioMasterPropertyName = 'Phones'
+    ioAutoRefreshOnNotification = arEnabledNoReload
     Left = 264
     Top = 360
   end

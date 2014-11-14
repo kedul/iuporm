@@ -11,7 +11,8 @@ uses
   IupOrm.DB.Interfaces,
   IupOrm.Helpers.ObjectHelperTools.Interfaces,
   IupOrm.Helpers.BindSourceHelperTools.Interfaces,
-  IupOrm.LiveBindings.Interfaces;
+  IupOrm.LiveBindings.Interfaces, IupOrm.Global.Factory,
+  IupOrm.DependencyInjection;
 
 type
 
@@ -19,6 +20,7 @@ type
   TioTObjectHelper = class helper for TObject
   public
     function IupOrm: IioObjectHelperTools;
+    function ioAsInterface<T>: T;
   end;
 
   // TioBaseBindSource class helper (PrototypeBindSource and so on)
@@ -41,6 +43,8 @@ type
     class procedure PersistRelationChildObject(AMasterContext:IioContext; AMasterProperty:IioContextProperty);
     class procedure PersistCollection_Internal(ACollection:TObject; ARelationPropertyName:String=''; ARelationOID:Integer=0);
   public
+    class function GlobalFactory: TioGlobalFactoryRef;
+    class function DependencyInjection: TioDependencyInjectionRef;
     class function RefTo(AClassRef:TioClassRef): TioWhere; overload;
     class function RefTo<T:class,constructor>: TioWhere<T>; overload;
     class function Load(AClassRef:TioClassRef): TioWhere; overload;
@@ -61,7 +65,8 @@ implementation
 uses
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory, IupOrm.Attributes,
   IupOrm.DB.Factory, IupOrm.Exceptions, IupOrm.Helpers.ObjectHelperTools,
-  IupOrm.Helpers.BindSourceHelperTools, IupOrm.DB.DBCreator.Factory;
+  IupOrm.Helpers.BindSourceHelperTools, IupOrm.DB.DBCreator.Factory,
+  System.SysUtils, System.TypInfo;
 
 
 { TIupOrm }
@@ -295,6 +300,16 @@ begin
   TioDbFactory.SqlGenerator.GenerateSqlDelete(AContext).ExecSQL;
 end;
 
+class function TIupOrm.DependencyInjection: TioDependencyInjectionRef;
+begin
+  Result := TioDependencyInjection;
+end;
+
+class function TIupOrm.GlobalFactory: TioGlobalFactoryRef;
+begin
+  Result := TioGlobalFactory;
+end;
+
 class procedure TIupOrm.InsertObject(AContext: IioContext);
 var
   AQuery: IioQuery;
@@ -316,6 +331,12 @@ end;
 
 { TioTObjectHelper }
 
+function TioTObjectHelper.ioAsInterface<T>: T;
+begin
+  if not Supports(Self, GetTypeData(TypeInfo(T))^.Guid, Result) then
+    raise EIupOrmException.Create(Self.ClassName + ': interface non implemented by object!');
+end;
+
 function TioTObjectHelper.IupOrm: IioObjectHelperTools;
 begin
   Result := TioObjectHelperTools.Create(Self);
@@ -334,3 +355,4 @@ begin
 end;
 
 end.
+

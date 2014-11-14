@@ -25,6 +25,8 @@ type
     function ClassFromField: IioClassFromField;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
+    // ObjStatusExist
+    function ObjStatusExist: Boolean;
     // Blob field present
     function BlobFieldExists: Boolean;
   end;
@@ -70,6 +72,11 @@ end;
 function TioMap.GetTable: IioContextTable;
 begin
   Result := FTable;
+end;
+
+function TioMap.ObjStatusExist: Boolean;
+begin
+  Result := Self.GetProperties.ObjStatusExist;
 end;
 
 function TioMap.RttiContext: TRttiContext;

@@ -3,8 +3,8 @@ unit IupOrm.MVVM.FMX.ViewModel;
 interface
 
 uses
-  System.SysUtils, System.Classes, IupOrm.MVVM.ViewModel, System.Actions,
-  FMX.ActnList;
+  System.SysUtils, System.Classes, System.Actions,
+  FMX.ActnList, IupOrm.MVVM.ViewModelBase;
 
 type
   TioViewModel = class(TioViewModelBase)
@@ -14,9 +14,6 @@ type
   public
     { Public declarations }
   end;
-
-var
-  ioViewModel: TioViewModel;
 
 implementation
 
