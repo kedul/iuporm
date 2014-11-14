@@ -66,9 +66,12 @@ begin
 end;
 
 class function TioSqlTranslator.Translate(const AValue: String): String;
+var
+  AEvaluator: TMatchEvaluator;
 begin
   Result := '';
-  Result := TRegEx.Replace(AValue, '\[.*?\]', ReplaceEval);
+  AEvaluator := ReplaceEval;
+  Result := TRegEx.Replace(AValue, '\[.*?\]', AEvaluator);
 end;
 
 end.

@@ -3,8 +3,8 @@ unit IupOrm.MVVM.VCL.ViewModel;
 interface
 
 uses
-  System.SysUtils, System.Classes, IupOrm.MVVM.ViewModel, System.Actions,
-  Vcl.ActnList;
+  System.SysUtils, System.Classes, System.Actions,
+  Vcl.ActnList, IupOrm.MVVM.ViewModelBase;
 
 type
   TioViewModel = class(TioViewModelBase)
@@ -15,13 +15,11 @@ type
     { Public declarations }
   end;
 
-var
-  ioViewModel: TioViewModel;
-
 implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
+
 
 end.

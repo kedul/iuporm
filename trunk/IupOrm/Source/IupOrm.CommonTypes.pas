@@ -2,6 +2,9 @@ unit IupOrm.CommonTypes;
 
 interface
 
+uses
+  System.Rtti;
+
 const
   IO_CLASSFROMFIELD_FIELDNAME = 'ClassInfo';
 

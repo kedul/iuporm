@@ -17,6 +17,8 @@ type
     function ClassFromField: IioClassFromField;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
+    // ObjStatusExist
+    function ObjStatusExist: Boolean;
     // Blob field present
     function BlobFieldExists: Boolean;
   end;

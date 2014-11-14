@@ -89,7 +89,7 @@ procedure TForm1.DetailBSCreateAdapter(Sender: TObject;
   var ABindSourceAdapter: TBindSourceAdapter);
 begin
   // Get the detail bind source adapter (active) directly from PrototypeBindSource (via IupOrm class helper)
-  ABindSourceAdapter := MasterBS.IupOrm.GetDetailBindSourceAdapter('Phones');
+  ABindSourceAdapter := MasterBS.IupOrm.GetDetailBindSourceAdapter(DetailBS, 'Phones');
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
