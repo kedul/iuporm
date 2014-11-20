@@ -125,7 +125,21 @@ object frmMain: TfrmMain
     Width = 137
     Height = 25
     Caption = 'Hello (ViewModel)'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
     TabOrder = 12
+  end
+  object ButtonHelloEnableDisable: TButton
+    Left = 712
+    Top = 173
+    Width = 137
+    Height = 25
+    Caption = 'Hello (Enable/Disable)'
+    TabOrder = 13
   end
   object ioPrototypeBindSource1: TioPrototypeBindSource
     AutoActivate = True

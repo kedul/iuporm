@@ -26,6 +26,8 @@ type
     Button12: TButton;
     [ioAction('acHello')]
     ButtonHello: TButton;
+    [ioAction('acEnableDisable')]
+    ButtonHelloEnableDisable: TButton;
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);

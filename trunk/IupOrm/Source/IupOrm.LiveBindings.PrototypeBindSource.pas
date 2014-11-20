@@ -33,15 +33,7 @@ type
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
     // =========================================================================
-    procedure SetIoWhere(const Value: TStrings);
-    function GetIoClassName: String;
-    function GetIoMasterBindSource: TioMasterBindSource;
-    function GetIoMasterPropertyName: String;
-    function GetIoWhere: TStrings;
     function GetIsDetail: Boolean;
-    procedure SetIoClassName(const Value: String);
-    procedure SetIoMasterBindSource(const Value: TioMasterBindSource);
-    procedure SetIoMasterPropertyName(const Value: String);
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -63,10 +55,10 @@ type
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
 
-    property ioClassName:String read GetIoClassName write SetIoClassName;
-    property ioWhere:TStrings read GetIoWhere write SetIoWhere;
-    property ioMasterBindSource:TioMasterBindSource read GetIoMasterBindSource write SetIoMasterBindSource;
-    property ioMasterPropertyName:String read GetIoMasterPropertyName write SetIoMasterPropertyName;
+    property ioClassName:String read FioClassName write FioClassName;
+    property ioWhere:TStrings read FIoWhere write FIoWhere;
+    property ioMasterBindSource:TioMasterBindSource read FIoMasterBindSource write FIoMasterBindSource;
+    property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
     property ioAutoRefreshOnNotification:TioAutoRefreshType read FioAutoRefreshOnNotification write FioAutoRefreshOnNotification;
     property ioViewModelInterface:String read FioViewModelInterface write FioViewModelInterface;
   end;
@@ -76,7 +68,7 @@ implementation
 uses
   System.SysUtils, IupOrm.Exceptions, IupOrm.RttiContext.Factory,
   IupOrm.Attributes, IupOrm.DependencyInjection, IupOrm,
-  IupOrm.Context.Container;
+  IupOrm.Context.Container, IupOrm.LiveBindings.Factory;
 
 { TioPrototypeBindSource }
 
@@ -179,19 +171,9 @@ begin
   begin
     // If this is a detail BindSource then retrieve the adapter from the master BindSource
     //  else get the adapter directly from IupOrm
-    if Assigned(Self.ioMasterBindSource) then
-    begin
-      // If the MasterPropertyName property is empty then get a NaturalActiveBindSourceAdapter
-      //  from the MasterBindSource else get a detail ActiveBindSourceAdapter even from the
-      //  MasterBindSource.
-      if (Self.ioMasterPropertyName.Trim <> '')
-        then ADataObject := Self.FioMasterBindSource.IupOrm.GetDetailBindSourceAdapter(Self, Self.FioMasterPropertyName)
-        else ADataObject := Self.FioMasterBindSource.IupOrm.GetNaturalObjectBindSourceAdapter(Self);
-    end
-    //  else get the adapter directly from IupOrm
-    else ADataObject := TIupOrm.Load(   TioMapContainer.GetClassRef(FioClassName)   )
-                               ._Where(Self.ioWhere.Text)
-                               .ToActiveListBindSourceAdapter(Self);
+    if Assigned(Self.ioMasterBindSource)
+      then ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self, Self.FioMasterBindSource, Self.ioMasterPropertyName)
+      else ADataObject := TioLiveBindingsFactory.GetBSAfromDB(Self, Self.FioClassName, Self.FioWhere.Text);
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
@@ -208,7 +190,7 @@ begin
   then
     Self.ioViewModel := TIupOrm.DependencyInjection.Locate(Self.ioViewModelInterface)
                                                    .ConstructorParams([TValue.From(AActiveBSA)])
-                                                   .ConstructorMarker('ThisIsCalledByIOPrototypeBindSource')
+                                                   .ConstructorMarker('CreateByBindSourceAdapter')
                                                    .Get
                                                    .ioAsInterface<IioViewModel>;
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -228,26 +210,6 @@ function TioPrototypeBindSource.Current: TObject;
 begin
   Result := nil;
   if Self.CheckAdapter then Result := Self.InternalAdapter.Current
-end;
-
-function TioPrototypeBindSource.GetIoClassName: String;
-begin
-  Result := FioClassName;
-end;
-
-function TioPrototypeBindSource.GetIoMasterBindSource: TioMasterBindSource;
-begin
-  Result := FioMasterBindSource;
-end;
-
-function TioPrototypeBindSource.GetIoMasterPropertyName: String;
-begin
-  Result := FioMasterPropertyName;
-end;
-
-function TioPrototypeBindSource.GetIoWhere: TStrings;
-begin
-  Result := FioWhere;
 end;
 
 function TioPrototypeBindSource.GetIsDetail: Boolean;
@@ -320,27 +282,6 @@ begin
   if Supports(Self.GetInternalAdapter, IioActiveBindSourceAdapter, AnActiveBSA)
     then AnActiveBSA.Refresh(ReloadData)
     else GetInternalAdapter.Refresh;
-end;
-
-procedure TioPrototypeBindSource.SetIoClassName(const Value: String);
-begin
-  FioClassName := Value;
-end;
-
-procedure TioPrototypeBindSource.SetIoMasterBindSource(
-  const Value: TioMasterBindSource);
-begin
-  FioMasterBindSource := Value;
-end;
-
-procedure TioPrototypeBindSource.SetIoMasterPropertyName(const Value: String);
-begin
-  FioMasterPropertyName := Value;
-end;
-
-procedure TioPrototypeBindSource.SetIoWhere(const Value: TStrings);
-begin
-  FioWhere.Assign(Value);
 end;
 
 function TioPrototypeBindSource._AddRef: Integer;

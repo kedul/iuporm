@@ -10,10 +10,11 @@ type
   IioDependencyInjectionLocator = interface
     ['{51289FD7-AA55-43D9-BF5B-EDA5BF27D301}']
     function Get: TObject;
+    function Alias(const AAlias:String): IioDependencyInjectionLocator;
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator;
     function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator;
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator;
-    function ViewModel(AViewModel:IioViewModel): IioDependencyInjectionLocator;
+    function ViewModel(const AViewModel:IioViewModel): IioDependencyInjectionLocator;
   end;
 
   IioDependencyInjectionLocator<T: IInterface> = interface(IioDependencyInjectionLocator)
