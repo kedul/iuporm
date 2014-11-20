@@ -12,7 +12,9 @@ type
   TioViewModel1 = class(TioViewModel)
     acHello: TAction;
     FDQuery1: TFDQuery;
+    acEnableDisable: TAction;
     procedure acHelloExecute(Sender: TObject);
+    procedure acEnableDisableExecute(Sender: TObject);
   private
     { Private declarations }
   public
@@ -26,6 +28,12 @@ uses IupOrm, Vcl.Dialogs;
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
+
+procedure TioViewModel1.acEnableDisableExecute(Sender: TObject);
+begin
+  inherited;
+  acHello.Enabled := not acHello.Enabled;
+end;
 
 procedure TioViewModel1.acHelloExecute(Sender: TObject);
 begin

@@ -4,7 +4,8 @@ interface
 
 uses
   IupOrm.CommonTypes, System.Generics.Collections, IupOrm.MVVM.Interfaces,
-  System.SyncObjs, IupOrm.DependencyInjection.Interfaces, System.Rtti;
+  System.SyncObjs, IupOrm.DependencyInjection.Interfaces, System.Rtti,
+  IupOrm.LiveBindings.PrototypeBindSource, IupOrm.LiveBindings.Interfaces;
 
 type
 
@@ -81,10 +82,11 @@ type
   public
     constructor Create(AInterfaceName:String); virtual;
     function Get: TObject; virtual;
+    function Alias(const AAlias:String): IioDependencyInjectionLocator;
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator;
     function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator;
     function ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator;
-    function ViewModel(AViewModel:IioViewModel): IioDependencyInjectionLocator;
+    function ViewModel(const AViewModel:IioViewModel): IioDependencyInjectionLocator;
   end;
   // Generic version of the Service Locator Class
   TioDependencyInjectionLocator<T:IInterface> = class(TioDependencyInjectionLocator, IioDependencyInjectionLocator<T>)
@@ -98,8 +100,15 @@ type
   public
     class function RegisterClass(const AClassRef:TioClassRef): TioDependencyInjectionRegister; overload;
     class function RegisterClass<T: class>: TioDependencyInjectionRegister; overload;
-    class function Locate(AInterfaceNameOrAlias:String): IioDependencyInjectionLocator; overload;
+    class function Locate(const AInterfaceNameOrAlias:String): IioDependencyInjectionLocator; overload;
     class function Locate<T:IInterface>: IioDependencyInjectionLocator<T>; overload;
+
+    class function LocateViewModel(const AInterfaceNameOrAlias, AModelClassName:String; const AWhere:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewModel(const AInterfaceNameOrAlias:String; const AMasterBindSource:TioMasterBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewModel(const AInterfaceNameOrAlias:String; ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
+    class function LocateViewModel<T:IInterface>(const AModelClassName:String; const AWhere:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewModel<T:IInterface>(const AMasterBindSource:TioMasterBindSource; const AMasterPropertyName:String=''): IioDependencyInjectionLocator; overload;
+    class function LocateViewModel<T:IInterface>(const ABindSourceAdapter:IioActiveBindSourceAdapter): IioDependencyInjectionLocator; overload;
   end;
 
   // Dependency Injection Factory
@@ -153,7 +162,7 @@ end;
 
 { TioDependencyInjection }
 
-class function TioDependencyInjection.Locate(AInterfaceNameOrAlias: String): IioDependencyInjectionLocator;
+class function TioDependencyInjection.Locate(const AInterfaceNameOrAlias: String): IioDependencyInjectionLocator;
 begin
   Result := TioDependencyInjectionFactory.GetLocator(AInterfaceNameOrAlias);
 end;
@@ -161,6 +170,53 @@ end;
 class function TioDependencyInjection.Locate<T>: IioDependencyInjectionLocator<T>;
 begin
   Result := TioDependencyInjectionFactory.GetLocator<T>;
+end;
+
+class function TioDependencyInjection.LocateViewModel(const AInterfaceNameOrAlias, AModelClassName,
+  AWhere: String): IioDependencyInjectionLocator;
+begin
+  Result := Self.Locate(AInterfaceNameOrAlias)
+                .ConstructorMarker('CreateByClassName')
+                .ConstructorParams([AModelClassName, AWhere]);
+end;
+
+class function TioDependencyInjection.LocateViewModel(const AInterfaceNameOrAlias:String; const AMasterBindSource: TioMasterBindSource;
+  const AMasterPropertyName: String): IioDependencyInjectionLocator;
+begin
+  Result := Self.Locate(AInterfaceNameOrAlias)
+                .ConstructorMarker('CreateByMasterBindSource')
+                .ConstructorParams([TValue.From(AMasterBindSource), AMasterPropertyName]);
+end;
+
+class function TioDependencyInjection.LocateViewModel(const AInterfaceNameOrAlias: String;
+  ABindSourceAdapter: IioActiveBindSourceAdapter): IioDependencyInjectionLocator;
+begin
+  Result := Self.Locate(AInterfaceNameOrAlias)
+                .ConstructorMarker('CreateByBindSourceAdapter')
+                .ConstructorParams([TValue.From(ABindSourceAdapter)]);
+end;
+
+class function TioDependencyInjection.LocateViewModel<T>(const AModelClassName, AWhere: String): IioDependencyInjectionLocator;
+begin
+  Result := Self.Locate<T>
+                .ConstructorMarker('CreateByClassName')
+                .ConstructorParams([AModelClassName, AWhere]);
+end;
+
+class function TioDependencyInjection.LocateViewModel<T>(const AMasterBindSource: TioMasterBindSource;
+  const AMasterPropertyName: String): IioDependencyInjectionLocator;
+begin
+  Result := Self.Locate<T>
+                .ConstructorMarker('CreateByMasterBindSource')
+                .ConstructorParams([TValue.From(AMasterBindSource), AMasterPropertyName]);
+end;
+
+class function TioDependencyInjection.LocateViewModel<T>(
+  const ABindSourceAdapter: IioActiveBindSourceAdapter): IioDependencyInjectionLocator;
+begin
+  Result := Self.Locate<T>
+                .ConstructorMarker('CreateByBindSourceAdapter')
+                .ConstructorParams([TValue.From(ABindSourceAdapter)]);
 end;
 
 class function TioDependencyInjection.RegisterClass(const AClassRef: TioClassRef): TioDependencyInjectionRegister;
@@ -293,6 +349,12 @@ end;
 
 { TioDependencyInjectionLocator }
 
+function TioDependencyInjectionLocator.Alias(const AAlias: String): IioDependencyInjectionLocator;
+begin
+  FAlias := AAlias;
+  Result := Self;
+end;
+
 function TioDependencyInjectionLocator.ConstructorMarker(const AConstructorMarker: String): IioDependencyInjectionLocator;
 begin
   FConstructorMarker := AConstructorMarker;
@@ -345,7 +407,7 @@ begin
   Result := Self.ComposeKey(FInterfaceName, FAlias);
 end;
 
-function TioDependencyInjectionLocator.ViewModel(AViewModel: IioViewModel): IioDependencyInjectionLocator;
+function TioDependencyInjectionLocator.ViewModel(const AViewModel: IioViewModel): IioDependencyInjectionLocator;
 begin
   FViewModel := AViewModel;
   Result := Self;

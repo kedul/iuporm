@@ -5,7 +5,7 @@ interface
 uses
   IupOrm.LiveBindings.Interfaces, IupOrm.CommonTypes, System.Classes,
   System.Generics.Collections, IupOrm.Context.Properties.Interfaces,
-  Data.Bind.ObjectScope;
+  Data.Bind.ObjectScope, IupOrm.LiveBindings.PrototypeBindSource;
 
 type
 
@@ -16,16 +16,20 @@ type
     class function ContainedObjectBindSourceAdapter(AOwner:TComponent; AMasterProperty:IioContextProperty): IioContainedBindSourceAdapter;
     class function NaturalObjectBindSourceAdapter(AOwner:TComponent; ASourceAdapter:IioNaturalBindSourceAdapterSource): TBindSourceAdapter;
     class function Notification(ASender:TObject; ASubject:TObject; ANotificationType:TioBSANotificationType): IioBSANotification;
+    class function GetBSAfromMasterBindSource(AOwner:TComponent; AMAsterBindSource:TioMasterBindSource; AMasterPropertyName:String=''): TBindSourceAdapter;
+    class function GetBSAfromDB(AOwner:TComponent; AClassName:String; AWhere:String=''): TBindSourceAdapter;
   end;
 
 implementation
 
 uses
+  IupOrm,
   IupOrm.LiveBindings.DetailAdaptersContainer,
   IupOrm.LiveBindings.ActiveListBindSourceAdapter,
   IupOrm.LiveBindings.ActiveObjectBindSourceAdapter,
   IupOrm.LiveBindings.Notification,
-  IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter;
+  IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter,
+  IupOrm.Context.Container;
 
 { TioLiveBindingsFactory }
 
@@ -56,6 +60,25 @@ end;
 class function TioLiveBindingsFactory.DetailAdaptersContainer(AMasterAdapter:IioContainedBindSourceAdapter): IioDetailBindSourceAdaptersContainer;
 begin
   Result := TioDetailAdaptersContainer.Create(AMasterAdapter);
+end;
+
+class function TioLiveBindingsFactory.GetBSAfromDB(AOwner:TComponent; AClassName, AWhere: String): TBindSourceAdapter;
+begin
+  // Get the adapter directly from IupOrm
+  Result := TIupOrm.Load(   TioMapContainer.GetClassRef(AClassName)   )
+                   ._Where(AWhere)
+                   .ToActiveListBindSourceAdapter(AOwner);
+end;
+
+class function TioLiveBindingsFactory.GetBSAfromMasterBindSource(AOwner:TComponent; AMAsterBindSource: TioMasterBindSource;
+  AMasterPropertyName: String): TBindSourceAdapter;
+begin
+  // If the MasterPropertyName property is empty then get a NaturalActiveBindSourceAdapter
+  //  from the MasterBindSource else get a detail ActiveBindSourceAdapter even from the
+  //  MasterBindSource.
+  if (AMasterPropertyName <> '')
+    then Result := AMAsterBindSource.IupOrm.GetDetailBindSourceAdapter(AOwner, AMasterPropertyName)
+    else Result := AMAsterBindSource.IupOrm.GetNaturalObjectBindSourceAdapter(AOwner);
 end;
 
 class function TioLiveBindingsFactory.NaturalObjectBindSourceAdapter(

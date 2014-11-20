@@ -5,13 +5,18 @@ interface
 uses
   System.SysUtils, System.Classes,
   IupOrm.LiveBindings.Interfaces, IupOrm.MVVM.Interfaces, System.Rtti,
-  IupOrm.Attributes;
+  IupOrm.Attributes, IupOrm.LiveBindings.PrototypeBindSource,
+  IupOrm.CommonTypes;
 
 type
   TioViewModelBase = class(TDataModule, IioViewModel)
   private
     { Private declarations }
     FViewData: IioViewData;
+    FioClassName: String;
+    FIoMasterBindSource: TioMasterBindSource;
+    FIoMasterPropertyName: String;
+    FIoWhere: String;
   protected
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
@@ -21,11 +26,19 @@ type
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
 // ---------------- End: section added for IInterface support ---------------
+    procedure ioLoadViewData;
   public
     { Public declarations }
+    [ioMarker('CreateByDataObject')]
     constructor Create(ADataObj:TObject); overload;
-    [ioMarker('ThisIsCalledByIOPrototypeBindSource')]
+    [ioMarker('CreateByBindSourceAdapter')]
     constructor Create(ABindSourceAdapter:IioActiveBindSourceAdapter); overload;
+    [ioMarker('CreateByClassName')]
+    constructor Create(const AClassName:String; const AioWhere:String=''); overload;
+    [ioMarker('CreateByClassRef')]
+    constructor Create(const AClassRef:TioClassRef; const AioWhere:String=''); overload;
+    [ioMarker('CreateByMasterBindSource')]
+    constructor Create(const AMasterBindSource:TioMasterBindSource; const AMasterPropertyName:String=''); overload;
     function ViewData: IioViewData;
     function GetActionByName(AActionName: String): TBasicAction;
     procedure BindActions(const AView:IioView);
@@ -38,6 +51,11 @@ type
     property RefCount: Integer read FRefCount;
 {$ENDIF}
 // ---------------- End: section added for IInterface support ---------------
+  published
+    property ioClassName:String read FioClassName write FioClassName;
+    property ioWhere:String read FIoWhere write FIoWhere;
+    property ioMasterBindSource:TioMasterBindSource read FIoMasterBindSource write FIoMasterBindSource;
+    property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
   end;
 // ---------------- Start: section added for IInterface support ---------------
   {$IFNDEF SYSTEM_HPP_DEFINES_OBJECTS}
@@ -48,7 +66,8 @@ type
 
 implementation
 
-uses IupOrm.MVVM.Factory, IupOrm.Exceptions, IupOrm.RttiContext.Factory;
+uses IupOrm.MVVM.Factory, IupOrm.Exceptions, IupOrm.RttiContext.Factory,
+     IupOrm.LiveBindings.Factory, Data.Bind.ObjectScope;
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 
@@ -60,9 +79,35 @@ uses IupOrm.MVVM.Factory, IupOrm.Exceptions, IupOrm.RttiContext.Factory;
 
 
 
-
-
+// ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}
+procedure TioViewModelBase.AfterConstruction;
+begin
+// Release the constructor's implicit refcount
+  AtomicDecrement(FRefCount);
+end;
+
+procedure TioViewModelBase.BeforeDestruction;
+begin
+  if RefCount <> 0 then
+    Error(reInvalidPtr);
+end;
+
+class function TioViewModelBase.NewInstance: TObject;
+begin
+  Result := inherited NewInstance;
+  TioViewModelBase(Result).FRefCount := 1;
+end;
+{$ENDIF}
+// ---------------- End: section added for IInterface support ---------------
+
+
+
+
+
+
+
+
 
 function TioViewModelBase.GetActionByName(AActionName: String): TBasicAction;
 var
@@ -78,18 +123,6 @@ begin
     Exit(AObj as TBasicAction);
   // Else raise an exception
   raise EIupOrmException.Create(Self.ClassName + ': action not found!');
-end;
-
-procedure TioViewModelBase.AfterConstruction;
-begin
-// Release the constructor's implicit refcount
-  AtomicDecrement(FRefCount);
-end;
-
-procedure TioViewModelBase.BeforeDestruction;
-begin
-  if RefCount <> 0 then
-    Error(reInvalidPtr);
 end;
 
 procedure TioViewModelBase.BindAction(const AType:TRttiType; const AView:IioView; const AComponentName, AActionName: String);
@@ -139,13 +172,6 @@ begin
   FViewData := TioMVVMFactory.ViewData(ABindSourceAdapter);
 end;
 
-class function TioViewModelBase.NewInstance: TObject;
-begin
-  Result := inherited NewInstance;
-  TioViewModelBase(Result).FRefCount := 1;
-end;
-
-{$ENDIF AUTOREFCOUNT}
 
 
 
@@ -164,6 +190,7 @@ end;
 
 function TioViewModelBase.ViewData: IioViewData;
 begin
+  if not Assigned(FViewData) then Self.ioLoadViewData;
   Result := FViewData;
 end;
 
@@ -186,5 +213,55 @@ begin
   Result := __ObjRelease;
 {$ENDIF}
 end;
+
+constructor TioViewModelBase.Create(const AClassName, AioWhere: String);
+begin
+  inherited Create(nil);
+  FioClassName := AClassName;
+  FIoWhere := FIoWhere;
+end;
+
+constructor TioViewModelBase.Create(const AClassRef: TioClassRef; const AioWhere: String);
+begin
+  inherited Create(nil);
+  FioClassName := AClassRef.ClassName;
+  FIoWhere := AioWhere;
+end;
+
+constructor TioViewModelBase.Create(const AMasterBindSource: TioMasterBindSource; const AMasterPropertyName: String);
+begin
+  inherited Create(nil);
+  FIoMasterBindSource := AMasterBindSource;
+  FIoMasterPropertyName := AMasterPropertyName;
+end;
+
+procedure TioViewModelBase.ioLoadViewData;
+var
+  ABindSourceAdapter: TBindSourceAdapter;
+  AActiveBindSourceAdapter: IioActiveBindSourceAdapter;
+begin
+  if Assigned(FViewData)
+  then raise EIupOrmException.Create(Self.ClassName + ': "ViewData" is already assigned!')
+  else if (Self.FioClassName = '') and (not Assigned(Self.FIoMasterBindSource))
+  then raise EIupOrmException.Create(Self.ClassName + ': "ioClassName" or "ioMasterBindSource" property is required!');
+  // If a ViewData object is NOT already assigned then retrieve a
+  //  BindSourceAdapter by iupORM anche create it
+  if  (not Assigned(FViewData)) then
+    // If this is a detail BindSource then retrieve the adapter from the master BindSource
+    //  else get the adapter directly from IupOrm
+    if Assigned(Self.FIoMasterBindSource)
+    then ABindSourceAdapter := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self, Self.FioMasterBindSource, Self.ioMasterPropertyName)
+    else ABindSourceAdapter := TioLiveBindingsFactory.GetBSAfromDB(Self, Self.FioClassName, Self.FioWhere);
+  // If the BindSourceAdapter is assigned then extract the IioActiveBindSourceAdapter interface
+  //  and creat the ViewData Object
+  if Assigned(ABindSourceAdapter) then
+  begin
+    if Supports(ABindSourceAdapter, IioActiveBindSourceAdapter, AActiveBindSourceAdapter)
+    then FViewData := TioMVVMFactory.ViewData(AActiveBindSourceAdapter)
+    else raise EIupOrmException.Create(Self.ClassName + ': The BindSourceAdapter does not support the "IioActiveBindSourceAdapter" interface!');
+  end;
+end;
+
+
 
 end.
