@@ -5,6 +5,7 @@ uses
   FMX.MobilePreview,
   FMX.Forms,
   IupOrm,
+  System.IOUtils,
   Main in 'Main.pas' {MainForm},
   GlobalFactory in 'GlobalFactory.pas',
   Model.BaseClasses in 'Model.BaseClasses.pas',
@@ -33,7 +34,7 @@ begin
 
   // ============ IupOrm initialization ====================
   // Set the directory name (under the Documents folder)
-  TIupOrm.SetDBFolderInDocuments('RVMan');
+  TIupOrm.ConnectionManager.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'RVMan.db')).Apply;
   // AutoCreation and AutoUpdate of the database
   TIupOrm.AutoCreateDatabase;
   // Check for default data
