@@ -12,7 +12,7 @@ uses
   IupOrm.Helpers.ObjectHelperTools.Interfaces,
   IupOrm.Helpers.BindSourceHelperTools.Interfaces,
   IupOrm.LiveBindings.Interfaces, IupOrm.Global.Factory,
-  IupOrm.DependencyInjection;
+  IupOrm.DependencyInjection, IupOrm.DB.ConnectionContainer;
 
 type
 
@@ -52,12 +52,11 @@ type
     class procedure Delete(AObj: TObject);
     class procedure Persist(AObj: TObject);
     class procedure PersistCollection(ACollection: TObject);
-    class procedure StartTransaction;
-    class procedure CommitTransaction;
-    class procedure RollbackTransaction;
-    class procedure SetDBFolder(AFolderName:String);
-    class procedure SetDBFolderInDocuments(AFolderName:String);
+    class procedure StartTransaction(AConnectionName:String='');
+    class procedure CommitTransaction(AConnectionName:String='');
+    class procedure RollbackTransaction(AConnectionName:String='');
     class procedure AutoCreateDatabase;
+    class function ConnectionManager: TioConnectionManagerRef;
   end;
 
 implementation
@@ -101,6 +100,23 @@ var
   AObj: TObject;
   AContext: IioContext;
 begin
+  // NB: Qui avvio la transazione per fare in modo che tutto il Persist di tutti gli oggetti contenuti
+  //      nella collection vengano persistiti o annullati ma poi ogni chiamata a PersistObject riavvia
+  //      una transazione per l'oggetto singolo (che non avrà praticamente effetto perchè inglobata
+  //      da quella avviata qua sotto.
+  //      Nel caso particolare in cui uno o più singoli oggetti contenuti dela collection siano di una
+  //      qualche classe che opera su una ConnectionDef diversa da quella di default verrà avviata (all'interno
+  //      della chiamata a "PersistObject" una transazione sulla Connection diversa da quella di default e quindi
+  //      al di fuori della transazione principale sulla connessione di default avviata qui sotto e in pratica
+  //      per questi oggetti ogni chiamata a "PersistObject" verrà eseguita nel contesto di una singola transazione
+  //      slegata dalle altre e quindi è possibile che (solo in questo specifico e particolare caso) alcune operazioni
+  //      vadano a buon fine mentre altre no.
+  //      AL momento non ho una soluzione al problema.
+  // NB: Qui non posso conoscere con certezza il tipo di oggetti realmente contenuto nella collection
+  //      in quanto il tipo reale dell'oggetto potrebbe essere diverso dal genericType della lista stessa
+  //      (a maggior ragione nel caso di una TList<IInterface> di interfacce, quindi avvio una transazione
+  //      sulla connessione di default che va bene nel 99% delle volte (raramente l'applicazione dichiererà classi
+  //      che operano su Database diversi contemporaneamente.
   Self.StartTransaction;
   try
     // Wrap the DestList into a DuckTypedList
@@ -117,9 +133,9 @@ begin
                         );
     end;
 
-    TioDBFactory.Connection.Commit;
+    Self.CommitTransaction;
   except
-    TioDBFactory.Connection.Rollback;
+    Self.RollbackTransaction;
     raise;
   end;
 end;
@@ -195,7 +211,7 @@ end;
 
 class procedure TIupOrm.PersistObject(AContext:IioContext; ARelationPropertyName:String=''; ARelationOID:Integer=0);
 begin
-  TioDbFactory.Connection.StartTransaction;
+  Self.StartTransaction(AContext.GetConnectionDefName);
   try
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     if  (ARelationPropertyName <> '')
@@ -227,9 +243,9 @@ begin
     // PostProcess (persist) relation childs (HasMany, HasOne)
     Self.PostProcessRelationChild(AContext);
 
-    TioDBFactory.Connection.Commit;
+    Self.CommitTransaction(AContext.GetConnectionDefName);
   except
-    TioDBFactory.Connection.Rollback;
+    Self.RollbackTransaction(AContext.GetConnectionDefName);
     raise;
   end;
 end;
@@ -246,24 +262,14 @@ begin
   Result.SetClassRef(T);
 end;
 
-class procedure TIupOrm.RollbackTransaction;
+class procedure TIupOrm.RollbackTransaction(AConnectionName:String);
 begin
-  TioDBFactory.Connection.Rollback;
+  TioDBFactory.Connection(AConnectionName).Rollback;
 end;
 
-class procedure TIupOrm.StartTransaction;
+class procedure TIupOrm.StartTransaction(AConnectionName:String);
 begin
-  TioDBFactory.Connection.StartTransaction;
-end;
-
-class procedure TIupOrm.SetDBFolder(AFolderName: String);
-begin
-  TioDbFactory.SetDBFolder(AFolderName);
-end;
-
-class procedure TIupOrm.SetDBFolderInDocuments(AFolderName: String);
-begin
-  TioDbFactory.SetDBFolderIntoDocuments(AFolderName);
+  TioDBFactory.Connection(AConnectionName).StartTransaction;
 end;
 
 class procedure TIupOrm.UpdateObject(AContext: IioContext);
@@ -277,9 +283,14 @@ begin
   TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase;
 end;
 
-class procedure TIupOrm.CommitTransaction;
+class procedure TIupOrm.CommitTransaction(AConnectionName:String);
 begin
-  TioDBFactory.Connection.Commit;
+  TioDBFactory.Connection(AConnectionName).Commit;
+end;
+
+class function TIupOrm.ConnectionManager: TioConnectionManagerRef;
+begin
+  Result := Self.GlobalFactory.DBFactory.ConnectionManager;
 end;
 
 class procedure TIupOrm.Delete(AObj: TObject);

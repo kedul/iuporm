@@ -40,6 +40,7 @@ type
     function TableName: String;
     function GetJoin: IioJoins;
     function GetGroupBy: IioGroupBy;
+    function GetConnectionDefName: String;
   end;
 
 implementation

@@ -53,6 +53,8 @@ type
     function GetGroupBySql: String;
     // Join
     function GetJoin: IioJoins;
+    // ConnectionDefName
+    function GetConnectionDefName: String;
   end;
 
 implementation
@@ -103,6 +105,11 @@ end;
 function TioContext.GetClassRef: TioClassRef;
 begin
   Result := Self.Map.GetClassRef;
+end;
+
+function TioContext.GetConnectionDefName: String;
+begin
+  Result := GetTable.GetConnectionDefName;
 end;
 
 function TioContext.GetDataObject: TObject;

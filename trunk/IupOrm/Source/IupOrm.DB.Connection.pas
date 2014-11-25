@@ -26,6 +26,7 @@ type
     constructor Create(AConnection:TioInternalSqlConnection);
     destructor Destroy; override;
     function GetConnection: TioInternalSqlConnection;
+    function GetConnectionDefName: String;
     function InTransaction: Boolean;
     procedure StartTransaction;
     procedure Commit;
@@ -45,7 +46,7 @@ begin
   Dec(FTransactionCounter);
   if FTransactionCounter > 0 then Exit;
   FConnection.Commit;
-  TioDBFactory.ConnectionContainer.FreeConnection;
+  TioDBFactory.ConnectionContainer.FreeConnection(Self);
 end;
 
 constructor TioConnection.Create(AConnection: TioInternalSqlConnection);
@@ -69,6 +70,11 @@ begin
   Result := FConnection;
 end;
 
+function TioConnection.GetConnectionDefName: String;
+begin
+  Result := Self.FConnection.ConnectionDefName;
+end;
+
 function TioConnection.InTransaction: Boolean;
 begin
   Result := FConnection.InTransaction;
@@ -78,7 +84,7 @@ procedure TioConnection.Rollback;
 begin
   FConnection.Rollback;
   FTransactionCounter := 0;
-  TioDBFactory.ConnectionContainer.FreeConnection;
+  TioDBFactory.ConnectionContainer.FreeConnection(Self);
 end;
 
 procedure TioConnection.StartTransaction;

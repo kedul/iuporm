@@ -7,6 +7,7 @@ uses
 
 const
   IO_CLASSFROMFIELD_FIELDNAME = 'ClassInfo';
+  IO_CONNECTIONDEF_DEFAULTNAME = 'NO_NAME';
 
 type
 

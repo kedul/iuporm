@@ -403,12 +403,13 @@ var
 begin
   // Init
   AQuery := nil;
-  TioDBFactory.Connection.StartTransaction;
+  // Create Context
+  AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
+  // Start the transaction
+  TIupOrm.StartTransaction(AContext.GetConnectionDefName);
   try try
     // Wrap the DestList into a DuckTypedList
     ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
-    // Create Context
-    AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
     // Create & open query
     AQuery := TioDbFactory.SqlGenerator.GenerateSqlSelectForList(AContext);
     AQuery.Open;
@@ -424,9 +425,9 @@ begin
     end;
     // Close query
     AQuery.Close;
-    TioDBFactory.Connection.Commit;
+    TIupOrm.CommitTransaction(AContext.GetConnectionDefName);
   except
-    TioDBFactory.Connection.Rollback;
+    TIupOrm.RollbackTransaction(AContext.GetConnectionDefName);
     raise;
   end;
   finally
@@ -450,10 +451,10 @@ var
 begin
   // Init
   Result := nil;
-  TioDBFactory.Connection.StartTransaction;
+  // Create Context
+  AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
+  TIupOrm.StartTransaction(AContext.GetConnectionDefName);
   try try
-    // Create Context
-    AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
     // Create & open query
     AQuery := TioDbFactory.SqlGenerator.GenerateSqlSelectForObject(AContext);
     AQuery.Open;
@@ -461,9 +462,9 @@ begin
     Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
     // Close query
     AQuery.Close;
-    TioDBFactory.Connection.Commit;
+    TIupOrm.CommitTransaction(AContext.GetConnectionDefName);
   except
-    TioDBFactory.Connection.Rollback;
+    TIupOrm.RollbackTransaction(AContext.GetConnectionDefName);
     raise;
   end;
   finally
