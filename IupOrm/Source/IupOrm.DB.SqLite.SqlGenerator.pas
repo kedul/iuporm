@@ -42,7 +42,7 @@ begin
     SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
     SQL.Add(AContext.Where.GetSql);
     // Crea l'oggetto ioQuery
-    Result := TioDbFactory.Query(SQL);
+    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
   finally
     // Alla fine devo distruggere la StringLIst sulla quale ho costruito la query
     // per non avere un memory leak
@@ -101,7 +101,7 @@ begin
       then SQL.Add(',' + AContext.ClassFromField.GetSqlValue);
     SQL.Add(')');
     // Crea l'oggetto ioQuery
-    Result := TioDbFactory.QueryInsert(SQL);
+    Result := TioDbFactory.QueryInsert(AContext.GetTable.GetConnectionDefName, SQL);
     // If some blob fields exist then load data on the relative parameters
     if AContext.BlobFieldExists then Self.LoadSqlParamsFromContext(Result, AContext);
   finally
@@ -151,7 +151,7 @@ begin
     // GroupBy
     SQL.Add(AContext.GetGroupBySql);
     // Crea l'oggetto ioQuery
-    Result := TioDbFactory.Query(SQL);
+    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
   finally
     // Alla fine devo distruggere la StringList sulla quale ho costruito la query
     // per non avere un memory leak
@@ -181,7 +181,7 @@ begin
     // GroupBy
     SQL.Add(AContext.GetGroupBySql);
     // Crea l'oggetto ioQuery
-    Result := TioDbFactory.Query(SQL);
+    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
   finally
     // Alla fine devo distruggere la StringList sulla quale ho costruito la query
     // per non avere un memory leak
@@ -230,7 +230,7 @@ begin
     // Where conditions
     SQL.Add(AContext.Where.GetSql);
     // Create ioQuery object
-    Result := TioDbFactory.Query(SQL);
+    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
     // If some blob fields exist then load data on the relative parameters
     if AContext.BlobFieldExists then Self.LoadSqlParamsFromContext(Result, AContext);
   finally

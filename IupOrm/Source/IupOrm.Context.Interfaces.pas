@@ -38,6 +38,8 @@ type
     function GetGroupBySql: String;
     // Join
     function GetJoin: IioJoins;
+    // ConnectionDefName
+    function GetConnectionDefName: String;
   end;
 
 implementation

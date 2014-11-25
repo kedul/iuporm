@@ -206,25 +206,27 @@ end;
 class function TioContextFactory.Table(Typ: TRttiInstanceType): IioContextTable;
 var
   Attr: TCustomAttribute;
-  TableName: String;
+  TableName, ConnectionDefName: String;
   ClassFromField: IioClassFromField;
   AJoins: IioJoins;
   AGroupBy: IioGroupBy;
 begin
   // Prop Init
   TableName := Typ.MetaclassType.ClassName.Substring(1);  // Elimina il primo carattere (di solito la T)
+  ConnectionDefName := '';
   AJoins := Self.Joins;
   AGroupBy := nil;
   // Check attributes
   for Attr in Typ.GetAttributes do
   begin
     if Attr is ioTable then TableName := ioTable(Attr).Value;
+    if Attr is ioConnectionDefName then ConnectionDefName := ioConnectionDefName(Attr).Value;
     if Attr is ioClassFromField then ClassFromField := Self.ClassFromField(Typ);
     if Attr is ioJoin then AJoins.Add(Self.JoinItem(   ioJoin(Attr)   ));
     if (Attr is ioGroupBy) and (not Assigned(AGroupBy)) then AGroupBy := Self.GroupBy(   ioGroupBy(Attr).Value   );
   end;
   // Create result Properties object
-  Result := TioContextTable.Create(TableName, ClassFromField, AJoins, AGroupBy);
+  Result := TioContextTable.Create(TableName, ClassFromField, AJoins, AGroupBy, ConnectionDefName);
 end;
 
 class function TioContextFactory.Where: TioWhere;

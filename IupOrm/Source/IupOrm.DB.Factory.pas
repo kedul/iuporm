@@ -7,7 +7,7 @@ uses
   IupOrm.ObjectsForge.Interfaces,
   IupOrm.DB.Interfaces,
   System.Classes,
-  System.Rtti, IupOrm.DB.ConnectionContainer;
+  System.Rtti, IupOrm.DB.ConnectionContainer, IupOrm.CommonTypes;
 
 type
 
@@ -20,14 +20,12 @@ type
     class function LogicRelation: TioLogicRelationRef;
     class function SqlGenerator: TioSqlGeneratorRef;
     class function SqlDataConverter: TioSqlDataConverterRef;
-    class function Connection: IioConnection;
-    class function NewConnection: IioConnection;
-    class function Query(SQL:TStrings): IioQuery;
-    class function QueryInsert(SQL:TStrings): IioQuery;
-    class function GetDBFolder: String;
-    class procedure SetDBFolder(AFolderName: String);
-    class procedure SetDBFolderIntoDocuments(AFolderName: String);
+    class function Connection(AConnectionName:String=''): IioConnection;
+    class function NewConnection(AConnectionName:String): IioConnection;
+    class function Query(AConnectionName:String; SQL:TStrings): IioQuery;
+    class function QueryInsert(AConnectionName:String; SQL:TStrings): IioQuery;
     class function ConnectionContainer: TioConnectionContainerRef;
+    class function ConnectionManager: TioConnectionManagerRef;
   end;
 
 implementation
@@ -36,10 +34,7 @@ uses
   IupOrm.DB.SqLite.CompareOperators, System.IOUtils,
   IupOrm.DB.Connection, IupOrm.DB.SqLite.LogicRelations, IupOrm.DB.Query,
   IupOrm.DB.SqLite.SqlDataConverter, IupOrm.DB.SqLite.SqlGenerator,
-  IupOrm.Where.SqlItems;
-
-var
-  ioDBFolder: String;
+  IupOrm.Where.SqlItems, System.SysUtils;
 
 { TioDbBuilder }
 
@@ -48,11 +43,17 @@ begin
   Result := TioCompareOperatorSqLite;
 end;
 
-class function TioDbFactory.Connection: IioConnection;
+class function TioDbFactory.Connection(AConnectionName:String): IioConnection;
 begin
-  if not Self.ConnectionContainer.ConnectionExist
-    then Self.ConnectionContainer.AddConnection(Self.NewConnection);
-  Result := Self.ConnectionContainer.GetConnection;
+  // If AConnectionName param is not specified (is empty) then
+  //  use the default connection def
+  if AConnectionName = '' then AConnectionName := Self.ConnectionManager.GetDefaultConnectionName;
+  // If the connection already exists in the COnnectionContainer then return then else
+  //  create a new connection, add it to the COnnectionContainer thne return the connection
+  //  itself to the caller code
+  if not Self.ConnectionContainer.ConnectionExist(AConnectionName)
+    then Self.ConnectionContainer.AddConnection(Self.NewConnection(AConnectionName));
+  Result := Self.ConnectionContainer.GetConnection(AConnectionName);
 end;
 
 class function TioDbFactory.ConnectionContainer: TioConnectionContainerRef;
@@ -60,19 +61,9 @@ begin
   Result := TioConnectionContainer;
 end;
 
-class function TioDbFactory.GetDBFolder: String;
+class function TioDbFactory.ConnectionManager: TioConnectionManagerRef;
 begin
-// If IOS or ANDROD then the Path of the db file is empty (Documents of the application)
-//  else if Windows then return the Path global parameter
-{$IF Defined(IOS) OR Defined(ANDROID)}
-  Result := TPath.GetDocumentsPath;
-{$ELSE}
-  // If empty then return the default default value
-  //  else return the value
-  if ioDBFolder = ''
-    then Result := TPath.Combine(TPath.GetDocumentsPath, 'IupOrm')
-    else Result := ioDBFolder;
-{$ENDIF}
+  Result := TioConnectionManager;
 end;
 
 class function TioDbFactory.LogicRelation: TioLogicRelationRef;
@@ -80,65 +71,48 @@ begin
   Result := TioLogicRelationSqLite;
 end;
 
-class function TioDbFactory.NewConnection: IioConnection;
+class function TioDbFactory.NewConnection(AConnectionName:String): IioConnection;
 var
-  DBPath, DBFileNameFull: String;
+  DBPath: String;
   LConnection: TioInternalSqlConnection;
 begin
-  // Get DBFOlder
-  DBPath := Self.GetDBFolder;
-  // Crea la cartella del DB se non c'è
-  if not TDirectory.Exists(DBPath)
-    then TDirectory.CreateDirectory(DBPath);
-  // Compone il nome completo del file database
-  DBFileNameFull := TPath.Combine(DBPath, 'db.db');
-  // Crea la connessione al DB
+  // Create the internal connection
   LConnection := TioInternalSqlConnection.Create(nil);
-  LConnection.DriverName := 'SQLite';
-  LConnection.LoginPrompt := False;
-  LConnection.Params.Values['FailIfMissing'] := 'False';
-  LConnection.Params.Values['HostName'] := 'localhost';
-  LConnection.Params.Values['Database'] := DBFileNameFull;
+  // Load and set the connection parameters (from the connection manager)
+  LConnection.ConnectionDefName := AConnectionName;
+  // Extract the file path anche create the directory if not exists
+  DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Database   );
+  if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
+  // Open the connection
   LConnection.Open;
-  // Crea la ioCOnnection da ritornare, la assegna alla variabile globale
-  //  e richiama se stessa
+  // Create the ioConnection and retorn
   Result := TioConnection.Create(LConnection);
 end;
 
-class function TioDbFactory.Query(SQL: TStrings): IioQuery;
+class function TioDbFactory.Query(AConnectionName:String; SQL: TStrings): IioQuery;
 var
   NewQry: TioInternalSqlQuery;
 begin
   NewQry := TioInternalSqlQuery.Create(nil);
   try
     if Assigned(SQL) then NewQry.SQL.AddStrings(SQL);
-    Result := TioQuery.Create(Self.Connection, NewQry);
+    Result := TioQuery.Create(Self.Connection(AConnectionName), NewQry);
   except
     NewQry.Free;
   end;
 end;
 
-class function TioDbFactory.QueryInsert(SQL: TStrings): IioQuery;
+class function TioDbFactory.QueryInsert(AConnectionName:String; SQL: TStrings): IioQuery;
 var
   NewQry: TioInternalSqlQuery;
 begin
   NewQry := TioInternalSqlQuery.Create(nil);
   try
     NewQry.SQL.AddStrings(SQL);
-    Result := TioQueryInsert.Create(Self.Connection, NewQry, 'SELECT last_insert_rowid()');
+    Result := TioQueryInsert.Create(Self.Connection(AConnectionName), NewQry, 'SELECT last_insert_rowid()');
   except
     NewQry.Free;
   end;
-end;
-
-class procedure TioDbFactory.SetDBFolder(AFolderName: String);
-begin
-  ioDBFolder := AFolderName;
-end;
-
-class procedure TioDbFactory.SetDBFolderIntoDocuments(AFolderName: String);
-begin
-  Self.SetDBFolder(TPath.Combine(TPath.GetDocumentsPath, AFolderName));
 end;
 
 class function TioDbFactory.SqlDataConverter: TioSqlDataConverterRef;

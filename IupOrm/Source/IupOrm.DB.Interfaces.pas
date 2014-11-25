@@ -9,7 +9,7 @@ uses
   System.Classes,
   System.Rtti, IupOrm.Context.Table.Interfaces,
   FireDAC.Comp.Client, FireDAC.Stan.Param,
-  Data.DB;
+  Data.DB, FireDAC.Stan.Intf;
 
 type
 
@@ -24,11 +24,19 @@ type
   TioSqlDataConverterRef = class of TioSqlDataConverter;
   TioSqlGeneratorRef = class of TioSqlGenerator;
 
+  // -Classe per il connection manager che funge da repository dei parametri di tutte
+  //   connessioni e da gestore del connection pooling
+  // -Interfaccia per oggetti contenenti i parametri di una connessione da inserire
+  //  nel connection manager
+  //  In pratica utilizzo l'interfaccia "IFDStanConnectionDef" fornita da FireDAC
+  IIoConnectionDef = IFDStanConnectionDef;
+
   // Interfaccia per il componente connection da fornire alla query per la
   //  connessione al database
   IioConnection = interface
     ['{FF5D54D7-7EBE-4E6E-830E-E091BA7AE929}']
     function GetConnection: TioInternalSqlConnection;
+    function GetConnectionDefName: String;
     function InTransaction: Boolean;
     procedure StartTransaction;
     procedure Commit;

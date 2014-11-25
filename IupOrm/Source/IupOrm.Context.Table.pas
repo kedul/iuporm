@@ -69,14 +69,16 @@ type
     FClassFromField: IioClassFromField;
     FJoins: IioJoins;
     FGroupBy: IioGroupBy;
+    FConnectionDefName: String;
   public
-    constructor Create(ASqlText:String; AClassFromField:IioClassFromField;
-    AJoins:IioJoins; AGroupBy:IioGroupBy); overload;
+    constructor Create(const ASqlText:String; const AClassFromField:IioClassFromField;
+    const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String); overload;
     function GetClassFromField: IioClassFromField;
     function IsClassFromField: Boolean;
     function TableName: String;
     function GetJoin: IioJoins;
     function GetGroupBy: IioGroupBy;
+    function GetConnectionDefName: String;
   end;
 
 implementation
@@ -86,18 +88,24 @@ uses
 
 { TioContextTable }
 
-constructor TioContextTable.Create(ASqlText:String; AClassFromField:IioClassFromField;
-    AJoins:IioJoins; AGroupBy:IioGroupBy);
+constructor TioContextTable.Create(const ASqlText:String; const AClassFromField:IioClassFromField;
+    const AJoins:IioJoins; const AGroupBy:IioGroupBy; const AConnectionDefName:String);
 begin
   inherited Create(ASqlText);
   FClassFromField := AClassFromField;
   FJoins := AJoins;
   FGroupBy := AGroupBy;
+  FConnectionDefName := AConnectionDefName;
 end;
 
 function TioContextTable.GetClassFromField: IioClassFromField;
 begin
   Result := FClassFromField;
+end;
+
+function TioContextTable.GetConnectionDefName: String;
+begin
+  Result := FConnectionDefName;
 end;
 
 function TioContextTable.GetGroupBy: IioGroupBy;

@@ -135,6 +135,10 @@ type
   ioTable = class(TioCustomStringAttribute)
   end;
 
+  // ConnectionDefName attribute
+  ioConnectionDefName = class(TioCustomStringAttribute)
+  end;
+
   // ClassFromField
   ioClassFromField = class(TioCustomAttribute)
   end;
