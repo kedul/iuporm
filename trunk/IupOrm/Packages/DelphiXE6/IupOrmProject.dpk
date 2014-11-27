@@ -37,7 +37,9 @@ requires
   FireDACCommon,
   FireDAC,
   FireDACCommonDriver,
-  fmxFireDAC;
+  fmxFireDAC,
+  vcl,
+  vclFireDAC;
 
 contains
   IupOrm.Attributes in '..\..\Source\IupOrm.Attributes.pas',

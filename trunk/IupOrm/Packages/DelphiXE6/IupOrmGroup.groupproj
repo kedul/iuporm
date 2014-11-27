@@ -19,7 +19,7 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj">
-            <Dependencies/>
+            <Dependencies>IupOrmProject.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\Pizza_ioActiveBindSourceAdapter\Pizza_ioActiveBindSourceAdapter.dproj">
             <Dependencies/>
@@ -34,13 +34,13 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\..\Samples\Pizza_ioPrototypeBindSource\Pizza_ioPrototypeBindSource.dproj">
-            <Dependencies/>
+            <Dependencies>IupOrmProject.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\RVMan\RVMan.dproj">
-            <Dependencies/>
+            <Dependencies>IupOrmProject.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\SpeedTest\SpeedTest.dproj">
-            <Dependencies/>
+            <Dependencies>IupOrmProject.dproj</Dependencies>
         </Projects>
         <Projects Include="..\..\Samples\TestVM\TestVM.dproj">
             <Dependencies/>
@@ -98,13 +98,13 @@
     <Target Name="PhoneContacts_ioActiveBindSourceAdapter:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioActiveBindSourceAdapter\PhoneContacts_ioActiveBindSourceAdapter.dproj" Targets="Make"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource">
+    <Target Name="PhoneContacts_ioPrototypeBindSource" DependsOnTargets="IupOrmProject">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean">
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Clean" DependsOnTargets="IupOrmProject:Clean">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="PhoneContacts_ioPrototypeBindSource:Make">
+    <Target Name="PhoneContacts_ioPrototypeBindSource:Make" DependsOnTargets="IupOrmProject:Make">
         <MSBuild Projects="..\..\Samples\PhoneContacts_ioProtypeBindSource\PhoneContacts_ioPrototypeBindSource.dproj" Targets="Make"/>
     </Target>
     <Target Name="Pizza_ioActiveBindSourceAdapter">
@@ -143,31 +143,31 @@
     <Target Name="VRManagerClient:Make">
         <MSBuild Projects="..\..\Samples\VRManager\VRManagerClient.dproj" Targets="Make"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBindSource">
+    <Target Name="Pizza_ioPrototypeBindSource" DependsOnTargets="IupOrmProject">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBindSource\Pizza_ioPrototypeBindSource.dproj"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBindSource:Clean">
+    <Target Name="Pizza_ioPrototypeBindSource:Clean" DependsOnTargets="IupOrmProject:Clean">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBindSource\Pizza_ioPrototypeBindSource.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="Pizza_ioPrototypeBindSource:Make">
+    <Target Name="Pizza_ioPrototypeBindSource:Make" DependsOnTargets="IupOrmProject:Make">
         <MSBuild Projects="..\..\Samples\Pizza_ioPrototypeBindSource\Pizza_ioPrototypeBindSource.dproj" Targets="Make"/>
     </Target>
-    <Target Name="RVMan">
+    <Target Name="RVMan" DependsOnTargets="IupOrmProject">
         <MSBuild Projects="..\..\Samples\RVMan\RVMan.dproj"/>
     </Target>
-    <Target Name="RVMan:Clean">
+    <Target Name="RVMan:Clean" DependsOnTargets="IupOrmProject:Clean">
         <MSBuild Projects="..\..\Samples\RVMan\RVMan.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="RVMan:Make">
+    <Target Name="RVMan:Make" DependsOnTargets="IupOrmProject:Make">
         <MSBuild Projects="..\..\Samples\RVMan\RVMan.dproj" Targets="Make"/>
     </Target>
-    <Target Name="SpeedTest">
+    <Target Name="SpeedTest" DependsOnTargets="IupOrmProject">
         <MSBuild Projects="..\..\Samples\SpeedTest\SpeedTest.dproj"/>
     </Target>
-    <Target Name="SpeedTest:Clean">
+    <Target Name="SpeedTest:Clean" DependsOnTargets="IupOrmProject:Clean">
         <MSBuild Projects="..\..\Samples\SpeedTest\SpeedTest.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="SpeedTest:Make">
+    <Target Name="SpeedTest:Make" DependsOnTargets="IupOrmProject:Make">
         <MSBuild Projects="..\..\Samples\SpeedTest\SpeedTest.dproj" Targets="Make"/>
     </Target>
     <Target Name="TestVM">

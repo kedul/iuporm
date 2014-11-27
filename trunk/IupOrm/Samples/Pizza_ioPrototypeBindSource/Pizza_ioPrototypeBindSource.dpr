@@ -5,7 +5,7 @@ uses
   FMX.MobilePreview,
   FMX.Forms,
   Main in 'Main.pas' {MainForml},
-  Model in 'Model.pas', IupOrm;
+  Model in 'Model.pas', IupOrm, System.IOUtils;
 
 {$R *.res}
 {$STRONGLINKTYPES ON}
@@ -15,7 +15,7 @@ begin
 
   // ============ IupOrm initialization ====================
   // Set the directory name (under the Documents folder)
-  TIupOrm.SetDBFolderInDocuments('Pizza');
+  TIupOrm.ConnectionManager.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'Pizza.db')).Apply;
   // AutoCreation and AutoUpdate of the database
   TIupOrm.AutoCreateDatabase;
   // ============ IupOrm initialization ====================

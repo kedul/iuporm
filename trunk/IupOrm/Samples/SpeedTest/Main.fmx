@@ -17,7 +17,7 @@ object Form2: TForm2
     Height = 44.000000000000000000
     Position.X = 56.000000000000000000
     Position.Y = 120.000000000000000000
-    TabOrder = 2
+    TabOrder = 3
     Text = 'Crea articoli con IO'
     Width = 209.000000000000000000
     OnClick = Button1Click
@@ -31,7 +31,7 @@ object Form2: TForm2
   end
   object Edit1: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 4
+    TabOrder = 5
     Text = '100'
     Position.X = 112.000000000000000000
     Position.Y = 64.000000000000000000
@@ -42,9 +42,27 @@ object Form2: TForm2
     Height = 44.000000000000000000
     Position.X = 56.000000000000000000
     Position.Y = 176.000000000000000000
-    TabOrder = 1
+    TabOrder = 2
     Text = 'Crea articoli con normale'
     Width = 209.000000000000000000
     OnClick = Button2Click
+  end
+  object Button3: TButton
+    Height = 44.000000000000000000
+    Position.X = 56.000000000000000000
+    Position.Y = 280.000000000000000000
+    TabOrder = 1
+    Text = 'Test'
+    Width = 209.000000000000000000
+    OnClick = Button3Click
+  end
+  object FDGUIxWaitCursor1: TFDGUIxWaitCursor
+    Provider = 'FMX'
+    Left = 72
+    Top = 328
+  end
+  object FDPhysSQLiteDriverLink1: TFDPhysSQLiteDriverLink
+    Left = 96
+    Top = 224
   end
 end

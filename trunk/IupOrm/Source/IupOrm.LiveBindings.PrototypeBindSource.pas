@@ -188,7 +188,7 @@ begin
   if  (Self.ioViewModelInterface <> '')
   and (not Assigned(Self.ioViewModel))
   then
-    Self.ioViewModel := TIupOrm.DependencyInjection.Locate(Self.ioViewModelInterface)
+    Self.ioViewModel := TioDependencyInjection.Locate(Self.ioViewModelInterface)
                                                    .ConstructorParams([TValue.From(AActiveBSA)])
                                                    .ConstructorMarker('CreateByBindSourceAdapter')
                                                    .Get
