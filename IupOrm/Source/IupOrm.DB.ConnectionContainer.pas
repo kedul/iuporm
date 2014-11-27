@@ -142,11 +142,11 @@ class function TioConnectionManager.NewFirebirdConnectionDef(const AServer, ADat
   AConnectionName: String): IIoConnectionDef;
 begin
   Result := Self.NewCustomConnectionDef(AConnectionName);
-  Result.DriverID := 'FB';
-  Result.Server := AServer;
-  Result.Database := ADatabase;
-  Result.UserName := AUserName;
-  Result.Password := APassword;
+  Result.Params.Values['DriverID'] := 'FB';
+  Result.Params.Values['Server'] := AServer;
+  Result.Params.Values['Database'] := ADatabase;
+  Result.Params.Values['User_Name'] := AUserName;
+  Result.Params.Values['Password'] := APassword;
   Result.Params.Values['Protocol'] := 'TCPIP';
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
 end;
@@ -155,32 +155,32 @@ class function TioConnectionManager.NewMySQLConnectionDef(const AServer, ADataba
   AConnectionName: String): IIoConnectionDef;
 begin
   Result := Self.NewCustomConnectionDef(AConnectionName);
-  Result.DriverID := 'MySQL';
-  Result.Server := AServer;
-  Result.Database := ADatabase;
-  Result.UserName := AUserName;
-  Result.Password := APassword;
+  Result.Params.Values['DriverID'] := 'MySQL';
+  Result.Params.Values['Server'] := AServer;
+  Result.Params.Values['Database'] := ADatabase;
+  Result.Params.Values['User_Name'] := AUserName;
+  Result.Params.Values['Password'] := APassword;
   if ACharSet <> '' then Result.Params.Values['CharacterSet'] := ACharSet;
 end;
 
 class function TioConnectionManager.NewSQLiteConnectionDef(const ADatabase, AConnectionName: String): IIoConnectionDef;
 begin
   Result := Self.NewCustomConnectionDef(AConnectionName);
+  Result.Params.Values['DriverID'] := 'SQLite';
+//  Result.Params.Values['Server'] := 'localhost';
+  Result.Params.Values['Database'] := ADatabase;
   Result.Params.Values['FailIfMissing'] := 'False';
-  Result.DriverID := 'SQLite';
-  Result.Server := 'localhost';
-  Result.Database := ADatabase;
 end;
 
 class function TioConnectionManager.NewSQLServerConnectionDef(const AServer, ADatabase, AUserName, APassword,
   AConnectionName: String): IIoConnectionDef;
 begin
   Result := Self.NewCustomConnectionDef(AConnectionName);
-  Result.DriverID := 'MSSQL';
-  Result.Server := AServer;
-  Result.Database := ADatabase;
-  Result.UserName := AUserName;
-  Result.Password := APassword;
+  Result.Params.Values['DriverID'] := 'MSSQL';
+  Result.Params.Values['Server'] := AServer;
+  Result.Params.Values['Database'] := ADatabase;
+  Result.Params.Values['User_Name'] := AUserName;
+  Result.Params.Values['Password'] := APassword;
 end;
 
 class procedure TioConnectionManager.SetDefaultConnectionName(const AConnectionName: String);

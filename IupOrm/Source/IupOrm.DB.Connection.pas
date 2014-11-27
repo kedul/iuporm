@@ -15,6 +15,7 @@ uses
   FireDAC.Comp.UI,
   FireDAC.Stan.Async;
 
+
 type
 
   TioConnection = class(TInterfacedObject, IioConnection)

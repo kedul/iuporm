@@ -144,6 +144,8 @@
         <DCCReference Include="FireDAC.dcp"/>
         <DCCReference Include="FireDACCommonDriver.dcp"/>
         <DCCReference Include="fmxFireDAC.dcp"/>
+        <DCCReference Include="vcl.dcp"/>
+        <DCCReference Include="vclFireDAC.dcp"/>
         <DCCReference Include="..\..\Source\IupOrm.Attributes.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.CommonTypes.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Context.CassFromField.pas"/>

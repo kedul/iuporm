@@ -8,9 +8,9 @@ uses
   Fmx.Bind.GenData, Data.Bind.Components, Data.Bind.ObjectScope, FMX.Layouts,
   FMX.ListBox, FMX.StdCtrls, FMX.Graphics, FMX.TabControl, System.Rtti,
   System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.EngExt,
-  Fmx.Bind.DBEngExt, FMX.Objects, FMX.Edit, System.Actions, FMX.ActnList,
+  Fmx.Bind.DBEngExt, FMX.Edit, System.Actions, FMX.ActnList,
   FMX.ListView.Types, FMX.ListView, System.Generics.Collections, Model,
-  IupOrm.LiveBindings.PrototypeBindSource;
+  IupOrm.LiveBindings.PrototypeBindSource, FMX.Objects;
 
 type
 
@@ -68,7 +68,7 @@ var
 
 implementation
 
-uses IupOrm, IupOrm.DB.DBCreator.Factory, IupOrm.CommonTypes;
+uses IupOrm, IupOrm.DB.DBCreator.Factory, IupOrm.CommonTypes, System.IOUtils;
 
 
 {$R *.fmx}
@@ -116,11 +116,6 @@ end;
 
 procedure TMainForml.FormCreate(Sender: TObject);
 begin
-  // Set the directory name (under the Documents folder)
-  TIupOrm.SetDBFolderInDocuments('Pizza');
-  // AutoCreation and AutoUpdate of the database
-  TioDBCreatorFactory.GetDBCreator.AutoCreateDatabase;
-
   { This defines the default active tab at runtime }
   TabControl1.ActiveTab := TabItem1;
 end;

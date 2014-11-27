@@ -357,6 +357,7 @@ begin
     Self.FViewModel  := AViewModel;
   except
     Self.FCriticalSection.Release;
+    raise;
   end;
 end;
 
@@ -436,7 +437,7 @@ function TioDependencyInjectionLocator.ViewModel(const AInterfaceNameOrAlias, AM
   AAlias: String): IioDependencyInjectionLocator;
 begin
   Result := Self.ViewModel(
-    TiupOrm.DependencyInjection.LocateViewModel(AInterfaceNameOrAlias, AModelClassName, AWhere, AAlias).Get.ioAsInterface<IioViewModel>
+    TioDependencyInjection.LocateViewModel(AInterfaceNameOrAlias, AModelClassName, AWhere, AAlias).Get.ioAsInterface<IioViewModel>
     );
 end;
 
@@ -444,7 +445,7 @@ function TioDependencyInjectionLocator.ViewModel(const AInterfaceNameOrAlias: St
   const AMasterPropertyName, AAlias: String): IioDependencyInjectionLocator;
 begin
   Result := Self.ViewModel(
-    TiupOrm.DependencyInjection.LocateViewModel(AInterfaceNameOrAlias, AMasterBindSource, AMasterPropertyName, AAlias).Get.ioAsInterface<IioViewModel>
+    TioDependencyInjection.LocateViewModel(AInterfaceNameOrAlias, AMasterBindSource, AMasterPropertyName, AAlias).Get.ioAsInterface<IioViewModel>
     );
 end;
 
@@ -452,7 +453,7 @@ function TioDependencyInjectionLocator.ViewModel(const AInterfaceNameOrAlias: St
   ABindSourceAdapter: IioActiveBindSourceAdapter; const AAlias: String): IioDependencyInjectionLocator;
 begin
   Result := Self.ViewModel(
-    TiupOrm.DependencyInjection.LocateViewModel(AInterfaceNameOrAlias, ABindSourceAdapter, AAlias).Get.ioAsInterface<IioViewModel>
+    TioDependencyInjection.LocateViewModel(AInterfaceNameOrAlias, ABindSourceAdapter, AAlias).Get.ioAsInterface<IioViewModel>
     );
 end;
 

@@ -11,8 +11,10 @@ uses
   IupOrm.DB.Interfaces,
   IupOrm.Helpers.ObjectHelperTools.Interfaces,
   IupOrm.Helpers.BindSourceHelperTools.Interfaces,
-  IupOrm.LiveBindings.Interfaces, IupOrm.Global.Factory,
-  IupOrm.DependencyInjection, IupOrm.DB.ConnectionContainer;
+  IupOrm.LiveBindings.Interfaces,
+  IupOrm.Global.Factory,
+  IupOrm.DependencyInjection,
+  IupOrm.DB.ConnectionContainer;
 
 type
 
@@ -62,10 +64,16 @@ type
 implementation
 
 uses
-  IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory, IupOrm.Attributes,
-  IupOrm.DB.Factory, IupOrm.Exceptions, IupOrm.Helpers.ObjectHelperTools,
-  IupOrm.Helpers.BindSourceHelperTools, IupOrm.DB.DBCreator.Factory,
-  System.SysUtils, System.TypInfo;
+  IupOrm.DuckTyped.Interfaces,
+  IupOrm.DuckTyped.Factory,
+  IupOrm.Attributes,
+  IupOrm.Exceptions,
+  IupOrm.Helpers.ObjectHelperTools,
+  IupOrm.Helpers.BindSourceHelperTools,
+  System.SysUtils,
+  System.TypInfo,
+  IupOrm.DB.Factory,
+  IupOrm.DB.DBCreator.Factory;
 
 
 { TIupOrm }

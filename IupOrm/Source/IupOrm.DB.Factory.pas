@@ -81,7 +81,7 @@ begin
   // Load and set the connection parameters (from the connection manager)
   LConnection.ConnectionDefName := AConnectionName;
   // Extract the file path anche create the directory if not exists
-  DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Database   );
+  DBPath := ExtractFilePath(   Self.ConnectionManager.GetConnectionDefByName(AConnectionName).Params.Values['Database']   );
   if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
   // Open the connection
   LConnection.Open;
@@ -99,6 +99,7 @@ begin
     Result := TioQuery.Create(Self.Connection(AConnectionName), NewQry);
   except
     NewQry.Free;
+    raise;
   end;
 end;
 
@@ -112,6 +113,7 @@ begin
     Result := TioQueryInsert.Create(Self.Connection(AConnectionName), NewQry, 'SELECT last_insert_rowid()');
   except
     NewQry.Free;
+    raise;
   end;
 end;
 

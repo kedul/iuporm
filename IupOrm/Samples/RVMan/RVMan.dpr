@@ -4,7 +4,6 @@ uses
   System.StartUpCopy,
   FMX.MobilePreview,
   FMX.Forms,
-  IupOrm,
   System.IOUtils,
   Main in 'Main.pas' {MainForm},
   GlobalFactory in 'GlobalFactory.pas',
@@ -23,7 +22,8 @@ uses
   Model.Factory in 'Model.Factory.pas',
   View.CostGeneric in 'View.CostGeneric.pas' {ViewCostGeneric: TFrame},
   View.Factory in 'View.Factory.pas',
-  View.CostFuel in 'View.CostFuel.pas' {ViewCostFuel: TFrame};
+  View.CostFuel in 'View.CostFuel.pas' {ViewCostFuel: TFrame},
+  IupOrm;
 
 {$R *.res}
 {$STRONGLINKTYPES ON}
