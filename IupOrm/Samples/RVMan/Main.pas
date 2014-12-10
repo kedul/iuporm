@@ -141,7 +141,7 @@ uses
   GlobalFactory, IupOrm, Model.TravelWithCostTypeList,
   IupOrm.LazyLoad.Generics.ObjectList, Model.Travel,
   System.Generics.Collections, IupOrm.LazyLoad.Interfaces,
-  IupOrm.LiveBindings.ActiveListBindSourceAdapter, Model.BaseInterfaces,
+  IupOrm.LiveBindings.ActiveListBindSourceAdapter,
   Model.Factory, Model.BaseConst, Model.CostType, View.CostGeneric;
 
 {$R *.fmx}

@@ -3,14 +3,14 @@ unit Model.Travel;
 interface
 
 uses
-  Model.BaseConst, Model.BaseInterfaces, Model.BaseClasses, System.SysUtils, System.Generics.Collections,
+  Model.BaseConst, Model.BaseClasses, System.SysUtils, System.Generics.Collections,
   IupOrm.Attributes;
 
 type
 
   // Classe che rappresenta un viaggio
   [ioTable('TRAVELS')]
-  TTravel = class(TBaseClass, ITravel)
+  TTravel = class(TBaseClass)
   strict private
     FStartDate: TDatetime;
     FEndDate: TDatetime;

@@ -3,7 +3,7 @@ unit Model.Cost;
 interface
 
 uses
-  Model.BaseConst, Model.BaseInterfaces, Model.BaseClasses, Model.Travel, System.SysUtils, System.Generics.Collections,
+  Model.BaseConst, Model.BaseClasses, Model.Travel, System.SysUtils, System.Generics.Collections,
   IupOrm.Attributes, Model.CostType;
 
 type
@@ -11,11 +11,11 @@ type
   // Classe che rappresenta un costo generico
   [ioTable('COSTS')]
   [ioClassFromField]
-  TCostGeneric = class(TBaseClass, ICostGeneric)
+  TCostGeneric = class(TBaseClass)
   strict private
     FTravelID: Integer;
     FCostDate: TDatetime;
-    FCostType: ICostType;
+    FCostType: TCostType;
     FCostAmount: Currency;
     FCostNote: String;
   strict protected
@@ -23,8 +23,8 @@ type
     procedure SetTravelID(Value: Integer);
     function GetCostDate: TDateTime;
     procedure SetCostDate(Value: TDateTime);
-    function GetCostType: ICostType;
-    procedure SetCostType(Value: ICostType);
+    function GetCostType: TCostType;
+    procedure SetCostType(Value: TCostType);
     function GetCostAmount: Currency;
     procedure SetCostAmount(Value: Currency);
     function GetCostNote: String;
@@ -32,13 +32,13 @@ type
     function GetListViewItem_Caption: String; override;
     function GetListViewItem_DetailText: String; override;
   public
-    constructor Create(AID:Integer; ADescrizione:String; ATravelID:Integer; ACostType:ICostType;
+    constructor Create(AID:Integer; ADescrizione:String; ATravelID:Integer; ACostType:TCostType;
                        ACostDate:TDatetime; ACostAmount:Currency; ACostNote:String); overload;
     property TravelID: Integer read GetTravelID write SetTravelID;
     property CostDate:TDateTime read GetCostDate write SetCostDate;
     [ioField('CostTypeID')]
     [ioBelongsTo(TCostType)]
-    property CostType:ICostType read GetCostType write SetCostType;
+    property CostType:TCostType read GetCostType write SetCostType;
     property CostAmount:Currency read GetCostAmount write SetCostAmount;
     property CostNote:String read GetCostNote write SetCostNote;
   end;
@@ -48,7 +48,7 @@ type
   // Classe che rappresenta un costo di carburante
   [ioTable('COSTS')]
   [ioClassFromField]
-  TCostFuel = class(TCostGeneric, ICostFuel)
+  TCostFuel = class(TCostGeneric)
   strict private
     FLiters: Double;
     FKMTraveled: Double;
@@ -61,7 +61,7 @@ type
     function GetLiters100KM: Double;
     function GetListViewItem_DetailText: String; override;
   public
-    constructor Create(AID:Integer; ADescrizione:String; ATravelID:Integer; ACostType:ICostType;
+    constructor Create(AID:Integer; ADescrizione:String; ATravelID:Integer; ACostType:TCostType;
                        ACostDate:TDatetime; ACostAmount:Currency; ACostNote:String;
                        ALiters:Double; AKMTraveled:Double); overload;
     property Liters:Double read GetLiters write SetLiters;
@@ -78,7 +78,7 @@ type
 //    class function NewCost(AID:Integer; ADescrizione:String; ATravelID:Integer; ACostTypeID:Integer;
 //                       ACostDate:TDatetime; ACostAmount:Currency; ACostNote:String;
 //                       ALiters:Double; AKMTraveled:Double): TCostGeneric;
-    class function NewCost(AID:Integer; ADescrizione:String; ATravelID:Integer; ACostType:ICostType;
+    class function NewCost(AID:Integer; ADescrizione:String; ATravelID:Integer; ACostType:TCostType;
                        ACostDate:TDatetime; ACostAmount:Currency; ACostNote:String;
                        ALiters:Double; AKMTraveled:Double): TCostGeneric;
   end;
@@ -92,7 +92,7 @@ uses
 { TCostGeneric }
 
 constructor TCostGeneric.Create(AID: Integer; ADescrizione: String;
-  ATravelID: Integer; ACostType: ICostType; ACostDate: TDatetime;
+  ATravelID: Integer; ACostType: TCostType; ACostDate: TDatetime;
   ACostAmount: Currency; ACostNote: String);
 begin
   inherited Create(AID, ADescrizione);
@@ -118,7 +118,7 @@ begin
   Result := FCostNote;
 end;
 
-function TCostGeneric.GetCostType: ICostType;
+function TCostGeneric.GetCostType: TCostType;
 begin
   Result := FCostType;
 end;
@@ -167,7 +167,7 @@ begin
   end;
 end;
 
-procedure TCostGeneric.SetCostType(Value: ICostType);
+procedure TCostGeneric.SetCostType(Value: TCostType);
 begin
   if Value <> FCostType then
   begin
@@ -195,7 +195,7 @@ end;
 { TCostFuel }
 
 constructor TCostFuel.Create(AID: Integer; ADescrizione: String;
-  ATravelID: Integer; ACostType: ICostType; ACostDate: TDatetime;
+  ATravelID: Integer; ACostType: TCostType; ACostDate: TDatetime;
   ACostAmount: Currency; ACostNote: String; ALiters, AKMTraveled: Double);
 begin
    inherited Create(AID, ADescrizione, ATravelID, ACostType, ACostDate, ACostAmount, ACostNote);
@@ -269,7 +269,7 @@ end;
 //  ACostAmount: Currency; ACostNote: String; ALiters,
 //  AKMTraveled: Double): TCostGeneric;
 class function TCostFactory.NewCost(AID: Integer; ADescrizione: String;
-  ATravelID: Integer; ACostType:ICostType; ACostDate: TDatetime;
+  ATravelID: Integer; ACostType:TCostType; ACostDate: TDatetime;
   ACostAmount: Currency; ACostNote: String; ALiters,
   AKMTraveled: Double): TCostGeneric;
 begin

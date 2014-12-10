@@ -3,7 +3,7 @@ unit Model.CostType;
 interface
 
 uses
-  Model.BaseConst, Model.BaseInterfaces, Model.BaseClasses, IupOrm.Attributes;
+  Model.BaseConst, Model.BaseClasses, IupOrm.Attributes;
 
 const
   GroupHeaders: array[0..2] of string = ('Totale', 'Varie', 'Carburante');
@@ -11,7 +11,7 @@ const
 type
   // Classe che rappresente i tipi di spesa possibili
   [ioTable('COSTTYPES')]
-  TCostType = class(TBaseClass, ICostType)
+  TCostType = class(TBaseClass)
   strict private
     FObjectType: Byte;
   strict protected

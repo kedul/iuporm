@@ -3,7 +3,7 @@ unit Model.Factory;
 interface
 
 uses
-  Model.CostType, Model.Travel, Model.BaseInterfaces, Model.Cost;
+  Model.CostType, Model.Travel, Model.Cost;
 
 type
 
@@ -14,9 +14,9 @@ type
     class function CostType(ADescrizione:String; AObjectType:Byte): TCostType;
     class function Travel(ADescrizione:String; AStartDate:TDateTime; AStartKM: Integer): TTravel; overload;
     class function Travel(ADescrizione:String; AStartDate,AEndDate:TDateTime; AStartKM,AEndKM: Integer): TTravel; overload;
-    class function Cost(ADescrizione: String; ATravelID: Integer; ACostType:ICostType; ACostDate: TDatetime;
+    class function Cost(ADescrizione: String; ATravelID: Integer; ACostType:TCostType; ACostDate: TDatetime;
                         ACostAmount: Currency; ACostNote: String; ALiters, AKMTraveled: Double): TCostGeneric; overload;
-    class function Cost(ATravelID: Integer; ACostType:ICostType; ACostDate: TDatetime): TCostGeneric; overload;
+    class function Cost(ATravelID: Integer; ACostType:TCostType; ACostDate: TDatetime): TCostGeneric; overload;
   end;
 
 implementation
@@ -27,7 +27,7 @@ uses
 { TModelFactory }
 
 class function TModelFactory.Cost(ADescrizione: String; ATravelID: Integer;
-  ACostType: ICostType; ACostDate: TDatetime; ACostAmount: Currency;
+  ACostType: TCostType; ACostDate: TDatetime; ACostAmount: Currency;
   ACostNote: String; ALiters, AKMTraveled: Double): TCostGeneric;
 begin
   Result := nil;
@@ -58,7 +58,7 @@ begin
   end;
 end;
 
-class function TModelFactory.Cost(ATravelID: Integer; ACostType: ICostType;
+class function TModelFactory.Cost(ATravelID: Integer; ACostType: TCostType;
   ACostDate: TDatetime): TCostGeneric;
 begin
   Result := Self.Cost('', ATravelID, ACostType, ACostDate, 0, '', 0, 0);

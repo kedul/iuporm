@@ -3,7 +3,7 @@ unit View.Factory;
 interface
 
 uses
-  View.CostGeneric, System.Classes, Model.BaseInterfaces;
+  View.CostGeneric, System.Classes;
 
 type
 

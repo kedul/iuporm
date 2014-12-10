@@ -3,29 +3,29 @@ unit Model.TravelWithCostTypeList;
 interface
 
 uses
-  Model.CostTypeWithCostList, Model.Travel, Model.BaseInterfaces,
+  Model.CostTypeWithCostList, Model.Travel,
   System.Generics.Collections, IupOrm.Attributes,
   IupOrm.LazyLoad.Generics.ObjectList;
 
 type
 
   [ioTable('TRAVELS')]
-  TTravelWithCostTypeList = class(TTravel, ITravel)
+  TTravelWithCostTypeList = class(TTravel)
   strict private
-    FCostTypeList: TioObjectList<TCostTypeWithCostList>;
+    FCostTypeList: TObjectList<TCostTypeWithCostList>;
     FTotalAmount: Currency; protected
   strict protected
     // Methods
-    function  GetCostTypeList: TioObjectList<TCostTypeWithCostList>;
-    procedure SetCostTypeList(Value: TioObjectList<TCostTypeWithCostList>);
+    function  GetCostTypeList: TObjectList<TCostTypeWithCostList>;
+    procedure SetCostTypeList(Value: TObjectList<TCostTypeWithCostList>);
     function GetListViewItem_Detailtext: String; override;
   public
     constructor Create;
     destructor Destroy; override;
     procedure RefreshTotals;
     // Properties
-    [ioHasMany(TCostTypeWithCostList, 'TravelID', ioLazyLoad)]
-    property CostTypeList:TioObjectList<TCostTypeWithCostList> read GetCostTypeList write SetCostTypeList;
+    [ioHasMany(TCostTypeWithCostList, 'TravelID', ioImmediateLoad)]
+    property CostTypeList:TObjectList<TCostTypeWithCostList> read GetCostTypeList write SetCostTypeList;
     [ioLoadSql('select sum([TCostGeneric.CostAmount]) from [TCostGeneric] where [TCostGeneric.TravelID] = [TTravel.ID]')]
     property TotalAmount:Currency read FTotalAmount write FTotalAmount;
   end;
@@ -36,7 +36,7 @@ uses System.SysUtils;
 
 { TTravelWithCostTypeList }
 
-function TTravelWithCostTypeList.GetCostTypeList: TioObjectList<TCostTypeWithCostList>;
+function TTravelWithCostTypeList.GetCostTypeList: TObjectList<TCostTypeWithCostList>;
 begin
   Result := FCostTypeList;
 end;
@@ -66,7 +66,7 @@ begin
 end;
 
 procedure TTravelWithCostTypeList.SetCostTypeList(
-  Value: TioObjectList<TCostTypeWithCostList>);
+  Value: TObjectList<TCostTypeWithCostList>);
 begin
   if Assigned(FCostTypeList) then FreeAndNil(FCostTypeList);
   FCostTypeList := Value;

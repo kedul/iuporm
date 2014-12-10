@@ -57,6 +57,7 @@ type
     function GetValueByFieldNameAsVariant(AFieldName:String): Variant;
     procedure Open;
     procedure Close;
+    function IsEmpty: Boolean;
     function ExecSQL: Integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
