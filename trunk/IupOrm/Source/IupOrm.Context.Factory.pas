@@ -152,7 +152,7 @@ begin
       Continue;
     end;
     // Prop Init
-    PropId := (Prop.Name = 'ID');  // Is a OID property if the name of the property itself is 'ID'
+    PropId := (Uppercase(Prop.Name) = 'ID');  // Is a OID property if the name of the property itself is 'ID'
     PropFieldName := Prop.Name;
     PropLoadSql := '';
     PropSkip := False;

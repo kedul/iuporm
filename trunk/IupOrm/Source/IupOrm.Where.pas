@@ -459,7 +459,8 @@ begin
     AQuery := TioDbFactory.SqlGenerator.GenerateSqlSelectForObject(AContext);
     AQuery.Open;
     // Create the object as TObject
-    Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+    if not AQuery.IsEmpty then
+      Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
     // Close query
     AQuery.Close;
     TIupOrm.CommitTransaction(AContext.GetConnectionDefName);
@@ -631,8 +632,12 @@ begin
 end;
 
 function TioWhere<T>.ToObject: T;
+var
+  AObj: TObject;
 begin
-  Result := TioWhere(Self).ToObject as T;
+  Result := nil;
+  AObj := TioWhere(Self).ToObject;
+  if Assigned(AObj) then Exit(AObj as T);
 end;
 
 function TioWhere<T>._And(ATextCondition: String): TioWhere<T>;

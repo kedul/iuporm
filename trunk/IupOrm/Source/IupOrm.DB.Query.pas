@@ -31,6 +31,7 @@ type
     function GetValueByFieldNameAsVariant(AFieldName:String): Variant;
     procedure Open;
     procedure Close;
+    function IsEmpty: Boolean;
     function ExecSQL: Integer; virtual;
     function GetSQL: TStrings;
     function Fields: TioFields;
@@ -154,6 +155,11 @@ end;
 function TioQuery.GetValueByFieldNameAsVariant(AFieldName: String): Variant;
 begin
   Result := FSqlQuery.FieldByName(AFieldName).Value;
+end;
+
+function TioQuery.IsEmpty: Boolean;
+begin
+  Result := FSqlQuery.IsEmpty;
 end;
 
 procedure TioQuery.Last;

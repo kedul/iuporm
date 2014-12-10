@@ -2,7 +2,7 @@ unit Model.CostTypeWithCostList;
 
 interface
 
-uses Model.CostTypeWithCostListInterface, Model.BaseListClasses, Model.CostType,
+uses Model.BaseListClasses, Model.CostType,
 Model.Cost, System.Generics.Collections, FMX.Dialogs, IupOrm.Attributes,
   IupOrm.LazyLoad.Generics.ObjectList;
 
@@ -13,7 +13,7 @@ type
   [ioTable('COSTTYPES')]
   [ioJoin(ioInner, TCostGeneric, '[TCostGeneric.CostType] = [TCostType.ID]')]
   [ioGroupBy('[TCostType.ID], [TCostType.Descrizione], [TCostGeneric.TravelID], [TCostType.ObjectType]')]
-  TCostTypeWithCostList = class(TCostType, ICostTypeWithCostList)
+  TCostTypeWithCostList = class(TCostType)
   strict private
     FCostList: TioObjectList<TCostGeneric>;
     FTravelID: Integer;
@@ -49,7 +49,7 @@ type
 implementation
 
 uses
-  Model.BaseInterfaces, System.SysUtils, Model.BaseConst, System.Math;
+  System.SysUtils, Model.BaseConst, System.Math;
 
 { TCostTypeWithCostList }
 

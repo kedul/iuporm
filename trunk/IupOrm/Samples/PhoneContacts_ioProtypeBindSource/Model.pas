@@ -2,7 +2,7 @@ unit Model;
 
 interface
 
-uses IupOrm.Attributes, System.Generics.Collections;
+uses IupOrm.Attributes, System.Generics.Collections, System.Classes;
 
 type
 

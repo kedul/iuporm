@@ -3,12 +3,12 @@ unit Model.BaseClasses;
 interface
 
 uses
-  Model.BaseInterfaces, Rtti, IupOrm.Attributes, IupOrm.CommonTypes;
+  Rtti, IupOrm.Attributes, IupOrm.CommonTypes;
 
 type
 
   // Classe base
-  TBaseClass = class(TInterfacedObject, IBaseInterface)
+  TBaseClass = class(TObject)
   strict private
     FID: Integer;
     FDescrizione: String;

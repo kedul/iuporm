@@ -31,7 +31,7 @@ var
 begin
   inherited;
   // DataObject creation
-  Result := AContext.GetClassRef.Create;
+  Result := Self.CreateObjectByClassRef(AContext.GetClassRef);
   AContext.DataObject := Result;
   // ObjectStatus
   AContext.ObjectStatus := osClean;
