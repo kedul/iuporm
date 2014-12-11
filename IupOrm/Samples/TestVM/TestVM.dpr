@@ -8,13 +8,26 @@ uses
   DM2 in 'DM2.pas' {DataModule2: TDataModule},
   Form2 in 'Form2.pas' {frm2},
   Dog in 'Dog.pas',
-  IupOrm.MVVM.VCL.ViewModel in '..\..\Source\IupOrm.MVVM.VCL.ViewModel.pas' {ioViewModel: TDataModule},
-  ViewModel1 in 'ViewModel1.pas' {ioViewModel1: TDataModule};
+  ViewModel1 in 'ViewModel1.pas' {ioViewModel1: TDataModule},
+  System.IOUtils,
+  IupOrm,
+  IupOrm.MVVM.VCL.ViewModel in '..\..\Source\IupOrm.MVVM.VCL.ViewModel.pas' {ioViewModel: TDataModule};
 
 {$R *.res}
+{$STRONGLINKTYPES ON}
 
 begin
   ReportMemoryLeaksOnShutdown := True;
+
+
+  // ============ IupOrm initialization ====================
+  // Set the directory name (under the Documents folder)
+  TIupOrm.ConnectionManager.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'TestVM.db')).Apply;
+  // AutoCreation and AutoUpdate of the database
+  TIupOrm.AutoCreateDatabase;
+  // ============ IupOrm initialization ====================
+
+
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmMain, frmMain);

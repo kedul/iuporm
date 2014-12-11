@@ -2,6 +2,8 @@ unit Dog;
 
 interface
 
+uses IupOrm.Attributes;
+
 type
 
   IDog = interface
@@ -9,9 +11,16 @@ type
     procedure Abbaia;
   end;
 
+  [ioTable('DOGS')]
   TDog = class(TInterfacedObject, IDog)
+  private
+    FIsAnAnimal: Boolean;
+    FID: Integer;
   public
+    constructor Create;
     Procedure Abbaia;
+    property ID:Integer Read FID write FID;
+    property IsAnAnimal: Boolean Read FIsAnAnimal Write FIsAnAnimal;
   end;
 
 implementation
@@ -24,6 +33,12 @@ uses
 procedure TDog.Abbaia;
 begin
   ShowMessage('Bau!');
+end;
+
+constructor TDog.Create;
+begin
+  inherited;
+  FIsAnAnimal := True;
 end;
 
 initialization

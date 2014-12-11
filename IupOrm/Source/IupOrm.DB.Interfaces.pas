@@ -74,8 +74,9 @@ type
   public
     class function StringToSQL(AString:String): String; virtual; abstract;
     class function FloatToSQL(AFloat:Extended): String; virtual; abstract;
-    class function TValueToSql(AValue:TValue): String; virtual; abstract;
     class function PropertyToFieldType(AProp:IioContextProperty): String; virtual; abstract;
+    class function TValueToSql(AValue:TValue): String; virtual; abstract;
+    class function QueryToTValue(AQuery:IioQuery; AProperty:IioContextProperty): TValue; virtual; abstract;
   end;
 
   // INterfaccia per le classi che devono generare i vari tipi di query

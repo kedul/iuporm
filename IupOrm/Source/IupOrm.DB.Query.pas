@@ -56,7 +56,7 @@ implementation
 uses
   System.TypInfo, IupOrm.Exceptions, IupOrm.Attributes,
   IupOrm.ObjectsForge.Factory, IupOrm.DuckTyped.Interfaces,
-  IupOrm.DuckTyped.Factory;
+  IupOrm.DuckTyped.Factory, IupOrm.DB.Factory;
 
 { TioQuerySqLite }
 
@@ -123,28 +123,14 @@ begin
   // If the property is a BelongsTo relation then return data as Integer
   //  (the type for ID)
   if AProperty.GetRelationType = ioRTBelongsTo
-    then Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger
+    then Exit(FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger);
 
   // If the property is mapped into a blob field
-  else if AProperty.IsBlob
-    then Result := TioObjectMakerFactory.GetObjectMaker(False).CreateObjectFromBlobField(Self, AProperty)
+  if AProperty.IsBlob
+    then Exit(TioObjectMakerFactory.GetObjectMaker(False).CreateObjectFromBlobField(Self, AProperty));
 
-  // If the field is null
-  else if FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).IsNull
-    then Exit
-
-  // Otherwise data type is by Property.TypeKind
-  else
-  begin
-    case AProperty.GetRttiProperty.PropertyType.TypeKind of
-      tkInt64, tkInteger:
-        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger;
-      tkFloat:
-        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsFloat;
-      tkString, tkUString, tkWChar, tkLString, tkWString, tkChar:
-        Result := FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsString;
-    end;
-  end;
+  // Else return the value for the field related to the AProperty as TValue
+  Result := TioDBFactory.SqlDataConverter.QueryToTValue(Self, AProperty);
 end;
 
 function TioQuery.GetValueByFieldIndexAsVariant(Idx: Integer): Variant;

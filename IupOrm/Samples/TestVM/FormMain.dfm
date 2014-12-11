@@ -141,6 +141,24 @@ object frmMain: TfrmMain
     Caption = 'Hello (Enable/Disable)'
     TabOrder = 13
   end
+  object Button13: TButton
+    Left = 478
+    Top = 280
+    Width = 147
+    Height = 25
+    Caption = 'Persist a dog'
+    TabOrder = 14
+    OnClick = Button13Click
+  end
+  object Button14: TButton
+    Left = 631
+    Top = 280
+    Width = 147
+    Height = 25
+    Caption = 'Load a dog'
+    TabOrder = 15
+    OnClick = Button14Click
+  end
   object ioPrototypeBindSource1: TioPrototypeBindSource
     AutoActivate = True
     AutoPost = False

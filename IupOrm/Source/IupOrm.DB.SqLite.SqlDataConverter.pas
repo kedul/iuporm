@@ -15,8 +15,9 @@ type
   public
     class function StringToSQL(AString:String): String; override;
     class function FloatToSQL(AFloat:Extended): String; override;
-    class function TValueToSql(AValue:TValue): String; override;
     class function PropertyToFieldType(AProp:IioContextProperty): String; override;
+    class function TValueToSql(AValue:TValue): String; override;
+    class function QueryToTValue(AQuery:IioQuery; AProperty:IioContextProperty): TValue; override;
   end;
 
 implementation
@@ -59,6 +60,27 @@ begin
   end;
 end;
 
+class function TioSqlDataConverterSqLite.QueryToTValue(AQuery: IioQuery; AProperty: IioContextProperty): TValue;
+begin
+  // If the field is null
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull
+    then Exit;
+  // Convert the field value to a TValue by TypeKind
+  case AProperty.GetRttiProperty.PropertyType.TypeKind of
+    tkInt64, tkInteger:
+      Result := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsInteger;
+    tkFloat:
+      Result := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsFloat;
+    tkString, tkUString, tkWChar, tkLString, tkWString, tkChar:
+      Result := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
+    tkEnumeration:
+      Result := TValue.FromOrdinal(
+                                    AProperty.GetRttiProperty.PropertyType.Handle,  // This is the PTypeInfo of the PropertyType
+                                    AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsInteger  // This is the ordinal value
+                                  );
+  end;
+end;
+
 class function TioSqlDataConverterSqLite.StringToSQL(AString: String): String;
 begin
   Result := QuotedStr(AString);
@@ -74,7 +96,9 @@ begin
     // String
     tkString, tkChar, tkWChar, tkLString, tkWString, tkUString: Result := QuotedStr(AValue.ToString);
     // Integer
-    tkInteger: Result := AValue.ToString;
+    tkInteger, tkInt64: Result := AValue.ToString;
+    // Enumerated (boolean also)
+    tkEnumeration: Result := AValue.AsOrdinal.ToString;
     // Se Float cerca di capire se è una data o similare, devo fare
     //  così perchè i TValue le date le esprimono come Float.
     tkFloat: begin
@@ -85,8 +109,8 @@ begin
   end;
 {
 NB: Tipi non ancora mappati
-TTypeKind = (tkUnknown, tkEnumeration, tkSet, tkClass, tkMethod,
-    tkVariant, tkArray, tkRecord, tkInterface, tkInt64, tkDynArray,
+TTypeKind = (tkUnknown, tkSet, tkClass, tkMethod,
+    tkVariant, tkArray, tkRecord, tkInterface, tkDynArray,
     tkClassRef, tkPointer, tkProcedure);
 }
 end;

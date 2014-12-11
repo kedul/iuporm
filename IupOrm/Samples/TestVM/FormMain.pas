@@ -28,6 +28,8 @@ type
     ButtonHello: TButton;
     [ioAction('acEnableDisable')]
     ButtonHelloEnableDisable: TButton;
+    Button13: TButton;
+    Button14: TButton;
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
@@ -38,6 +40,8 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure Button11Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
+    procedure Button13Click(Sender: TObject);
+    procedure Button14Click(Sender: TObject);
   private
     { Private declarations }
     FDM2_1: TDataModule2;
@@ -76,6 +80,38 @@ end;
 procedure TfrmMain.Button12Click(Sender: TObject);
 begin
   FCriticalSection.Release;
+end;
+
+procedure TfrmMain.Button13Click(Sender: TObject);
+var
+  ADog: TDog;
+begin
+  ADog := TDog.Create;
+  try
+    ADog.IsAnAnimal := True;
+    TIupOrm.Persist(ADog);
+  finally
+    ADog.Free;
+  end;
+end;
+
+procedure TfrmMain.Button14Click(Sender: TObject);
+var
+  ADog: TDog;
+  AMsg: String;
+begin
+  ADog := TIupOrm.Load<TDog>.ByOID(1).ToObject;
+  try
+    AMsg := 'Dog ID = "' + ADog.ID.ToString + '"';
+
+    if ADog.IsAnAnimal
+    then AMsg := AMsg + ' and is an animal.'
+    else AMsg := AMsg + ' and is not an animal.';
+
+    ShowMessage(AMsg);
+  finally
+    ADog.Free;
+  end;
 end;
 
 procedure TfrmMain.Button5Click(Sender: TObject);

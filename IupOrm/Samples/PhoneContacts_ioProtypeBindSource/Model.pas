@@ -29,6 +29,7 @@ type
     FLastName: String;
     FFirstName: String;
     FPhones: TObjectList<TPhoneNumber>;
+    FAttivo: Boolean;
     function GetFullName: String;
     function GetClassNameProp: String;
   public
@@ -46,6 +47,7 @@ type
     property FullName:String read GetFullName;
     [ioSkip]
     property ClassNameProp:String read GetClassNameProp;
+    property Attivo:Boolean read FAttivo write FAttivo;
   end;
 
   [ioTable('Persons')]
@@ -92,6 +94,7 @@ begin
   FID := NewID;
   FFirstName := NewFirstName;
   FLastName := NewLastName;
+  FAttivo := True;
 end;
 
 destructor TPerson.Destroy;
