@@ -159,6 +159,15 @@ object frmMain: TfrmMain
     TabOrder = 15
     OnClick = Button14Click
   end
+  object Button15: TButton
+    Left = 478
+    Top = 311
+    Width = 300
+    Height = 25
+    Caption = 'Persist a dog with an existing ID'
+    TabOrder = 16
+    OnClick = Button15Click
+  end
   object ioPrototypeBindSource1: TioPrototypeBindSource
     AutoActivate = True
     AutoPost = False

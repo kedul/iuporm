@@ -236,7 +236,7 @@ end;
 
 function TioProperty.IsBlob: Boolean;
 begin
-  Result := Self.GetFieldType.StartsWith('BLOB');
+  Result := (FRelationType = ioRTNone) and Self.GetFieldType.StartsWith('BLOB');
 end;
 
 function TioProperty.IsID: Boolean;

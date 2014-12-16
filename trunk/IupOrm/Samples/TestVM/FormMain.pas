@@ -30,6 +30,7 @@ type
     ButtonHelloEnableDisable: TButton;
     Button13: TButton;
     Button14: TButton;
+    Button15: TButton;
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
@@ -42,6 +43,7 @@ type
     procedure Button12Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
     procedure Button14Click(Sender: TObject);
+    procedure Button15Click(Sender: TObject);
   private
     { Private declarations }
     FDM2_1: TDataModule2;
@@ -109,6 +111,20 @@ begin
     else AMsg := AMsg + ' and is not an animal.';
 
     ShowMessage(AMsg);
+  finally
+    ADog.Free;
+  end;
+end;
+
+procedure TfrmMain.Button15Click(Sender: TObject);
+var
+  ADog: TDog;
+begin
+  ADog := TDog.Create;
+  try
+    ADog.ID := 999;
+    ADog.IsAnAnimal := True;
+    TIupOrm.Persist(ADog);
   finally
     ADog.Free;
   end;

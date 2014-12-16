@@ -18,6 +18,7 @@ type
     class function GenerateSqlInsert(AContext:IioContext): IioQuery; override;
     class function GenerateSqlUpdate(AContext:IioContext): IioQuery; override;
     class function GenerateSqlDelete(AContext:IioContext): IioQuery; override;
+    class function GenerateSqlForExists(AContext:IioContext): IioQuery; override;
     class function GenerateSqlJoinSectionItem(AJoinItem: IioJoinItem): String; override;
   end;
 
@@ -25,7 +26,7 @@ implementation
 
 uses
   System.Classes, IupOrm.DB.Factory, IupOrm.Context.Properties.Interfaces,
-  IupOrm.Attributes, IupOrm.Exceptions, System.IOUtils
+  IupOrm.Attributes, IupOrm.Exceptions, System.IOUtils, IupOrm.CommonTypes
   ;
 
 { TioSqlGeneratorSqLite }
@@ -41,6 +42,29 @@ begin
     // Compone l'SQL
     SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
     SQL.Add(AContext.Where.GetSql);
+    // Crea l'oggetto ioQuery
+    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
+  finally
+    // Alla fine devo distruggere la StringLIst sulla quale ho costruito la query
+    // per non avere un memory leak
+    SQL.Free;
+  end;
+end;
+
+class function TioSqlGeneratorSqLite.GenerateSqlForExists(AContext: IioContext): IioQuery;
+var
+  SQL: TStrings;
+begin
+  Result := nil;
+  SQL := TStringList.Create;
+  try
+    // Compone l'SQL
+    SQL.Add('SELECT EXISTS(SELECT * FROM ' +
+      AContext.GetTable.GetSql +
+      ' WHERE ' +
+      AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + ' = ' + AContext.GetProperties.GetIdProperty.GetSqlValue(AContext.DataObject) +
+      ')'
+    );
     // Crea l'oggetto ioQuery
     Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
   finally
@@ -73,8 +97,10 @@ begin
     begin
       // If the current property is ReadOnly then skip it
       if not Prop.IsSqlRequestCompliant(ioInsert) then Continue;
-      // If current property is the ID property then skip its value (always NULL)
-      if Prop.IsID then begin
+      // If current property is the ID property and its value is not null
+      //  then skip its value (always NULL)
+      if  Prop.IsID and (Prop.GetValue(AContext.DataObject).AsInteger = IO_INTEGER_NULL_VALUE) then
+      begin
         SQL.Add(Comma + 'NULL');
         Comma := ',';
         Continue;

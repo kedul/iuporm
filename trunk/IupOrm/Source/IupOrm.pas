@@ -44,6 +44,7 @@ type
     class procedure PersistRelationChildList(AMasterContext:IioContext; AMasterProperty:IioContextProperty);
     class procedure PersistRelationChildObject(AMasterContext:IioContext; AMasterProperty:IioContextProperty);
     class procedure PersistCollection_Internal(ACollection:TObject; ARelationPropertyName:String=''; ARelationOID:Integer=0);
+    class function ObjectExists(AContext:IioContext): Boolean;
   public
     class function GlobalFactory: TioGlobalFactoryRef;
     class function DependencyInjection: TioDependencyInjectionRef;
@@ -81,6 +82,17 @@ uses
 class function TIupOrm.Load<T>: TioWhere<T>;
 begin
   Result := Self.RefTo<T>;
+end;
+
+class function TIupOrm.ObjectExists(AContext: IioContext): Boolean;
+var
+  AQuery: IioQuery;
+begin
+  // Generate and open the query
+  AQuery := TioDbFactory.SqlGenerator.GenerateSqlForExists(AContext);
+  AQuery.Open;
+  // Result
+  Result := AQuery.Fields[0].AsInteger <> 0;
 end;
 
 class procedure TIupOrm.Persist(AObj: TObject);
@@ -224,7 +236,7 @@ begin
     // Set/Update MasterID property if this is a relation child object (HasMany, HasOne, BelongsTo)
     if  (ARelationPropertyName <> '')
     and (ARelationOID <> 0)
-    and (AContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = ioRTNone) // Altrimenti in alcuni gìcasi particolare dava errori
+    and (AContext.GetProperties.GetPropertyByName(ARelationPropertyName).GetRelationType = ioRTNone) // Altrimenti in alcuni casi particolare dava errori
       then AContext.GetProperties.GetPropertyByName(ARelationPropertyName).SetValue(AContext.DataObject, ARelationOID);
     // PreProcess (persist) relation childs (BelongsTo)
     Self.PreProcessRelationChild(AContext);
@@ -236,7 +248,7 @@ begin
       //  the object else update
       osDirty:
       begin
-        if AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger = 0
+        if AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger = IO_INTEGER_NULL_VALUE
         then Self.InsertObject(AContext)
         else Self.UpdateObject(AContext);
         AContext.ObjectStatus := osClean;
@@ -282,6 +294,13 @@ end;
 
 class procedure TIupOrm.UpdateObject(AContext: IioContext);
 begin
+  // If the object is not present in the database then perform
+  //  an Insert instead of an Update to prevent a data loss
+  if not Self.ObjectExists(AContext) then
+  begin
+    Self.InsertObject(AContext);
+    Exit;
+  end;
   // Create and execute query
   TioDbFactory.SqlGenerator.GenerateSqlUpdate(AContext).ExecSQL;
 end;
