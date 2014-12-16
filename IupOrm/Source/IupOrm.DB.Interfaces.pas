@@ -88,6 +88,7 @@ type
     class function GenerateSqlInsert(AContext:IioContext): IioQuery; virtual; abstract;
     class function GenerateSqlUpdate(AContext:IioContext): IioQuery; virtual; abstract;
     class function GenerateSqlDelete(AContext:IioContext): IioQuery; virtual; abstract;
+    class function GenerateSqlForExists(AContext:IioContext): IioQuery; virtual; abstract;
     class function GenerateSqlJoinSectionItem(AJoinItem: IioJoinItem): String; virtual; abstract;
   end;
 

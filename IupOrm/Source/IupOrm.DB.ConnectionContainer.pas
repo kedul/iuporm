@@ -128,7 +128,7 @@ end;
 
 class function TioConnectionManager.NewCustomConnectionDef(const AConnectionName: String; const AsDefault: Boolean): IIoConnectionDef;
 begin
-  // Create the ConnectionDef object and set his name
+   // Create the ConnectionDef object and set his name
   //  NB: The nae of the connectionDef should never be chenged after
   Result := FDManager.ConnectionDefs.AddConnectionDef;
   Result.Name := AConnectionName;
