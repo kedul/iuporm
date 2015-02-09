@@ -26,6 +26,7 @@ type
   IioClassFromField = interface
     ['{D15A9A28-FB90-4753-BE4A-7484A834CD2D}']
     function GetSqlFieldName: string;
+    function GetSqlParamName: String;
     function GetValue: String;
     function GetSqlValue: string;
     function GetClassName: String;

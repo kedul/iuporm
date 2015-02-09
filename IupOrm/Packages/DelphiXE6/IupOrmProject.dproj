@@ -120,6 +120,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_Define>ioPresent;$(DCC_Define)</DCC_Define>
         <DCC_Description>IupOrm Runtime</DCC_Description>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -146,9 +147,10 @@
         <DCCReference Include="fmxFireDAC.dcp"/>
         <DCCReference Include="vcl.dcp"/>
         <DCCReference Include="vclFireDAC.dcp"/>
+        <DCCReference Include="DbxCommonDriver.dcp"/>
+        <DCCReference Include="soaprtl.dcp"/>
         <DCCReference Include="..\..\Source\IupOrm.Attributes.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.CommonTypes.pas"/>
-        <DCCReference Include="..\..\Source\IupOrm.Context.CassFromField.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Context.Container.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Context.Factory.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Context.Interfaces.pas"/>
@@ -178,9 +180,7 @@
         <DCCReference Include="..\..\Source\IupOrm.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.RttiContext.Factory.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.SqlItems.pas"/>
-        <DCCReference Include="..\..\Source\IupOrm.Where.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Where.pas"/>
-        <DCCReference Include="..\..\Source\IupOrm.Where.SqlItems.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.Where.SqlItems.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.DB.SqLite.CompareOperators.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.DB.SqLite.LogicRelations.pas"/>
@@ -217,6 +217,15 @@
         <DCCReference Include="..\..\Source\IupOrm.DependencyInjection.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.DependencyInjection.Interfaces.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.MVVM.Factory.pas"/>
+        <DCCReference Include="..\..\ExtLibs\DMVC\DuckListU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\DMVC\ObjectsMappers.pas"/>
+        <DCCReference Include="..\..\ExtLibs\DMVC\RTTIUtilsU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\DMVC\DuckObjU.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.ObjectsForge.ObjectMapper.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.DMVC.ObjectsMappersAdapter.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.DB.QueryContainer.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.DB.QueryEngine.pas"/>
+        <DCCReference Include="..\..\Source\IupOrm.Where.SqlItems.Interfaces.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

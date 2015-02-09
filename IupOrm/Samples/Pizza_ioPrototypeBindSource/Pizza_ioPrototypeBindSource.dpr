@@ -5,7 +5,9 @@ uses
   FMX.MobilePreview,
   FMX.Forms,
   Main in 'Main.pas' {MainForml},
-  Model in 'Model.pas', IupOrm, System.IOUtils;
+  Model in 'Model.pas',
+  IupOrm,
+  System.IOUtils;
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

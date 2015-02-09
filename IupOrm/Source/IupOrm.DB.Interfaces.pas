@@ -31,12 +31,29 @@ type
   //  In pratica utilizzo l'interfaccia "IFDStanConnectionDef" fornita da FireDAC
   IIoConnectionDef = IFDStanConnectionDef;
 
+  // Forward declaration
+  IioQuery = interface;
+
+  // Interfaccia per il QueryContainer che contiene la collezione di tutte gli oggetti IioQuery creati
+  //  per una connessione. In pratica ogni connessione (IioConnection) contiene la collezione di query
+  //  create per la connessione stessa in modo da poterle riutilizzare. Il ciclo di vita di questi oggetti query
+  //  coincide quindi con quello della connessione che a sua volta coincide con quello della transazione.
+  IioQueryContainer = interface
+    ['{9CF03765-6685-48A3-8DCC-85C7040D676D}']
+    function Exist(AQueryIdentity:String): Boolean;
+    function GetQuery(AQueryIdentity:String): IioQuery;
+    procedure AddQuery(AQueryIdentity:String; AQuery:IioQuery);
+    procedure CleanQueryConnectionsRef;
+  end;
+
   // Interfaccia per il componente connection da fornire alla query per la
   //  connessione al database
   IioConnection = interface
     ['{FF5D54D7-7EBE-4E6E-830E-E091BA7AE929}']
+    procedure Free;
     function GetConnection: TioInternalSqlConnection;
     function GetConnectionDefName: String;
+    function QueryContainer: IioQueryContainer;
     function InTransaction: Boolean;
     procedure StartTransaction;
     procedure Commit;
@@ -58,11 +75,16 @@ type
     procedure Open;
     procedure Close;
     function IsEmpty: Boolean;
+    function IsSqlEmpty: Boolean;
     function ExecSQL: Integer;
     function GetSQL: TStrings;
     function Fields: TioFields;
-    function Params: TioParams;
+    function ParamByName(AParamName:String): TioParam;
+    function ParamByProp(AProp:IioContextProperty): TioParam;
+    procedure SetParamValueByContext(AProp:IioContextProperty; AContext:IioContext);
+    procedure SetParamValueToNull(AProp:IioContextProperty; AForceDataType:TFieldType=ftUnknown);
     function Connection: IioConnection;
+    procedure CleanConnectionRef;
     function CreateBlobStream(AProperty: IioContextProperty; Mode: TBlobStreamMode): TStream;
     procedure SaveStreamObjectToSqlParam(AObj:TObject; AProperty: IioContextProperty);
     property SQL: TStrings read GetSQL;
@@ -83,13 +105,13 @@ type
   //  Select/Update/Insert/Delete
   TioSqlGenerator = class abstract
   public
-    class function GenerateSqlSelectForObject(AContext:IioContext): IioQuery; virtual; abstract;
-    class function GenerateSqlSelectForList(AContext:IioContext): IioQuery; virtual; abstract;
-    class function GenerateSqlInsert(AContext:IioContext): IioQuery; virtual; abstract;
-    class function GenerateSqlUpdate(AContext:IioContext): IioQuery; virtual; abstract;
-    class function GenerateSqlDelete(AContext:IioContext): IioQuery; virtual; abstract;
-    class function GenerateSqlForExists(AContext:IioContext): IioQuery; virtual; abstract;
-    class function GenerateSqlJoinSectionItem(AJoinItem: IioJoinItem): String; virtual; abstract;
+    class procedure GenerateSqlSelect(AQuery:IioQuery; AContext:IioContext); virtual; abstract;
+    class procedure GenerateSqlInsert(AQuery:IioQuery; AContext:IioContext); virtual; abstract;
+    class procedure GenerateSqlLastInsertRowID(AQuery:IioQuery); virtual; abstract;
+    class procedure GenerateSqlUpdate(AQuery:IioQuery; AContext:IioContext); virtual; abstract;
+    class procedure GenerateSqlDelete(AQuery:IioQuery; AContext:IioContext); virtual; abstract;
+    class procedure GenerateSqlForExists(AQuery:IioQuery; AContext:IioContext); virtual; abstract;
+  class function GenerateSqlJoinSectionItem(AJoinItem: IioJoinItem): String; virtual; abstract;
   end;
 
   // Interfaccia per le classi che devono generare le LogicRelations

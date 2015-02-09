@@ -3,7 +3,7 @@ unit IupOrm.SqlItems;
 interface
 
 uses
-  IupOrm.Interfaces;
+  IupOrm.Interfaces, System.Rtti;
 
 type
 

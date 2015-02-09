@@ -46,7 +46,7 @@ begin
     // Normal property, no relation, field type is by TypeKind of the property itself
     ioRTNone: begin
       case AProp.GetRttiProperty.PropertyType.TypeKind of
-        tkInt64, tkInteger: Result := 'INTEGER';
+        tkInt64, tkInteger, tkEnumeration: Result := 'INTEGER';
         tkFloat: Result := 'REAL';
         tkString, tkUString, tkWChar, tkLString, tkWString, tkChar: Result := 'TEXT';
         tkClass, tkInterface: Result := 'BLOB';

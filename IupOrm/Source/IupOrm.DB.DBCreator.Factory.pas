@@ -38,7 +38,7 @@ end;
 class function TioDBCreatorFactory.GetSqlGenerator: IioDBCreatorSqlGenerator;
 begin
   // NB: Query for BD Creation only for the default ConnectionDef
-  Result := TioDBCreatorSqLiteSqlGenerator.Create(TioDbFactory.Query('', nil));
+  Result := TioDBCreatorSqLiteSqlGenerator.Create(TioDbFactory.Query(''));
 end;
 
 class function TioDBCreatorFactory.GetTable(

@@ -13,12 +13,12 @@ type
   strict protected
     class procedure LoadSqlParamsFromContext(AQuery:IioQuery; AContext:IioContext);
   public
-    class function GenerateSqlSelectForObject(AContext:IioContext): IioQuery; override;
-    class function GenerateSqlSelectForList(AContext:IioContext): IioQuery; override;
-    class function GenerateSqlInsert(AContext:IioContext): IioQuery; override;
-    class function GenerateSqlUpdate(AContext:IioContext): IioQuery; override;
-    class function GenerateSqlDelete(AContext:IioContext): IioQuery; override;
-    class function GenerateSqlForExists(AContext:IioContext): IioQuery; override;
+    class procedure GenerateSqlSelect(AQuery:IioQuery; AContext:IioContext); override;
+    class procedure GenerateSqlInsert(AQuery:IioQuery; AContext:IioContext); override;
+    class procedure GenerateSqlLastInsertRowID(AQuery:IioQuery); override;
+    class procedure GenerateSqlUpdate(AQuery:IioQuery; AContext:IioContext); override;
+    class procedure GenerateSqlDelete(AQuery:IioQuery; AContext:IioContext); override;
+    class procedure GenerateSqlForExists(AQuery:IioQuery; AContext:IioContext); override;
     class function GenerateSqlJoinSectionItem(AJoinItem: IioJoinItem): String; override;
   end;
 
@@ -31,110 +31,67 @@ uses
 
 { TioSqlGeneratorSqLite }
 
-class function TioSqlGeneratorSqLite.GenerateSqlDelete(
-  AContext: IioContext): IioQuery;
-var
-  SQL: TStrings;
+class procedure TioSqlGeneratorSqLite.GenerateSqlDelete(AQuery:IioQuery; AContext:IioContext);
 begin
-  Result := nil;
-  SQL := TStringList.Create;
-  try
-    // Compone l'SQL
-    SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
-    SQL.Add(AContext.Where.GetSql);
-    // Crea l'oggetto ioQuery
-    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
-  finally
-    // Alla fine devo distruggere la StringLIst sulla quale ho costruito la query
-    // per non avere un memory leak
-    SQL.Free;
-  end;
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('DELETE FROM ' + AContext.GetTable.GetSql);
+  // If a Where exist then the query is an external query else
+  //  is an internal query.
+  if AContext.WhereExist then
+    AQuery.SQL.Add(AContext.Where.GetSql(AContext.GetProperties))
+  else
+    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  // -----------------------------------------------------------------
 end;
 
-class function TioSqlGeneratorSqLite.GenerateSqlForExists(AContext: IioContext): IioQuery;
-var
-  SQL: TStrings;
+class procedure TioSqlGeneratorSqLite.GenerateSqlForExists(AQuery:IioQuery; AContext: IioContext);
 begin
-  Result := nil;
-  SQL := TStringList.Create;
-  try
-    // Compone l'SQL
-    SQL.Add('SELECT EXISTS(SELECT * FROM ' +
-      AContext.GetTable.GetSql +
-      ' WHERE ' +
-      AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + ' = ' + AContext.GetProperties.GetIdProperty.GetSqlValue(AContext.DataObject) +
-      ')'
-    );
-    // Crea l'oggetto ioQuery
-    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
-  finally
-    // Alla fine devo distruggere la StringLIst sulla quale ho costruito la query
-    // per non avere un memory leak
-    SQL.Free;
-  end;
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('SELECT EXISTS(SELECT * FROM '
+    + AContext.GetTable.GetSql
+    + ' WHERE '
+    + AContext.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName
+    + ')'
+  );
+  // -----------------------------------------------------------------
 end;
 
-class function TioSqlGeneratorSqLite.GenerateSqlInsert(
-  AContext: IioContext): IioQuery;
+class procedure TioSqlGeneratorSqLite.GenerateSqlInsert(AQuery:IioQuery; AContext: IioContext);
 var
-  SQL: TStrings;
-  Prop: IioContextProperty;
   Comma: Char;
+  Prop: IioContextProperty;
 begin
-  Result := nil;
-  SQL := TStringList.Create;
-  try
-    // Compone l'SQL
-    SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql);
-    SQL.Add('(');
-    SQL.Add(AContext.GetProperties.GetSql(ioInsert));
-    if AContext.IsClassFromField
-      then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
-    SQL.Add(') VALUES (');
-    // Cicla per comporre i valori
-    Comma := ' ';
-    for Prop in AContext.GetProperties do
-    begin
-      // If the current property is ReadOnly then skip it
-      if not Prop.IsSqlRequestCompliant(ioInsert) then Continue;
-      // If current property is the ID property and its value is not null
-      //  then skip its value (always NULL)
-      if  Prop.IsID and (Prop.GetValue(AContext.DataObject).AsInteger = IO_INTEGER_NULL_VALUE) then
-      begin
-        SQL.Add(Comma + 'NULL');
-        Comma := ',';
-        Continue;
-      end;
-      // Relation type
-      case Prop.GetRelationType of
-        // If RelationType = ioRTNone save the current property value normally
-        ioRTNone: begin
-          if Prop.IsBlob
-            then SQL.Add(Comma + ':' + Prop.GetSqlParamName)
-            else SQL.Add(Comma + Prop.GetSqlValue(AContext.DataObject));
-          Comma := ',';
-        end;
-        //  NB: First save the related child object (for ID if it's a new child object)
-        ioRTBelongsTo: begin
-          SQL.Add(Comma + Prop.GetRelationChildObjectID(AContext.DataObject));
-          Comma := ',';
-        end;
-        // else if RelationType = ioRTHasMany then load objects and assign it to the property  (list)
-        ioRTHasMany: {Nothing};
-      end;
-    end;
-    if AContext.IsClassFromField
-      then SQL.Add(',' + AContext.ClassFromField.GetSqlValue);
-    SQL.Add(')');
-    // Crea l'oggetto ioQuery
-    Result := TioDbFactory.QueryInsert(AContext.GetTable.GetConnectionDefName, SQL);
-    // If some blob fields exist then load data on the relative parameters
-    if AContext.BlobFieldExists then Self.LoadSqlParamsFromContext(Result, AContext);
-  finally
-    // Alla fine devo distruggere la StringList sulla quale ho costruito la query
-    // per non avere un memory leak
-    SQL.Free;
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('INSERT INTO ' + AContext.GetTable.GetSql);
+  AQuery.SQL.Add('(');
+  AQuery.SQL.Add(AContext.GetProperties.GetSql(ioInsert));
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField
+    then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add(') VALUES (');
+  // -----------------------------------------------------------------
+  // Iterate for all properties
+  Comma := ' ';
+  for Prop in AContext.GetProperties do
+  begin
+    // If the current property is ReadOnly then skip it
+    // If the current property RelationType is HasMany then skip it
+    if (not Prop.IsSqlRequestCompliant(ioInsert))
+    or (Prop.GetRelationType = ioRTHasMany)
+    then Continue;
+    // Add the field param
+    AQuery.SQL.Add(Comma + ':' + Prop.GetSqlParamName);
+    Comma := ',';
   end;
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField
+  then AQuery.SQL.Add(',:' + AContext.ClassFromField.GetSqlParamName);
+  AQuery.SQL.Add(')');
+  // -----------------------------------------------------------------
 end;
 
 class function TioSqlGeneratorSqLite.GenerateSqlJoinSectionItem(
@@ -156,114 +113,62 @@ begin
     then Result := Result + ' ON (' + AJoinItem.GetJoinCondition + ')';
 end;
 
-class function TioSqlGeneratorSqLite.GenerateSqlSelectForList(
-  AContext: IioContext): IioQuery;
-var
-  SQL: TStrings;
+class procedure TioSqlGeneratorSqLite.GenerateSqlLastInsertRowID(AQuery:IioQuery);
 begin
-  Result := nil;
-  SQL := TStringList.Create;
-  try
-    // Select
-    SQL.Add('SELECT ' + AContext.GetProperties.GetSql(ioSelect));
-    if AContext.IsClassFromField
-      then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
-    // From
-    SQL.Add('FROM ' + AContext.GetTable.GetSql);
-    // Join
-    SQL.Add(AContext.GetJoin.GetSql);
-    //Where
-    SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.ClassFromField));
-    // GroupBy
-    SQL.Add(AContext.GetGroupBySql);
-    // Crea l'oggetto ioQuery
-    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
-  finally
-    // Alla fine devo distruggere la StringList sulla quale ho costruito la query
-    // per non avere un memory leak
-//SQL.SaveToFile(TPath.Combine(TPath.GetDocumentsPath, 'sql.sql'));
-    SQL.Free;
-  end;
+  // Build the query text
+  AQuery.SQL.Add('SELECT last_insert_rowid()');
 end;
 
-class function TioSqlGeneratorSqLite.GenerateSqlSelectForObject(
-  AContext: IioContext): IioQuery;
-var
-  SQL: TStrings;
+class procedure TioSqlGeneratorSqLite.GenerateSqlSelect(AQuery:IioQuery; AContext:IioContext);
 begin
-  Result := nil;
-  SQL := TStringList.Create;
-  try
-    // Select
-    SQL.Add('SELECT ' + AContext.GetProperties.GetSql(ioSelect));
-    if AContext.IsClassFromField
-      then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
-    // From
-    SQL.Add('FROM ' + AContext.GetTable.GetSql);
-    // Join
-    SQL.Add(AContext.GetJoin.GetSql);
-    // Where
-    SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.ClassFromField));
-    // GroupBy
-    SQL.Add(AContext.GetGroupBySql);
-    // Crea l'oggetto ioQuery
-    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
-  finally
-    // Alla fine devo distruggere la StringList sulla quale ho costruito la query
-    // per non avere un memory leak
-    SQL.Free;
-  end;
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('SELECT ' + AContext.GetProperties.GetSql(ioSelect));
+  if AContext.IsClassFromField
+    then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName);
+  // From
+  AQuery.SQL.Add('FROM ' + AContext.GetTable.GetSql);
+  // Join
+  AQuery.SQL.Add(AContext.GetJoin.GetSql);
+  // If a Where exist then the query is an external query else
+  //  is an internal query.
+  if AContext.WhereExist then
+    AQuery.SQL.Add(AContext.Where.GetSqlWithClassFromField(AContext.GetProperties, AContext.IsClassFromField, AContext.ClassFromField))
+  else
+    AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  // GroupBy
+  AQuery.SQL.Add(AContext.GetGroupBySql);
+  // -----------------------------------------------------------------
 end;
 
-class function TioSqlGeneratorSqLite.GenerateSqlUpdate(
-  AContext: IioContext): IioQuery;
+class procedure TioSqlGeneratorSqLite.GenerateSqlUpdate(AQuery:IioQuery; AContext:IioContext);
 var
-  SQL: TStrings;
-  Prop: IioContextProperty;
   Comma: Char;
+  Prop: IioContextProperty;
 begin
-  Result := nil;
-  SQL := TStringList.Create;
-  try
-    // Compone l'SQL
-    SQL.Add('UPDATE ' + AContext.GetTable.GetSql + ' SET');
-    Comma := ' ';
-    for Prop in AContext.GetProperties do
-    begin
-      // If the current property is ReadOnly then skip it
-      if not Prop.IsSqlRequestCompliant(ioUpdate) then Continue;
-      // Relation type
-      case Prop.GetRelationType of
-        // If RelationType = ioRTNone save the current property value normally
-        ioRTNone: begin
-          if Prop.IsBlob
-            then SQL.Add(Comma + Prop.GetSqlFieldName + '=:' +  Prop.GetSqlParamName)
-            else SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetSqlValue(AContext.DataObject));
-          Comma := ',';
-        end;
-        //  NB: First save the related child object (for ID if it's a new child object)
-        ioRTBelongsTo: begin
-          SQL.Add(Comma + Prop.GetSqlFieldName + '=' + Prop.GetRelationChildObjectID(AContext.DataObject));
-          Comma := ',';
-        end;
-        // else if RelationType = ioRTHasMany then load objects and assign it to the property  (list)
-        ioRTHasMany: {Nothing};
-      end;
-    end;
-    // ClassFromField if enabled
-    if AContext.IsClassFromField
-      then SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=' + AContext.ClassFromField.GetSqlValue);
-    // Where conditions
-    SQL.Add(AContext.Where.GetSql);
-    // Create ioQuery object
-    Result := TioDbFactory.Query(AContext.GetTable.GetConnectionDefName, SQL);
-    // If some blob fields exist then load data on the relative parameters
-    if AContext.BlobFieldExists then Self.LoadSqlParamsFromContext(Result, AContext);
-  finally
-    // Alla fine devo distruggere la StringList sulla quale ho costruito la query
-    // per non avere un memory leak
-    SQL.Free;
+  // Build the query text
+  // -----------------------------------------------------------------
+  AQuery.SQL.Add('UPDATE ' + AContext.GetTable.GetSql + ' SET');
+  // Iterate for all properties
+  Comma := ' ';
+  for Prop in AContext.GetProperties do
+  begin
+    // If the current property is ReadOnly then skip it
+    // If the current property RelationType is HasMany then skip it
+    if (not Prop.IsSqlRequestCompliant(ioInsert))
+    or (Prop.GetRelationType = ioRTHasMany)
+    then Continue;
+    // Add the field param
+    AQuery.SQL.Add(Comma + Prop.GetSqlFieldName + '=:' + Prop.GetSqlParamName);
+    Comma := ',';
   end;
+  // Add the ClassFromField if enabled
+  if AContext.IsClassFromField
+  then AQuery.SQL.Add(',' + AContext.ClassFromField.GetSqlFieldName + '=:' + AContext.ClassFromField.GetSqlParamName);
+  // Where conditions
+//  AQuery.SQL.Add(AContext.Where.GetSql);
+  AQuery.SQL.Add('WHERE ' + AContext.GetProperties.GetIdProperty.GetSqlFieldName + '=:' + AContext.GetProperties.GetIdProperty.GetSqlParamName);
+  // -----------------------------------------------------------------
 end;
 
 class procedure TioSqlGeneratorSqLite.LoadSqlParamsFromContext(AQuery: IioQuery;

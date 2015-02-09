@@ -67,6 +67,7 @@ implementation
 uses
   IupOrm.DuckTyped.Interfaces,
   IupOrm.DuckTyped.Factory,
+  IupOrm.DuckTyped.StreamObject,
   IupOrm.Attributes,
   IupOrm.Exceptions,
   IupOrm.Helpers.ObjectHelperTools,
@@ -89,7 +90,7 @@ var
   AQuery: IioQuery;
 begin
   // Generate and open the query
-  AQuery := TioDbFactory.SqlGenerator.GenerateSqlForExists(AContext);
+  AQuery := TioDbFactory.QueryEngine.GetQueryForExists(AContext);
   AQuery.Open;
   // Result
   Result := AQuery.Fields[0].AsInteger <> 0;
@@ -244,13 +245,16 @@ begin
     // --------------------------
     case AContext.ObjectStatus of
       // DIRTY
-      //  If the ID property of the object is not assigned then insert
-      //  the object else update
+      //  If the ID property of the object is not assigned
+      //  then insert the object else update
+      //  If the object is not present in the database then perform
+      //  an Insert instead of an Update to prevent a data loss
       osDirty:
       begin
-        if AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger = IO_INTEGER_NULL_VALUE
-        then Self.InsertObject(AContext)
-        else Self.UpdateObject(AContext);
+        if (AContext.GetProperties.GetIdProperty.GetValue(AContext.DataObject).AsInteger <> IO_INTEGER_NULL_VALUE)
+        and Self.ObjectExists(AContext)
+          then Self.UpdateObject(AContext)
+          else Self.InsertObject(AContext);
         AContext.ObjectStatus := osClean;
       end;
       // DELETE
@@ -293,16 +297,11 @@ begin
 end;
 
 class procedure TIupOrm.UpdateObject(AContext: IioContext);
+var
+  AQuery: IioQuery;
 begin
-  // If the object is not present in the database then perform
-  //  an Insert instead of an Update to prevent a data loss
-  if not Self.ObjectExists(AContext) then
-  begin
-    Self.InsertObject(AContext);
-    Exit;
-  end;
   // Create and execute query
-  TioDbFactory.SqlGenerator.GenerateSqlUpdate(AContext).ExecSQL;
+  TioDbFactory.QueryEngine.GetQueryUpdate(AContext).ExecSQL;
 end;
 
 class procedure TIupOrm.AutoCreateDatabase;
@@ -335,7 +334,7 @@ end;
 class procedure TIupOrm.DeleteObject(AContext: IioContext);
 begin
   // Create and execute query
-  TioDbFactory.SqlGenerator.GenerateSqlDelete(AContext).ExecSQL;
+  TioDbFactory.QueryEngine.GetQueryDelete(AContext).ExecSQL;
 end;
 
 class function TIupOrm.DependencyInjection: TioDependencyInjectionRef;
@@ -353,13 +352,27 @@ var
   AQuery: IioQuery;
   LastInsertID: Integer;
 begin
-  // Create query
-  AQuery := TioDbFactory.SqlGenerator.GenerateSqlInsert(AContext);
-  // Execute query
-  LastInsertID := AQuery.ExecSQL;
-  if LastInsertID = -1 then raise EIupOrmException.Create(Self.ClassName + ': last insert ID not valid');
-  // Retrieve ID
-  AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LastInsertID);
+  // Create and execute insert query
+  TioDbFactory.QueryEngine.GetQueryInsert(AContext).ExecSQL;
+  // -----------------------------------------------------------
+  // Get and execute a query to retrieve the last ID generated
+  //  in the last insert query.
+  //  If the query is non assigned (not all RDBMS supports it)
+  //  then skip this operation
+  if AContext.LastInsertNullID then
+  begin
+    AQuery := TioDBFActory.QueryEngine.GetQueryLastInsertRowID(AContext);
+    if not Assigned(AQuery) then Exit;
+    AQuery.Open;
+    try
+      LastInsertID := AQuery.Fields[0].AsInteger;
+    finally
+      AQuery.Close;
+    end;
+    // Set the LastInsertID as the ObjectID
+    AContext.GetProperties.GetIdProperty.SetValue(AContext.DataObject, LastInsertID);
+  end;
+  // -----------------------------------------------------------
 end;
 
 class function TIupOrm.Load(AClassRef:TioClassRef): TioWhere;
@@ -391,6 +404,14 @@ function TioBindSourceHelper.IupOrm: IioBindSourceHelperTools;
 begin
   Result := TioBindSourceHelperTools.Create(Self);
 end;
+
+
+initialization
+
+  // Register as default DuckTypedStreamObject invoker
+  //  NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non
+  //       venive eseguito
+  TIupOrm.DependencyInjection.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.Execute;
 
 end.
 

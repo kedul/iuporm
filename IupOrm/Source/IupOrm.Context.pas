@@ -16,7 +16,7 @@ type
     FMap: IioMap;
     FDataObject: TObject;
     FWhere: TioWhere;
-    FSelfCreatedWhere: Boolean;
+    FLastInsertNullID: Boolean;
   strict protected
     // Map
     function Map: IioMap;
@@ -29,9 +29,11 @@ type
     // Where
     function GetWhere: TioWhere;
     procedure SetWhere(AWhere: TioWhere);
+    // LastInsertNullID
+    procedure SetLastInsertNullID(AValue:Boolean);
+    function GetLastInsertNullID: Boolean;
   public
     constructor Create(AClassName:String; AMap:IioMap; AWhere:TioWhere=nil; ADataObject:TObject=nil); overload;
-    destructor Destroy; override;
     function GetClassRef: TioClassRef;
     function GetTable: IioContextTable;
     function GetProperties: IioContextProperties;
@@ -39,22 +41,25 @@ type
     function IsClassFromField: Boolean;
     function RttiContext: TRttiContext;
     function RttiType: TRttiInstanceType;
+    function WhereExist: Boolean;
     // Blob field present
     function BlobFieldExists: Boolean;
     // ObjStatusExist
     function ObjStatusExist: Boolean;
-    // DataObject
-    property DataObject:TObject read GetDataObject write SetDataObject;
-    // ObjectStatus
-    property ObjectStatus:TIupOrmObjectStatus read GetObjectStatus write SetObjectStatus;
-    // Where
-    property Where:TioWhere read GetWhere write SetWhere;
     // GroupBy
     function GetGroupBySql: String;
     // Join
     function GetJoin: IioJoins;
     // ConnectionDefName
     function GetConnectionDefName: String;
+    // DataObject
+    property DataObject:TObject read GetDataObject write SetDataObject;
+    // ObjectStatus
+    property ObjectStatus:TIupOrmObjectStatus read GetObjectStatus write SetObjectStatus;
+    // Where
+    property Where:TioWhere read GetWhere write SetWhere;
+    // LastInsertNullID
+    property LastInsertNullID:Boolean read GetLastInsertNullID write SetLastInsertNullID;
   end;
 
 implementation
@@ -80,26 +85,7 @@ begin
   inherited Create;
   FMap := AMap;
   FDataObject := ADataObject;
-  // ---------------------------------------------------------------------------
-  // Create TioWhere if nil
-  FSelfCreatedWhere := False;
-  if not Assigned(AWhere)then
-  begin
-    FSelfCreatedWhere := True;
-    AWhere := TioContextFactory.Where;
-    if Assigned(FDataObject)
-      then AWhere.Add(Self.GetProperties.GetIdProperty.GetSqlQualifiedFieldName + TioDbFactory.CompareOperator._Equal.GetSql + Self.GetProperties.GetIdProperty.GetSqlValue(FDataObject));
-  end;
-  // Add ContextProperties to TioWhere and assign it to the field
-  AWhere.SetContextProperties(Self.GetProperties);
   FWhere := AWhere;
-  // ---------------------------------------------------------------------------
-end;
-
-destructor TioContext.Destroy;
-begin
-  if FSelfCreatedWhere then FWhere.Free;
-  inherited;
 end;
 
 function TioContext.GetClassRef: TioClassRef;
@@ -133,6 +119,11 @@ begin
   Result := Self.GetTable.GetJoin;
 end;
 
+function TioContext.GetLastInsertNullID: Boolean;
+begin
+  Result := FLastInsertNullID;
+end;
+
 function TioContext.GetObjectStatus: TIupOrmObjectStatus;
 begin
   if Self.GetProperties.ObjStatusExist
@@ -160,6 +151,11 @@ begin
   FDataObject := AValue;
 end;
 
+procedure TioContext.SetLastInsertNullID(AValue: Boolean);
+begin
+  FLastInsertNullID := AValue;
+end;
+
 procedure TioContext.SetObjectStatus(AValue: TIupOrmObjectStatus);
 var
   PropValue: TValue;
@@ -176,6 +172,11 @@ begin
   FWhere := AWhere;
 end;
 
+function TioContext.WhereExist: Boolean;
+begin
+  Result := Assigned(FWhere);
+end;
+
 function TioContext.GetTable: IioContextTable;
 begin
   Result := Self.Map.GetTable;
@@ -188,7 +189,8 @@ end;
 
 function TioContext.IsClassFromField: Boolean;
 begin
-  Result := Self.GetTable.IsClassFromField and not FWhere.GetDisableClassFromField;
+  Result := Self.GetTable.IsClassFromField
+            and (   (not Assigned(FWhere)) or (not FWhere.GetDisableClassFromField)   );
 end;
 
 function TioContext.Map: IioMap;

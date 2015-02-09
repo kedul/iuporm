@@ -91,11 +91,31 @@ end;
 
 class procedure TioConnectionContainer.FreeConnection(const AConnection:IioConnection);
 begin
+  // Remove the reference to the connection
+  //  NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
+  //       tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
+  //       che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
+  //       questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
+  //       a vicenda e rendevano inefficace il Reference Count
+  AConnection.QueryContainer.CleanQueryConnectionsRef;
+  // RImuove la connessione causandone anche la distruzione perchè a questo punto non c'è
+  //  più alcun riferimento ad essa.
   FContainer.Remove(   Self.ConnectionNameToContainerKey(AConnection.GetConnectionDefName)   );
 end;
 
 class procedure TioConnectionContainer.FreeInternalContainer;
+var
+  AConnection: IioConnection;
 begin
+  // Remove the reference to the connection
+  //  NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
+  //       tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
+  //       che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
+  //       questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
+  //       a vicenda e rendevano inefficace il Reference Count
+  for AConnection in Self.FContainer.Values
+  do Self.FreeConnection(AConnection);
+  // Free the Container
   Self.FContainer.Free;
 end;
 

@@ -42,20 +42,25 @@ uses
   FireDAC.Stan.Def,
   FireDAC.Dapt,
   FireDAC.Stan.Async,
-  System.IOUtils, IupOrm.DB.ConnectionContainer;
+  System.IOUtils, IupOrm.DB.ConnectionContainer, Winapi.Windows;
 
 {$R *.fmx}
 
 procedure TForm2.Button1Click(Sender: TObject);
 var
   AArtList: TObjectList<TArticolo>;
+  InitialTime: DWord;
+  ElapsedTime: Extended;
 begin
-//  UserMsg('Generating list');
-//  AArtList := Self.GeneraLista;
-//  UserMsg('Persisting');
-//  TIupOrm.PersistCollection(AArtList);
-//  UserMsg('Persisted');
-//  AArtList.Free;
+  UserMsg('Generating list');
+  AArtList := Self.GeneraLista;
+  UserMsg('Persisting');
+  InitialTime := GetTickCount;
+  TIupOrm.PersistCollection(AArtList);
+  ElapsedTime := (GetTickCount - InitialTime)/1000;
+  UserMsg('Persisted');
+  AArtList.Free;
+  ShowMessage('Fatto: ' + ElapsedTime.ToString + ' secondi');
 end;
 
 procedure TForm2.Button2Click(Sender: TObject);
@@ -65,14 +70,25 @@ var
   AArtList: TObjectList<TArticolo>;
   AArticolo: TArticolo;
   I: Integer;
+  InitialTime: DWord;
+  ElapsedTime: Extended;
 begin
-  I := 0;
 //  TioConnectionManager.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'SpeedTest.db')).Apply;
   AConnection := TioDBFactory.Connection;
   AQuery := TFDQuery.Create(Self);
   AQuery.Connection := AConnection.GetConnection;
   UserMsg('Generating list');
   AArtList := Self.GeneraLista;
+
+
+  // Rileva l'ID più alto presente
+  AQuery.SQL.Clear;
+  AQuery.SQL.Add('select coalesce(max(ID),0) from articoli');
+  AQuery.Open;
+  I := AQuery.Fields[0].AsInteger;
+
+
+  InitialTime := GetTickCount;
   AConnection.StartTransaction;
   for AArticolo in AArtList do
   begin
@@ -83,8 +99,12 @@ begin
     AQuery.ExecSQL;
   end;
   AConnection.Commit;
+  ElapsedTime := (GetTickCount - InitialTime)/1000;
+
+
   AQuery.Free;
   AArtList.Free;
+  ShowMessage('Fatto: ' + ElapsedTime.ToString + ' secondi');
 end;
 
 procedure TForm2.Button3Click(Sender: TObject);

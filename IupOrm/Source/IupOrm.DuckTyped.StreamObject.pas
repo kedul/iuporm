@@ -3,12 +3,14 @@ unit IupOrm.DuckTyped.StreamObject;
 interface
 
 uses
-  IupOrm.DuckTyped.Interfaces, System.Classes, System.Rtti;
+  IupOrm.DuckTyped.Interfaces, System.Classes, System.Rtti,
+  IupOrm.DMVC.ObjectsMappersAdapter;
 
 type
 
   // DuckTypedStreamObject
-  TioDuckTypedStreamObject = class(TInterfacedObject, IioDuckTypedStreamObject)
+  //  NB: IWrappedObject interface is for DMVC ObjectsMappers adapter
+  TioDuckTypedStreamObject = class(TInterfacedObject, IioDuckTypedStreamObject, IWrappedObject)
   strict protected
     FObj: TObject;
     FLoadFromStreamMethod: TRttiMethod;
@@ -17,15 +19,15 @@ type
     FCountProperty: TRttiProperty;
   public
     constructor Create(AObj: TObject);
-    procedure LoadFromStream(Stream: TStream);
-    procedure SaveToStream(Stream: TStream);
-    function IsEmpty: Boolean;
+    procedure LoadFromStream(Stream: TStream); virtual;
+    procedure SaveToStream(Stream: TStream); virtual;
+    function IsEmpty: Boolean; virtual;
   end;
 
 implementation
 
 uses
-  IupOrm.RttiContext.Factory, IupOrm.Exceptions;
+  IupOrm.RttiContext.Factory, IupOrm.Exceptions, IupOrm;
 
 { TioDuckTypedStreamObject }
 

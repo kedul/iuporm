@@ -8,9 +8,12 @@ uses
   System.Classes,
   System.Rtti,
   FireDAC.Comp.Client,
-  Data.DB;
+  Data.DB, IupOrm.Context.Interfaces;
 
 type
+
+  // A class reference to a query (used in the DB.Factory)
+  TioQueryRef = class of TioQuery;
 
   // Classe che incapsula una query
   TioQuery = class(TInterfacedObject, IioQuery)
@@ -32,23 +35,19 @@ type
     procedure Open;
     procedure Close;
     function IsEmpty: Boolean;
+    function IsSqlEmpty: Boolean;
     function ExecSQL: Integer; virtual;
     function GetSQL: TStrings;
     function Fields: TioFields;
-    function Params: TioParams;
+    function ParamByName(AParamName:String): TioParam;
+    function ParamByProp(AProp:IioContextProperty): TioParam;
+    procedure SetParamValueByContext(AProp:IioContextProperty; AContext:IioContext);
+    procedure SetParamValueToNull(AProp:IioContextProperty; AForceDataType:TFieldType=ftUnknown);
     function Connection: IioConnection;
+    procedure CleanConnectionRef;
     function CreateBlobStream(AProperty: IioContextProperty; Mode: TBlobStreamMode): TStream;
     procedure SaveStreamObjectToSqlParam(AObj:TObject; AProperty: IioContextProperty);
     property SQL: TStrings read GetSQL;
-  end;
-
-  // Classe che incapsula una query specifica per query insert
-  TioQueryInsert = class(TioQuery)
-  strict private
-    FGetLastIdSql: String;
-  public
-    constructor Create(AConnection:IioConnection; ASQLQuery:TioInternalSqlQuery; AGetLastIdSql:String='');
-    function ExecSQL: Integer; override;
   end;
 
 implementation
@@ -59,6 +58,17 @@ uses
   IupOrm.DuckTyped.Factory, IupOrm.DB.Factory;
 
 { TioQuerySqLite }
+
+procedure TioQuery.CleanConnectionRef;
+begin
+  // Remove the reference to the connection
+  //  NB: Viene richiamato alla distruzione di una connessione perchè altrimenti avrei un riferimento incrociato
+  //       tra la connessione che, attraverso il proprio QueryContainer, manteine un riferimento a tutte le query
+  //       che sono state preparate ela query che mantiene un riferimento alla connessione al suo interno; in pratica
+  //       questo causava molti memory leaks perchè questi oggetti rimanevano in vita perenne in quanto si sostenevano
+  //       a vicenda e rendevano inefficace il Reference Count
+  FSqlConnection := nil;
+end;
 
 procedure TioQuery.Close;
 begin
@@ -126,6 +136,8 @@ begin
     then Exit(FSqlQuery.FieldByName(AProperty.GetSqlFieldAlias).AsInteger);
 
   // If the property is mapped into a blob field
+  //  NB: Non più usato per il caricamento degli oggetti, per il caricamento dei campi
+  //       BLOB vedere a partire dal metodo "MakeObject" dell'ObjectMaker
   if AProperty.IsBlob
     then Exit(TioObjectMakerFactory.GetObjectMaker(False).CreateObjectFromBlobField(Self, AProperty));
 
@@ -141,6 +153,11 @@ end;
 function TioQuery.GetValueByFieldNameAsVariant(AFieldName: String): Variant;
 begin
   Result := FSqlQuery.FieldByName(AFieldName).Value;
+end;
+
+function TioQuery.IsSqlEmpty: Boolean;
+begin
+  Result := (FSqlQuery.SQL.Count = 0);
 end;
 
 function TioQuery.IsEmpty: Boolean;
@@ -163,9 +180,14 @@ begin
   FSqlQuery.Open;
 end;
 
-function TioQuery.Params: TioParams;
+function TioQuery.ParamByName(AParamName: String): TioParam;
 begin
-  Result := FSqlQuery.Params;
+  Result := Self.FSqlQuery.ParamByName(AParamName);
+end;
+
+function TioQuery.ParamByProp(AProp: IioContextProperty): TioParam;
+begin
+  Result := Self.ParamByName(AProp.GetSqlParamName);
 end;
 
 procedure TioQuery.Prior;
@@ -185,6 +207,101 @@ begin
   // Get the param
   AParam := Self.FSqlQuery.Params.ParamByName(AProperty.GetSqlParamName);
   if not Assigned(AParam) then raise EIupOrmException.Create(Self.ClassName +  ': ' + AProperty.GetSqlParamName + ' Sql parameter not found');
+
+  // If AObj is a TStream then use it directly else wrap it with a
+  //  DuckTypedSTreamObject wrapper, extract the stream and then use it.
+  // -------------------------------------------------------------------------------------------------------------------------------
+  // TStream or descendant
+  // -------------------------------------------------------------------------------------------------------------------------------
+  if AObj is TStream then
+  begin
+    AStream := TStream(AObj);
+    // If the Stream is empty or nil then set the Param value to NULL and exit
+    if (not Assigned(AStream)) or (AStream.Size = 0) then
+    begin
+      AParam.DataType := ftBlob;
+      AParam.Clear;
+      Exit;
+    end;
+    // Load the stream content into the Param
+    AParam.LoadFromStream(AStream, ftBlob);
+  end
+  // -------------------------------------------------------------------------------------------------------------------------------
+  // NOT TStream or descendant, wrap into a DuckTypedStreamObject
+  // -------------------------------------------------------------------------------------------------------------------------------
+  else
+  begin
+    // Wrap the object into a DuckTypedStreamObject
+    ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(AObj);
+    // If the wrapped object IsEmpty set the Param value to NULL then exit
+    if ADuckTypedStreamObject.IsEmpty then
+    begin
+      AParam.DataType := ftBlob;
+      AParam.Clear;
+      Exit;
+    end;
+    // Create the MemoryStream
+    AStream := TMemoryStream.Create;
+    try
+      // Save the object content into the stream
+      ADuckTypedStreamObject.SaveToStream(AStream);
+      // Load the stream content into the Param
+      AParam.LoadFromStream(AStream, ftBlob);
+    finally
+      // CleanUp
+      AStream.Free;
+    end;
+  end;
+  // -------------------------------------------------------------------------------------------------------------------------------
+end;
+
+
+procedure TioQuery.SetParamValueByContext(AProp: IioContextProperty; AContext: IioContext);
+var
+  AObj: TObject;
+  ADuckTypedStreamObject: IioDuckTypedStreamObject;
+  AStream: TStream;
+  AParam: TioParam;
+begin
+  // -------------------------------------------------------------------------------------------------------------------------------
+  // Normal property type (NO BLOB)
+  // -------------------------------------------------------------------------------------------------------------------------------
+  if not AProp.IsBlob then
+  begin
+    Self.ParamByProp(AProp).Value := AProp.GetValue(AContext.DataObject).AsVariant;
+    Exit;
+  end;
+  // At this point the property refer to a blob field (and to an Object) type then
+  //  check if the Object is assigned and if it isn't clear
+  //  the parameter
+  AObj := AProp.GetValue(AContext.DataObject).AsObject;
+  if not Assigned(AObj) then
+  begin
+    Self.SetParamValueToNull(AProp);
+    Exit;
+  end;
+  // Get a Param reference
+  AParam := Self.ParamByProp(AProp);
+  // -------------------------------------------------------------------------------------------------------------------------------
+  // TStream or descendant (BLOB)
+  // -------------------------------------------------------------------------------------------------------------------------------
+  if AProp.IsStream then
+  begin
+    AStream := TStream(AObj);
+    // If the Stream is empty or nil then set the Param value to NULL and exit
+    if (not Assigned(AStream)) or (AStream.Size = 0) then
+    begin
+      AParam.DataType := ftBlob;
+      AParam.Clear;
+      Exit;
+    end;
+    // Load the stream content into the Param
+    AParam.LoadFromStream(AStream, ftBlob);
+    Exit;
+  end;
+  // -------------------------------------------------------------------------------------------------------------------------------
+  // NOT TStream or descendant, wrap into a DuckTypedStreamObject  (BLOB)
+  // -------------------------------------------------------------------------------------------------------------------------------
   // Wrap the object into a DuckTypedStreamObject
   ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(AObj);
   // If the wrapped object IsEmpty set the Param value to NULL then exit
@@ -205,34 +322,17 @@ begin
     // CleanUp
     AStream.Free;
   end;
+  // -------------------------------------------------------------------------------------------------------------------------------
 end;
 
-
-{ TioQueryInsert }
-
-constructor TioQueryInsert.Create(AConnection: IioConnection;
-  ASQLQuery: TioInternalSqlQuery; AGetLastIdSql: String);
+procedure TioQuery.SetParamValueToNull(AProp: IioContextProperty; AForceDataType:TFieldType=ftUnknown);
 begin
-  inherited Create(AConnection, ASQLQuery);
-  FGetLastIdSql := AGetLastIdSql;
+  // Set the parameter to NULL
+  Self.ParamByProp(AProp).Clear;
+  // If a DataType is specified then set the parameter DataType
+  if AForceDataType <> ftUnknown
+  then Self.ParamByProp(AProp).DataType := AForceDataType;
 end;
 
-function TioQueryInsert.ExecSQL: Integer;
-begin
-  // Execute the defined query (normally insert query)
-  inherited;
-  // If assigned, set and execute the query for retrieve the
-  //  last ID inserted
-  Result := -1;
-  if FGetLastIdSql = '' then Exit;
-  Self.SQL.Clear;
-  Self.SQL.Add(FGetLastIdSql);
-  Self.Open;
-  try
-    Result := Self.GetValueByFieldIndexAsVariant(0);
-  finally
-    Self.Close;
-  end;
-end;
 
 end.

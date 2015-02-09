@@ -15,7 +15,7 @@ type
   TioReadWrite = (iorwReadOnly, iorwReadWrite, iorwWriteOnly);
 
   // Options set for GetSql functions parameter
-  TioSqlRequestType = (ioAll=0, ioSelect, ioUpdate, ioInsert);
+  TioSqlRequestType = (ioAll=0, ioSelect, ioUpdate, ioInsert, ioDelete, ioExist);
 
   IioContextProperty = interface
     ['{A79DD7E8-D2B2-4F78-A07A-7757605AC94C}']
@@ -29,6 +29,7 @@ type
     function GetSqlParamName: String;
     function GetFieldType: String;
     function IsBlob: Boolean;
+    function IsStream: Boolean;
     function GetValue(Instance: Pointer): TValue;
     procedure SetValue(Instance: Pointer; AValue: TValue);
     function GetSqlValue(ADataObject: TObject): string;

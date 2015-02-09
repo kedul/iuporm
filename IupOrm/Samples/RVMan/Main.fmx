@@ -378,7 +378,7 @@ object MainForm: TMainForm
               Text = 'Partenza'
               Width = 315.000000000000000000
               object eTravelDataPartenza: TDateEdit
-                Date = 41944.000000000000000000
+                Date = 42309.000000000000000000
                 DateFormatKind = Long
                 Height = 30.000000000000000000
                 Position.X = 106.000000000000000000
@@ -395,7 +395,7 @@ object MainForm: TMainForm
               Text = 'Arrivo'
               Width = 315.000000000000000000
               object eTravelDataArrivo: TDateEdit
-                Date = 41944.000000000000000000
+                Date = 42309.000000000000000000
                 DateFormatKind = Long
                 Height = 30.000000000000000000
                 Position.X = 106.000000000000000000
@@ -772,7 +772,6 @@ object MainForm: TMainForm
   end
   object BSTravels: TioPrototypeBindSource
     AutoActivate = True
-    AutoEdit = False
     AutoPost = False
     FieldDefs = <
       item
@@ -829,6 +828,7 @@ object MainForm: TMainForm
   end
   object BSCostTypes: TioPrototypeBindSource
     AutoActivate = True
+    AutoEdit = False
     AutoPost = False
     FieldDefs = <
       item
@@ -864,7 +864,7 @@ object MainForm: TMainForm
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ioClassName = 'TCostGeneric'
+    ioClassName = 'TCOstGeneric'
     ioMasterBindSource = BSCostTypes
     ioMasterPropertyName = 'CostList'
     ioAutoRefreshOnNotification = arEnabledNoReload
@@ -884,6 +884,7 @@ object MainForm: TMainForm
     ioClassName = 'TCostType'
     ioWhere.Strings = (
       '[TCostType.ObjectType] > 0')
+    ioMasterBindSource = BSCosts
     ioAutoRefreshOnNotification = arEnabledNoReload
     Left = 224
     Top = 292

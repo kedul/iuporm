@@ -3,7 +3,7 @@ unit IupOrm.Interfaces;
 interface
 
 uses
-  Data.Bind.ObjectScope;
+  Data.Bind.ObjectScope, System.Rtti;
 
 type
 

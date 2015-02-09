@@ -12,20 +12,20 @@ type
   [ioTable('TRAVELS')]
   TTravelWithCostTypeList = class(TTravel)
   strict private
-    FCostTypeList: TObjectList<TCostTypeWithCostList>;
+    FCostTypeList: TioObjectList<TCostTypeWithCostList>;
     FTotalAmount: Currency; protected
   strict protected
     // Methods
-    function  GetCostTypeList: TObjectList<TCostTypeWithCostList>;
-    procedure SetCostTypeList(Value: TObjectList<TCostTypeWithCostList>);
+    function  GetCostTypeList: TioObjectList<TCostTypeWithCostList>;
+    procedure SetCostTypeList(Value: TioObjectList<TCostTypeWithCostList>);
     function GetListViewItem_Detailtext: String; override;
   public
     constructor Create;
     destructor Destroy; override;
     procedure RefreshTotals;
     // Properties
-    [ioHasMany(TCostTypeWithCostList, 'TravelID', ioImmediateLoad)]
-    property CostTypeList:TObjectList<TCostTypeWithCostList> read GetCostTypeList write SetCostTypeList;
+    [ioHasMany(TCostTypeWithCostList, 'TravelID', ioLazyLoad)]
+    property CostTypeList:TioObjectList<TCostTypeWithCostList> read GetCostTypeList write SetCostTypeList;
     [ioLoadSql('select sum([TCostGeneric.CostAmount]) from [TCostGeneric] where [TCostGeneric.TravelID] = [TTravel.ID]')]
     property TotalAmount:Currency read FTotalAmount write FTotalAmount;
   end;
@@ -36,7 +36,7 @@ uses System.SysUtils;
 
 { TTravelWithCostTypeList }
 
-function TTravelWithCostTypeList.GetCostTypeList: TObjectList<TCostTypeWithCostList>;
+function TTravelWithCostTypeList.GetCostTypeList: TioObjectList<TCostTypeWithCostList>;
 begin
   Result := FCostTypeList;
 end;
@@ -66,9 +66,11 @@ begin
 end;
 
 procedure TTravelWithCostTypeList.SetCostTypeList(
-  Value: TObjectList<TCostTypeWithCostList>);
+  Value: TioObjectList<TCostTypeWithCostList>);
 begin
-  if Assigned(FCostTypeList) then FreeAndNil(FCostTypeList);
+  if Assigned(FCostTypeList)
+  and (Value <> FCostTypeList)
+  then FreeAndNil(FCostTypeList);
   FCostTypeList := Value;
 end;
 
