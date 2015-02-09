@@ -9,5 +9,8 @@
     <Transaction>2014/05/12 18:47:35.000.689,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\Pizza\Unit1.pas</Transaction>
     <Transaction>2014/06/05 14:54:36.000.709,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\Pizza_List\Pizza_List.dproj=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\Pizza_List\PizzaProject.dproj</Transaction>
     <Transaction>2014/06/06 10:43:45.000.608,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\Pizza_ioPrototypeBindSource\Pizza_ioPrototypeBindSource.dproj=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\Pizza_ioPrototypeBindSource\Pizza_List.dproj</Transaction>
+    <Transaction>2015/01/20 12:09:35.000.093,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\Pizza_ioPrototypeBindSource\Unit1.pas</Transaction>
+    <Transaction>2015/01/20 12:12:03.000.465,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\Pizza_ioPrototypeBindSource\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.DB.pas</Transaction>
+    <Transaction>2015/01/20 12:14:41.000.643,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.DB.pas=</Transaction>
   </Transactions>
 </BorlandProject>

@@ -17,6 +17,8 @@ type
   strict protected
     class function LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
+    class function LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
+    class procedure LoadPropertyStream(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
     class function InternalFindMethod(ARttiType:TRttiType; AMethodName,AMarkerText:String; IsConstructor:Boolean; const AParameters:Array of TValue): TRttiMethod;
     class function FindConstructor(ARttiType:TRttiType; const AParameters:Array of TValue; AMarkerText:String=''; AMethodName:String=''): TRttiMethod;
     class function FindMethod(ARttiType:TRttiType; AMethodName:String; const AParameters:Array of TValue; AMarkerText:String=''): TRttiMethod;
@@ -206,6 +208,51 @@ begin
                                                             ._Property(AProperty.GetRelationChildPropertyName)
                                                             ._EqualTo(AQuery.GetValue(AContext.GetProperties.GetIdProperty))
                                                             .ToObject;
+end;
+
+class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioContextProperty);
+var
+  AStream, ABlobStream: TStream;
+begin
+  // If the field is null then exit
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
+  // Get the stream from the DataObject property
+  AStream := TStream(   AProperty.GetValue(AContext.DataObject).AsObject   );
+  // If the stream is not assigned then raise an Exception
+  //  (the stream must exist)
+  if not Assigned(AStream) then raise EIupOrmException.Create(Self.ClassName + ': Stream not assigned.');
+  // Get the BlobStream
+  ABlobStream := AQuery.CreateBlobStream(AProperty, bmRead);
+  try
+    AStream.CopyFrom(ABlobStream, ABlobStream.Size);
+    AStream.Position := 0;
+  finally
+    ABlobStream.Free;
+  end;
+end;
+
+class function TioObjectMakerIntf.LoadPropertyStreamable(AContext: IioContext; AQuery: IioQuery;
+  AProperty: IioContextProperty): TObject;
+var
+  ADuckTypedStreamObject: IioDuckTypedStreamObject;
+  ABlobStream: TStream;
+begin
+  // Create the object if it isn't not already created by the master class constructor
+  Result := AProperty.GetValue(AContext.DataObject).AsObject;
+  if not Assigned(Result)
+    then Result := Self.CreateObjectByRttiType(   AProperty.GetRttiProperty.PropertyType   );
+  // If the field is null then exit
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
+  // Wrap the object into a DuckTypedStreamObject
+  ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(Result);
+  // Get the BlobStream
+  ABlobStream := AQuery.CreateBlobStream(AProperty, bmRead);
+  try
+    // Load stream o the object
+    ADuckTypedStreamObject.LoadFromStream(ABlobStream);
+  finally
+    ABlobStream.Free;
+  end;
 end;
 
 

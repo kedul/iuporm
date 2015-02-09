@@ -34,9 +34,9 @@ begin
   // Set the directory name (under the Documents folder)
   TIupOrm.ConnectionManager.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'RVMan.db')).Apply;
   // AutoCreation and AutoUpdate of the database
-  TIupOrm.AutoCreateDatabase;
+//  TIupOrm.AutoCreateDatabase;
   // Check for default data
-  TDefaultData.CheckForDefaultData;
+//  TDefaultData.CheckForDefaultData;
   // ============ IupOrm initialization ====================
 
 

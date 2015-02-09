@@ -23,6 +23,7 @@ package IupOrmProject;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
+{$DEFINE ioPresent}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'IupOrm Runtime'}
@@ -39,12 +40,13 @@ requires
   FireDACCommonDriver,
   fmxFireDAC,
   vcl,
-  vclFireDAC;
+  vclFireDAC,
+  DbxCommonDriver,
+  soaprtl;
 
 contains
   IupOrm.Attributes in '..\..\Source\IupOrm.Attributes.pas',
   IupOrm.CommonTypes in '..\..\Source\IupOrm.CommonTypes.pas',
-  IupOrm.Context.CassFromField in '..\..\Source\IupOrm.Context.CassFromField.pas',
   IupOrm.Context.Container in '..\..\Source\IupOrm.Context.Container.pas',
   IupOrm.Context.Factory in '..\..\Source\IupOrm.Context.Factory.pas',
   IupOrm.Context.Interfaces in '..\..\Source\IupOrm.Context.Interfaces.pas',
@@ -74,9 +76,7 @@ contains
   IupOrm in '..\..\Source\IupOrm.pas',
   IupOrm.RttiContext.Factory in '..\..\Source\IupOrm.RttiContext.Factory.pas',
   IupOrm.SqlItems in '..\..\Source\IupOrm.SqlItems.pas',
-  IupOrm.Where.Interfaces in '..\..\Source\IupOrm.Where.Interfaces.pas',
   IupOrm.Where in '..\..\Source\IupOrm.Where.pas',
-  IupOrm.Where.SqlItems.Interfaces in '..\..\Source\IupOrm.Where.SqlItems.Interfaces.pas',
   IupOrm.Where.SqlItems in '..\..\Source\IupOrm.Where.SqlItems.pas',
   IupOrm.DB.SqLite.CompareOperators in '..\..\Source\IupOrm.DB.SqLite.CompareOperators.pas',
   IupOrm.DB.SqLite.LogicRelations in '..\..\Source\IupOrm.DB.SqLite.LogicRelations.pas',
@@ -109,6 +109,15 @@ contains
   IupOrm.Global.Factory in '..\..\Source\IupOrm.Global.Factory.pas',
   IupOrm.DependencyInjection in '..\..\Source\IupOrm.DependencyInjection.pas',
   IupOrm.DependencyInjection.Interfaces in '..\..\Source\IupOrm.DependencyInjection.Interfaces.pas',
-  IupOrm.MVVM.Factory in '..\..\Source\IupOrm.MVVM.Factory.pas';
+  IupOrm.MVVM.Factory in '..\..\Source\IupOrm.MVVM.Factory.pas',
+  DuckListU in '..\..\ExtLibs\DMVC\DuckListU.pas',
+  ObjectsMappers in '..\..\ExtLibs\DMVC\ObjectsMappers.pas',
+  RTTIUtilsU in '..\..\ExtLibs\DMVC\RTTIUtilsU.pas',
+  DuckObjU in '..\..\ExtLibs\DMVC\DuckObjU.pas',
+  IupOrm.ObjectsForge.ObjectMapper in '..\..\Source\IupOrm.ObjectsForge.ObjectMapper.pas',
+  IupOrm.DMVC.ObjectsMappersAdapter in '..\..\Source\IupOrm.DMVC.ObjectsMappersAdapter.pas',
+  IupOrm.DB.QueryContainer in '..\..\Source\IupOrm.DB.QueryContainer.pas',
+  IupOrm.DB.QueryEngine in '..\..\Source\IupOrm.DB.QueryEngine.pas',
+  IupOrm.Where.SqlItems.Interfaces in '..\..\Source\IupOrm.Where.SqlItems.Interfaces.pas';
 
 end.

@@ -10,6 +10,7 @@ type
 
   IioDependencyInjectionLocator = interface
     ['{51289FD7-AA55-43D9-BF5B-EDA5BF27D301}']
+    function Exist: Boolean;
     function Get: TObject;
     function Alias(const AAlias:String): IioDependencyInjectionLocator;
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator;

@@ -312,7 +312,7 @@ object MainForml: TMainForml
     ScopeMappings = <>
     ioClassName = 'TPizza'
     ioAutoRefreshOnNotification = arEnabledNoReload
-    Left = 240
+    Left = 232
     Top = 208
   end
   object BindingsList1: TBindingsList

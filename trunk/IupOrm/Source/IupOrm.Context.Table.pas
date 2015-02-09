@@ -5,7 +5,7 @@ interface
 uses
   IupOrm.Context.Interfaces,
   IupOrm.SqlItems, IupOrm.Context.Table.Interfaces, IupOrm.Attributes,
-  IupOrm.CommonTypes, System.Generics.Collections;
+  IupOrm.CommonTypes, System.Generics.Collections, System.Rtti;
 
 type
 
@@ -29,6 +29,8 @@ type
   public
     constructor Create(const AJoinType:TioJoinType; AJoinClassRef:TioClassRef; AJoinCondition:String='');
     function GetSql: String;
+    function GetSqlParamName: String;
+    function GetValue: TValue;
     function GetJoinClassRef: TioClassRef;
     function GetJoinCondition: String;
     function GetJoinType: TioJoinType;
@@ -44,6 +46,8 @@ type
     destructor Destroy; override;
     procedure Add(AJoinItem:IioJoinItem);
     function GetSql: String;
+    function GetSqlParamName: String;
+    function GetValue: TValue;
   end;
 
   // Classe che incapsula le informazioni per la funzione ClassFromField
@@ -56,6 +60,7 @@ type
   public
     constructor Create(ASqlFieldName, AClassName, AQualifiedClassName, AAncestors: String);
     function GetSqlFieldName: string;
+    function GetSqlParamName: String;
     function GetValue: String;
     function GetSqlValue: string;
     function GetClassName: String;
@@ -154,6 +159,11 @@ begin
   Result := FSqlFieldName;
 end;
 
+function TioClassFromField.GetSqlParamName: String;
+begin
+  Result := 'P_' + Self.GetSqlFieldName;
+end;
+
 function TioClassFromField.GetSqlValue: string;
 begin
   Result := TioDbFactory.SqlDataConverter.StringToSQL(Self.GetValue);
@@ -202,6 +212,16 @@ begin
   Result := TioDBFactory.SqlGenerator.GenerateSqlJoinSectionItem(Self);
 end;
 
+function TioJoinItem.GetSqlParamName: String;
+begin
+  Result := '';
+end;
+
+function TioJoinItem.GetValue: TValue;
+begin
+  Result := nil;
+end;
+
 { TioJoins }
 
 procedure TioJoins.Add(AJoinItem: IioJoinItem);
@@ -227,6 +247,16 @@ begin
   Result := '';
   for aJoinItem in FJoinList do
     Result := Result + #13 + TioSqlTranslator.Translate(aJoinItem.GetSql);
+end;
+
+function TioJoins.GetSqlParamName: String;
+begin
+  Result := '';
+end;
+
+function TioJoins.GetValue: TValue;
+begin
+  Result := nil;
 end;
 
 { TioGroupBy }

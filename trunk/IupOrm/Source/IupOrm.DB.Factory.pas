@@ -7,7 +7,9 @@ uses
   IupOrm.ObjectsForge.Interfaces,
   IupOrm.DB.Interfaces,
   System.Classes,
-  System.Rtti, IupOrm.DB.ConnectionContainer, IupOrm.CommonTypes;
+  System.Rtti, IupOrm.DB.ConnectionContainer, IupOrm.CommonTypes,
+  IupOrm.Context.Interfaces, IupOrm.Context.Properties.Interfaces,
+  IupOrm.DB.QueryEngine;
 
 type
 
@@ -16,16 +18,19 @@ type
     class function WhereItemProperty(APropertyName:String): IioSqlItemWhere;
     class function WhereItemPropertyOID: IioSqlItemWhere;
     class function WhereItemTValue(AValue:TValue): IioSqlItemWhere;
+    class function WhereItemPropertyEqualsTo(APropertyName:String; AValue:TValue): IioSqlItemWhere;
+    class function WhereItemPropertyOIDEqualsTo(AValue:TValue): IioSqlItemWhere;
     class function CompareOperator: TioCompareOperatorRef;
     class function LogicRelation: TioLogicRelationRef;
     class function SqlGenerator: TioSqlGeneratorRef;
     class function SqlDataConverter: TioSqlDataConverterRef;
     class function Connection(AConnectionName:String=''): IioConnection;
     class function NewConnection(AConnectionName:String): IioConnection;
-    class function Query(AConnectionName:String; SQL:TStrings): IioQuery;
-    class function QueryInsert(AConnectionName:String; SQL:TStrings): IioQuery;
+    class function Query(AConnectionDefName:String; AQueryIdentity:String=''): IioQuery;
     class function ConnectionContainer: TioConnectionContainerRef;
     class function ConnectionManager: TioConnectionManagerRef;
+    class function QueryContainer: IioQueryContainer;
+    class function QueryEngine: TioQueryEngineRef;
   end;
 
 implementation
@@ -34,7 +39,7 @@ uses
   IupOrm.DB.SqLite.CompareOperators, System.IOUtils,
   IupOrm.DB.Connection, IupOrm.DB.SqLite.LogicRelations, IupOrm.DB.Query,
   IupOrm.DB.SqLite.SqlDataConverter, IupOrm.DB.SqLite.SqlGenerator,
-  IupOrm.Where.SqlItems, System.SysUtils;
+  IupOrm.Where.SqlItems, System.SysUtils, IupOrm.DB.QueryContainer;
 
 { TioDbBuilder }
 
@@ -85,36 +90,35 @@ begin
   if not TDirectory.Exists(DBPath) then TDirectory.CreateDirectory(DBPath);
   // Open the connection
   LConnection.Open;
-  // Create the ioConnection and retorn
-  Result := TioConnection.Create(LConnection);
+  // Create the ioConnection and his QueryContainer and return it
+  Result := TioConnection.Create(LConnection,   Self.QueryContainer   );
 end;
 
-class function TioDbFactory.Query(AConnectionName:String; SQL: TStrings): IioQuery;
-var
-  NewQry: TioInternalSqlQuery;
+class function TioDbFactory.QueryContainer: IioQueryContainer;
 begin
-  NewQry := TioInternalSqlQuery.Create(nil);
-  try
-    if Assigned(SQL) then NewQry.SQL.AddStrings(SQL);
-    Result := TioQuery.Create(Self.Connection(AConnectionName), NewQry);
-  except
-    NewQry.Free;
-    raise;
-  end;
+  Result := TioQueryContainer.Create;
 end;
 
-class function TioDbFactory.QueryInsert(AConnectionName:String; SQL: TStrings): IioQuery;
-var
-  NewQry: TioInternalSqlQuery;
+class function TioDbFactory.QueryEngine: TioQueryEngineRef;
 begin
-  NewQry := TioInternalSqlQuery.Create(nil);
-  try
-    NewQry.SQL.AddStrings(SQL);
-    Result := TioQueryInsert.Create(Self.Connection(AConnectionName), NewQry, 'SELECT last_insert_rowid()');
-  except
-    NewQry.Free;
-    raise;
-  end;
+  Result := TioQueryEngine;
+end;
+
+class function TioDbFactory.Query(AConnectionDefName:String; AQueryIdentity:String=''): IioQuery;
+var
+  AConnection: IioConnection;
+begin
+  // Get the proper connection
+  AConnection := Self.Connection(AConnectionDefName);
+  // Else if the query is already present in the QueryContainer of the connection then
+  //  get it and return
+  if AConnection.QueryContainer.Exist(AQueryIdentity) then
+    Exit(   AConnection.QueryContainer.GetQuery(AQueryIdentity)   );
+  // Else create a new query and insert it in the QueryContainer of the connection
+  //  for future use if AConnectionDefName is valid (used by DBCreator)
+  Result := TioQuery.Create(AConnection, TioInternalSqlQuery.Create(nil));
+  if not AConnectionDefName.IsEmpty then
+    AConnection.QueryContainer.AddQuery(AQueryIdentity, Result);
 end;
 
 class function TioDbFactory.SqlDataConverter: TioSqlDataConverterRef;
@@ -132,9 +136,19 @@ begin
   Result := TioSqlItemsWhereProperty.Create(APropertyName);
 end;
 
+class function TioDbFactory.WhereItemPropertyEqualsTo(APropertyName: String; AValue: TValue): IioSqlItemWhere;
+begin
+  Result := TioSqlItemsWherePropertyEqualsTo.Create(APropertyName, AValue);
+end;
+
 class function TioDbFactory.WhereItemPropertyOID: IioSqlItemWhere;
 begin
   Result := TioSqlItemsWherePropertyOID.Create;
+end;
+
+class function TioDbFactory.WhereItemPropertyOIDEqualsTo(AValue: TValue): IioSqlItemWhere;
+begin
+  Result := TioSqlItemsWherePropertyOIDEqualsTo.Create(AValue);
 end;
 
 class function TioDbFactory.WhereItemTValue(AValue: TValue): IioSqlItemWhere;

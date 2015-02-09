@@ -3,7 +3,7 @@ unit IupOrm.Attributes;
 interface
 
 uses
-  IupOrm.CommonTypes;
+  IupOrm.CommonTypes, ObjectsMappers;
 
 type
 
@@ -164,6 +164,31 @@ type
   // SEND CLASS ATTRIBUTES
   // ===========================================================================
 
+
+
+
+  // ===========================================================================
+  // START EMBEDDED ATTRIBUTES
+  // ---------------------------------------------------------------------------
+
+  // Embedded attribute
+  ioEmbedded = class(TioCustomAttribute)
+
+  end;
+
+  // EmbeddedSkip attribute
+  ioEmbeddedSkip = class(DoNotSerializeAttribute)  // from DMVC ObjectsMappers
+
+  end;
+
+  // EmbeddedSkip attribute
+  ioEmbeddedStreamable = class(StreamableAttribute)  // from DMVC ObjectsMappers
+
+  end;
+
+  // ===========================================================================
+  // end EMBEDDED ATTRIBUTES
+  // ---------------------------------------------------------------------------
 
 implementation
 

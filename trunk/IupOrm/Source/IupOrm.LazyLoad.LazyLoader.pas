@@ -45,9 +45,7 @@ begin
   if Self.FioRelationChildPropertyName = ''
     then FInternalObj := T.Create
     else FInternalObj := TIupOrm.Load(Self.FioRelationChildClassRef)
-                                ._Where
-                                ._Property(Self.FioRelationChildPropertyName)
-                                ._EqualTo(Self.FioRelationChildID)
+                                ._PropertyEqualsTo(Self.FioRelationChildPropertyName, Self.FioRelationChildID)
                                 .ToList<T>(Self.FOwnsObjects);
 end;
 

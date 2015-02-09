@@ -49,7 +49,7 @@ type
     class function Container: TioDependencyInjectionContainerRef;
     class function InterfaceNameToString<T:IInterface>: String;
     class function InterfaceGUIToString<T:IInterface>: String;
-    class function ComposeKey(const AInterface:String; const AAlias: String): String; overload;
+    class function ComposeKey(const AInterface:String; const AAlias: String): String;
   end;
 
   // Register Class (NoRefCounter)
@@ -81,6 +81,7 @@ type
     function ViewModelExist: Boolean;
   public
     constructor Create(AInterfaceName:String); virtual;
+    function Exist: Boolean; virtual;
     function Get: TObject; virtual;
     function Alias(const AAlias:String): IioDependencyInjectionLocator;
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator; virtual;
@@ -142,7 +143,8 @@ uses
 class function TioDependencyInjectionBase.ComposeKey(const AInterface, AAlias: String): String;
 begin
   if AAlias <> ''
-    then Exit(AAlias)
+//    then Exit(AAlias)
+    then Exit(AInterface + '-' + AAlias)
     else Exit(AInterface);
 end;
 
@@ -402,6 +404,11 @@ begin
   inherited Create;
   FInterfaceName := AInterfaceName;
   FViewModel := nil;
+end;
+
+function TioDependencyInjectionLocator.Exist: Boolean;
+begin
+  Result := Self.Container.Exists(Self.GetKey);
 end;
 
 function TioDependencyInjectionLocator.Get: TObject;

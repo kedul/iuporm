@@ -23,11 +23,13 @@ type
     FConnection: TioInternalSqlConnection;
     FTransactionCounter: Integer;
     FFDGUIxWaitCursor: TFDGUIxWaitCursor;
+    FQueryContainer: IioQueryContainer;
   public
-    constructor Create(AConnection:TioInternalSqlConnection);
+    constructor Create(AConnection:TioInternalSqlConnection; AQueryContainer:IioQueryContainer);
     destructor Destroy; override;
     function GetConnection: TioInternalSqlConnection;
     function GetConnectionDefName: String;
+    function QueryContainer: IioQueryContainer;
     function InTransaction: Boolean;
     procedure StartTransaction;
     procedure Commit;
@@ -50,13 +52,14 @@ begin
   TioDBFactory.ConnectionContainer.FreeConnection(Self);
 end;
 
-constructor TioConnection.Create(AConnection: TioInternalSqlConnection);
+constructor TioConnection.Create(AConnection: TioInternalSqlConnection; AQueryContainer:IioQueryContainer);
 begin
   inherited Create;
   FFDGUIxWaitCursor := TFDGUIxWaitCursor.Create(nil);
   FFDGUIxWaitCursor.Provider := 'FMX';
   FTransactionCounter := 0;
   FConnection := AConnection;
+  FQueryContainer := AQueryContainer;
 end;
 
 destructor TioConnection.Destroy;
@@ -81,6 +84,11 @@ begin
   Result := FConnection.InTransaction;
 end;
 
+function TioConnection.QueryContainer: IioQueryContainer;
+begin
+  Result := FQueryContainer;
+end;
+
 procedure TioConnection.Rollback;
 begin
   FConnection.Rollback;
@@ -99,3 +107,4 @@ begin
 end;
 
 end.
+

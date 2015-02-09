@@ -28,6 +28,9 @@ type
     FRelationLoadType: TioLoadType;
     FTable:IioContextTable;
     FReadWrite: TioReadWrite;
+    FEmbedded: Boolean;
+    // NB: Gli altri due attributes (ioEmbeddedSkip e ioEmbeddedStreamable) non sono necessari qui
+    //      perchè li usa solo l'ObjectsMappers al suo interno, iupORM non li usa
   public
     constructor Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; ALoadSql:String; AFieldType:String; AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationLoadType:TioLoadType);
     function GetLoadSql: String;
@@ -41,6 +44,7 @@ type
     function GetSqlParamName: String;
     function GetFieldType: String;
     function IsBlob: Boolean;
+    function IsStream: Boolean;
     function GetValue(Instance: Pointer): TValue;
     procedure SetValue(Instance: Pointer; AValue:TValue);
     function GetSqlValue(ADataObject:TObject): String;
@@ -59,6 +63,7 @@ type
     function IsID: Boolean;
     function IsWriteEnabled: Boolean;
     function IsReadEnabled: Boolean;
+    function IsEmbedded: Boolean;
   end;
 
   // Classe con l'elenco delle proprietà della classe
@@ -101,7 +106,7 @@ implementation
 uses
   System.TypInfo, IupOrm.Context.Interfaces, IupOrm.Context.Factory,
   IupOrm.DB.Factory, IupOrm.Exceptions, System.SysUtils, IupOrm.SqlTranslator,
-  System.StrUtils;
+  System.StrUtils, System.Classes;
 
 { TioProperty }
 
@@ -239,6 +244,11 @@ begin
   Result := (FRelationType = ioRTNone) and Self.GetFieldType.StartsWith('BLOB');
 end;
 
+function TioProperty.IsEmbedded: Boolean;
+begin
+  Result := Self.FEmbedded;
+end;
+
 function TioProperty.IsID: Boolean;
 begin
   Result := FIsID;
@@ -257,8 +267,14 @@ begin
     ioSelect: Result := (FReadWrite <= iorwReadWrite);
     ioInsert: Result := (FReadWrite >= iorwReadWrite);
     ioUpdate: Result := (FReadWrite >= iorwReadWrite);
-    ioAll: Result := True;
+  else Result := True;
   end;
+end;
+
+function TioProperty.IsStream: Boolean;
+begin
+  Result := (Self.GetRttiProperty.PropertyType.IsInstance)
+        and (Self.GetRttiProperty.PropertyType.AsInstance.InheritsFrom(TSTream));
 end;
 
 function TioProperty.IsWriteEnabled: Boolean;
@@ -401,10 +417,10 @@ begin
                            then Result := AProp.GetLoadSql
                            else Result := AProp.GetSqlFullQualifiedFieldName;
                        end;
-    else      AFunc := function (AProp:IioCOntextProperty): String
-                       begin
-                         Result := AProp.GetSqlFieldName;
-                       end;
+  else AFunc := function (AProp:IioCOntextProperty): String
+                begin
+                  Result := AProp.GetSqlFieldName;
+                end;
   end;
   // Use Internal function with an anonomous method
   Result := Self.InternalGetSql(ASqlRequestType, AFunc);

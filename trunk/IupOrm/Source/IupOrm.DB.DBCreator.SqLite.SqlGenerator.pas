@@ -98,7 +98,7 @@ begin
   Result := False;
   // Define sets
   TextFieldTypeSet := [ftString, ftWideString, ftWideMemo, ftMemo];
-  IntegerFieldTypeSet := [ftInteger, ftSmallint, ftWord, ftLargeInt];
+  IntegerFieldTypeSet := [ftInteger, ftSmallint, ftWord, ftLargeInt, ftAutoinc];
   RealFieldTypeSet := [ftFloat, ftCurrency, ftBCD, ftDate, ftTime, ftDateTime];
   BlobFieldTypeSet := [ftBlob];
   // Text field type

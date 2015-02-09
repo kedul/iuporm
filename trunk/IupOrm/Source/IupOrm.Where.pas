@@ -18,19 +18,17 @@ type
   strict protected
     FWhereItems: TWhereItems;
     FClassRef: TioClassRef;
-    FContextProperties: IioContextProperties;
     FDisableClassFromField: Boolean;
     function IsAnInterface<T>: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
     function GetWhereItems: TWhereItems;
-    function GetSql(AddWhere:Boolean=True): String; reintroduce;
-    function GetSqlWithClassFromField(AClassFromField: IioClassFromField): String;
+    function GetSql(AProperties:IioContextProperties; AddWhere:Boolean=True): String; reintroduce;
+    function GetSqlWithClassFromField(AProperties:IioContextProperties; AIsClassFromField:Boolean; AClassFromField: IioClassFromField): String;
     function GetDisableClassFromField: Boolean;
     function GetClassRef: TioClassRef;
     procedure SetClassRef(AClassRef:TioClassRef);
-    procedure SetContextProperties(AContextProperties:IioContextProperties);
     // ------ Destination methods
     function ToObject: TObject;
     function ToList<TDEST:class,constructor>(AOwnsObjects:Boolean=True): TDEST; overload;
@@ -77,6 +75,8 @@ type
     function _Where(ATextCondition:String): TioWhere; overload;
     function _Property(APropertyName:String): TioWhere;
     function _PropertyOID: TioWhere;
+    function _PropertyEqualsTo(APropertyName:String; AValue:TValue): TioWhere;
+    function _PropertyOIDEqualsTo(AValue:TValue): TioWhere;
     function _Value(AValue:TValue): TioWhere;
   end;
 
@@ -127,6 +127,8 @@ type
     function _Where(ATextCondition:String): TioWhere<T>; overload;
     function _Property(APropertyName:String): TioWhere<T>;
     function _PropertyOID: TioWhere<T>;
+    function _PropertyEqualsTo(APropertyName:String; AValue:TValue): TioWhere<T>;
+    function _PropertyOIDEqualsTo(AValue:TValue): TioWhere<T>;
     function _Value(AValue:TValue): TioWhere<T>;
   end;
 
@@ -134,12 +136,13 @@ type
 implementation
 
 uses
-  IupOrm.DB.Factory, IupOrm.DB.Interfaces,
+  IupOrm.DB.Factory,
   IupOrm.Context.Factory, System.SysUtils,
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory,
   IupOrm.ObjectsForge.Factory, IupOrm.Context.Interfaces,
   IupOrm.RttiContext.Factory, IupOrm,
-  IupOrm.LiveBindings.ActiveListBindSourceAdapter, IupOrm.Where.SqlItems;
+  IupOrm.LiveBindings.ActiveListBindSourceAdapter, IupOrm.Where.SqlItems,
+  IupOrm.DB.Interfaces;
 
 { TioWhere }
 
@@ -269,7 +272,7 @@ end;
 function TioWhere.ByOID(AOID:Integer): TioWhere;
 begin
   Result := Self;
-  Self._Where._PropertyOID._EqualTo(AOID);
+  Self._PropertyOIDEqualsTo(AOID);
 end;
 
 constructor TioWhere.Create;
@@ -287,7 +290,7 @@ begin
     // Create Context
     AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
     // Create & open query
-    AQuery := TioDbFactory.SqlGenerator.GenerateSqlDelete(AContext);
+    AQuery := TioDbFactory.QueryEngine.GetQueryDelete(AContext);
     AQuery.ExecSQL;
   finally
     // Destroy itself at the end to avoid memory leak
@@ -317,7 +320,7 @@ begin
   Result := FDisableClassFromField;
 end;
 
-function TioWhere.GetSql(AddWhere:Boolean): String;
+function TioWhere.GetSql(AProperties:IioContextProperties; AddWhere:Boolean): String;
 var
   CurrSqlItem: IioSqlItem;
   CurrSqlItemWhere: IioSqlItemWhere;
@@ -326,25 +329,27 @@ begin
   Result := '';
   if FWhereItems.Count = 0 then Exit;
   if AddWhere then Result := 'WHERE ';
+  // Add current SqlItem
   for CurrSqlItem in FWhereItems do
   begin
-    // Set ContextProperty if TioSqlItemWhere descendant
-    if Supports(CurrSqlItem, IioSqlItemWhere, CurrSqlItemWhere)
-      then CurrSqlItemWhere.SetContextProperties(FContextProperties);
-    // Add current SqlItem
-    Result := Result + CurrSqlItem.GetSql;
+    if Supports(CurrSqlItem, IioSqlItemWhere, CurrSqlItemWhere) then
+      Result := Result + CurrSqlItemWhere.GetSql(AProperties)
+    else
+      Result := Result + CurrSqlItem.GetSql;
   end;
 end;
 
-function TioWhere.GetSqlWithClassFromField(
-  AClassFromField: IioClassFromField): String;
+function TioWhere.GetSqlWithClassFromField(AProperties:IioContextProperties; AIsClassFromField:Boolean; AClassFromField: IioClassFromField): String;
 begin
-  Result := Self.GetSql;
-  if not Assigned(AClassFromField) then Exit;
-  if Result = ''
-    then Result := 'WHERE '
-    else Result := Result + ' AND ';
-  Result := Result + AClassFromField.GetSqlFieldName + ' LIKE ' + TioDbFactory.SqlDataConverter.StringToSQL('%<'+AClassFromField.GetClassName+'>%');
+  Result := Self.GetSql(AProperties);
+  if AIsClassFromField then
+  begin
+    if Result = ''
+      then Result := 'WHERE '
+      else Result := Result + ' AND ';
+//    Result := Result + AClassFromField.GetSqlFieldName + ' LIKE ' + TioDbFactory.SqlDataConverter.StringToSQL('%<'+AClassFromField.GetClassName+'>%');
+    Result := Result + AClassFromField.GetSqlFieldName + ' LIKE :' + AClassFromField.GetSqlParamName;
+  end;
 end;
 
 function TioWhere.GetWhereItems: TWhereItems;
@@ -363,12 +368,6 @@ begin
   FClassRef := AClassRef;
 end;
 
-procedure TioWhere.SetContextProperties(
-  AContextProperties: IioContextProperties);
-begin
-  FContextProperties := AContextProperties;
-end;
-
 function TioWhere.ToActiveListBindSourceAdapter(AOwner: TComponent;
   AOwnsObject: Boolean): TBindSourceAdapter;
 var
@@ -381,7 +380,7 @@ begin
     // Create the adapter
     Result := TioActiveListBindSourceAdapter.Create(
                                                       Self.FClassRef
-                                                    , Self.GetSql(False)
+                                                    , Self.GetSql(AContext.GetProperties, False)
                                                     , AOwner
                                                     , TObjectList<TObject>.Create    // Create an empty list for adapter creation only
                                                     , True  // AutoLoadData := True
@@ -411,7 +410,7 @@ begin
     // Wrap the DestList into a DuckTypedList
     ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
     // Create & open query
-    AQuery := TioDbFactory.SqlGenerator.GenerateSqlSelectForList(AContext);
+    AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext);
     AQuery.Open;
     // Loop
     while not AQuery.Eof do
@@ -456,7 +455,7 @@ begin
   TIupOrm.StartTransaction(AContext.GetConnectionDefName);
   try try
     // Create & open query
-    AQuery := TioDbFactory.SqlGenerator.GenerateSqlSelectForObject(AContext);
+    AQuery := TioDbFactory.QueryEngine.GetQuerySelectForObject(AContext);
     AQuery.Open;
     // Create the object as TObject
     if not AQuery.IsEmpty then
@@ -532,10 +531,22 @@ begin
   Self.FWhereItems.Add(TioDbFactory.WhereItemProperty(APropertyName));
 end;
 
+function TioWhere._PropertyEqualsTo(APropertyName: String; AValue: TValue): TioWhere;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyEqualsTo(APropertyName, AValue));
+end;
+
 function TioWhere._PropertyOID: TioWhere;
 begin
   Result := Self;
   Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyOID);
+end;
+
+function TioWhere._PropertyOIDEqualsTo(AValue: TValue): TioWhere;
+begin
+  Result := Self;
+  Self.FWhereItems.Add(TioDbFactory.WhereItemPropertyOIDEqualsTo(AValue));
 end;
 
 function TioWhere._Value(AValue: TValue): TioWhere;
@@ -772,10 +783,22 @@ begin
   TioWhere(Self)._Property(APropertyName);
 end;
 
+function TioWhere<T>._PropertyEqualsTo(APropertyName: String; AValue: TValue): TioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._PropertyEqualsTo(APropertyName, AValue);
+end;
+
 function TioWhere<T>._PropertyOID: TioWhere<T>;
 begin
   Result := Self;
   TioWhere(Self)._PropertyOID;
+end;
+
+function TioWhere<T>._PropertyOIDEqualsTo(AValue: TValue): TioWhere<T>;
+begin
+  Result := Self;
+  TioWhere(Self)._PropertyOIDEqualsTo(AValue);
 end;
 
 function TioWhere<T>._Value(AValue: TValue): TioWhere<T>;
