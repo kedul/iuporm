@@ -3,10 +3,9 @@ unit IupOrm.MVVM.ViewModelBase;
 interface
 
 uses
-  System.SysUtils, System.Classes,
-  IupOrm.LiveBindings.Interfaces, IupOrm.MVVM.Interfaces, System.Rtti,
-  IupOrm.Attributes, IupOrm.LiveBindings.PrototypeBindSource,
-  IupOrm.CommonTypes;
+  System.Classes, IupOrm.MVVM.Interfaces,
+  IupOrm.LiveBindings.PrototypeBindSource, IupOrm.LiveBindings.Interfaces,
+  IupOrm.CommonTypes, System.Rtti, IupOrm.Attributes;
 
 type
   TioViewModelBase = class(TDataModule, IioViewModel)
@@ -66,8 +65,9 @@ type
 
 implementation
 
-uses IupOrm.MVVM.Factory, IupOrm.Exceptions, IupOrm.RttiContext.Factory,
-     IupOrm.LiveBindings.Factory, Data.Bind.ObjectScope;
+uses System.SysUtils, IupOrm.Exceptions, IupOrm.RttiContext.Factory,
+  IupOrm.MVVM.Factory, Data.Bind.ObjectScope,
+  IupOrm.LiveBindings.Factory;
 
 {%CLASSGROUP 'System.Classes.TPersistent'}
 

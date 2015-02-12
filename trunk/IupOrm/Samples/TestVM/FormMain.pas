@@ -21,7 +21,6 @@ type
     Button8: TButton;
     Button9: TButton;
     Button10: TButton;
-    ioPrototypeBindSource1: TioPrototypeBindSource;
     Button11: TButton;
     Button12: TButton;
     [ioAction('acHello')]
@@ -31,6 +30,7 @@ type
     Button13: TButton;
     Button14: TButton;
     Button15: TButton;
+    ioPrototypeBindSource1: TioPrototypeBindSource;
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);

@@ -2,32 +2,36 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2014/10/04 15:46:44.000.396,=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit3.pas</Transaction>
-    <Transaction>2014/10/04 15:47:38.000.553,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.VCL.MainForm.dfm=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit3.dfm</Transaction>
-    <Transaction>2014/10/04 15:47:38.000.553,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.VCL.MainForm.pas=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit3.pas</Transaction>
-    <Transaction>2014/10/04 15:48:14.000.674,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.dproj=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
-    <Transaction>2014/10/04 15:48:26.000.141,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.MainForm.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.VCL.MainForm.pas</Transaction>
-    <Transaction>2014/10/04 15:48:26.000.141,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.MainForm.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.VCL.MainForm.dfm</Transaction>
+    <Transaction>2014/10/04 15:47:38.000.553,C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit3.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.VCL.MainForm.dfm</Transaction>
+    <Transaction>2014/10/04 15:47:38.000.553,C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit3.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.VCL.MainForm.pas</Transaction>
+    <Transaction>2014/10/04 15:48:14.000.674,C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.dproj</Transaction>
+    <Transaction>2014/10/04 15:48:26.000.141,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.VCL.MainForm.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.MainForm.dfm</Transaction>
+    <Transaction>2014/10/04 15:48:26.000.141,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.VCL.MainForm.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.MainForm.pas</Transaction>
     <Transaction>2014/10/04 15:50:39.000.432,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit3.pas</Transaction>
-    <Transaction>2014/10/04 15:51:09.000.392,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit3.dfm</Transaction>
-    <Transaction>2014/10/04 15:51:09.000.392,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit3.pas</Transaction>
+    <Transaction>2014/10/04 15:51:09.000.392,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit3.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.pas</Transaction>
+    <Transaction>2014/10/04 15:51:09.000.392,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit3.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.dfm</Transaction>
     <Transaction>2014/10/04 15:59:25.000.677,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.pas</Transaction>
     <Transaction>2014/10/04 15:59:37.000.710,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.pas=</Transaction>
     <Transaction>2014/10/04 16:06:45.000.067,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
-    <Transaction>2014/10/04 17:47:51.000.605,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\TestVM\IupOrm.MVVM.VCL.ViewModel.dfm</Transaction>
-    <Transaction>2014/10/04 17:47:51.000.605,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\TestVM\IupOrm.MVVM.VCL.ViewModel.pas</Transaction>
+    <Transaction>2014/10/04 17:47:51.000.605,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\TestVM\IupOrm.MVVM.VCL.ViewModel.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.dfm</Transaction>
+    <Transaction>2014/10/04 17:47:51.000.605,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\TestVM\IupOrm.MVVM.VCL.ViewModel.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.pas</Transaction>
     <Transaction>2014/10/04 17:50:03.000.563,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.pas</Transaction>
     <Transaction>2014/10/04 17:52:32.000.781,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.pas=</Transaction>
     <Transaction>2014/10/04 17:53:29.000.767,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.pas</Transaction>
     <Transaction>2014/10/04 17:54:24.000.213,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
-    <Transaction>2014/10/04 17:55:01.000.339,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.dfm</Transaction>
-    <Transaction>2014/10/04 17:55:01.000.339,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.pas</Transaction>
+    <Transaction>2014/10/04 17:55:01.000.339,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.dfm</Transaction>
+    <Transaction>2014/10/04 17:55:01.000.339,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.ViewModel.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
     <Transaction>2014/10/04 18:44:32.000.832,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.MainForm.pas=</Transaction>
-    <Transaction>2014/10/05 13:01:48.000.660,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModelBase.dfm</Transaction>
-    <Transaction>2014/10/05 13:01:48.000.660,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModelBase.pas</Transaction>
+    <Transaction>2014/10/05 13:01:48.000.660,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModelBase.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.pas</Transaction>
+    <Transaction>2014/10/05 13:01:48.000.660,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModelBase.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.dfm</Transaction>
     <Transaction>2014/10/14 16:18:58.000.422,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
-    <Transaction>2014/10/14 16:19:15.000.218,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.View.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
-    <Transaction>2014/10/14 16:19:15.000.218,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.View.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.dfm</Transaction>
+    <Transaction>2014/10/14 16:19:15.000.218,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.View.dfm</Transaction>
+    <Transaction>2014/10/14 16:19:15.000.218,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.View.pas</Transaction>
     <Transaction>2014/10/14 16:31:33.000.290,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.Interfaces.pas</Transaction>
     <Transaction>2014/11/14 15:01:06.000.748,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.VCL.View.pas=</Transaction>
+    <Transaction>2015/02/11 10:33:20.000.808,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\ExtLibs\DMVC\ObjectsMappers.pas</Transaction>
+    <Transaction>2015/02/11 10:33:20.000.774,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\ExtLibs\DMVC\DuckListU.pas</Transaction>
+    <Transaction>2015/02/11 10:33:20.000.824,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\ExtLibs\DMVC\RTTIUtilsU.pas</Transaction>
+    <Transaction>2015/02/11 10:33:20.000.789,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\ExtLibs\DMVC\DuckObjU.pas</Transaction>
   </Transactions>
 </BorlandProject>

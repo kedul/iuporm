@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2014/11/28 17:19:35.000.386,=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2015/02/09 12:17:47.000.094,=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Unit3.pas</Transaction>
+    <Transaction>2015/02/09 12:21:28.000.621,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\ImpOrm.MVVM.ALL.dproj=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2015/02/09 12:21:52.000.703,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.Interfaces.pas</Transaction>
+    <Transaction>2015/02/09 12:23:07.000.192,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModelBase.pas</Transaction>
+    <Transaction>2015/02/09 12:29:12.000.186,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\ExtLibs\DMVC\ObjectsMappers.pas</Transaction>
+    <Transaction>2015/02/09 12:29:44.000.169,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\ExtLibs\DMVC\DuckListU.pas</Transaction>
+    <Transaction>2015/02/09 12:30:04.000.963,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\ExtLibs\DMVC\RTTIUtilsU.pas</Transaction>
+    <Transaction>2015/02/09 12:30:22.000.057,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\ExtLibs\DMVC\DuckObjU.pas</Transaction>
+    <Transaction>2015/02/09 12:31:30.000.434,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
+    <Transaction>2015/02/09 12:31:57.000.147,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ALL.ViewModel.dfm</Transaction>
+    <Transaction>2015/02/09 12:31:57.000.147,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ALL.ViewModel.pas</Transaction>
+    <Transaction>2015/02/09 15:56:10.000.305,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
+    <Transaction>2015/02/09 16:00:36.000.445,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ALL.ViewModel.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
+    <Transaction>2015/02/09 16:00:36.000.445,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ALL.ViewModel.dfm=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.dfm</Transaction>
+    <Transaction>2015/02/10 09:34:09.000.077,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
+    <Transaction>2015/02/10 09:34:35.000.567,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModel.Commands.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\Unit1.pas</Transaction>
+  </Transactions>
+</BorlandProject>

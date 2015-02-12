@@ -32,7 +32,6 @@ package IupOrmProject;
 requires
   rtl,
   dbrtl,
-  fmx,
   bindengine,
   bindcomp,
   FireDACCommon,
