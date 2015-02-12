@@ -1,9 +1,15 @@
-unit IupOrm.MVVM.VCL.ViewModel;
+unit IupOrm.MVVM.ALL.ViewModel;
 
 interface
 
 uses
-  IupOrm.MVVM.ViewModelBase, System.Classes, System.Actions, Vcl.ActnList;
+  System.Classes, IupOrm.MVVM.ViewModelBase, System.Actions,
+{$IF DECLARED(TFmxObject)}
+  FMX.ActnList,
+{$ELSE}
+  VCL.ActnList,
+{$IFEND}
+  System.SysUtils, FMX.ActnList;
 
 type
   TioViewModel = class(TioViewModelBase)
@@ -16,9 +22,6 @@ type
 
 implementation
 
-{%CLASSGROUP 'Vcl.Controls.TControl'}
-
 {$R *.dfm}
-
 
 end.

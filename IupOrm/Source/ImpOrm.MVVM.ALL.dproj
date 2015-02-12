@@ -1,0 +1,153 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{FBBB1A4C-01CD-466F-BDDC-CC54EC52D0E0}</ProjectGuid>
+        <ProjectVersion>15.4</ProjectVersion>
+        <FrameworkType>FMX</FrameworkType>
+        <MainSource>ImpOrm.MVVM.ALL.dpr</MainSource>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1</TargetedPlatforms>
+        <AppType>Application</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Base)'=='true') or '$(Base_OSX32)'!=''">
+        <Base_OSX32>true</Base_OSX32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+        <SanitizedProjectName>ImpOrm_MVVM_ALL</SanitizedProjectName>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_UnitSearchPath>..\..\source;..\..\packages\delphixe6\$(Platform)\$(Config);$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <VerInfo_Locale>1040</VerInfo_Locale>
+        <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_E>false</DCC_E>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_K>false</DCC_K>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_OSX32)'!=''">
+        <DCC_UsePackage>Mitov_Runtime_DXE6;FireDACSqliteDriver;TimingLabBasicPkgDXE6;FireDACDSDriver;DBXSqliteDriver;FireDACPgDriver;fmx;IndySystem;tethering;DBXInterBaseDriver;DataSnapClient;DataSnapServer;DataSnapCommon;DataSnapProviderClient;DbxCommonDriver;dbxcds;OpenWireBindingFmxPkgDXE6;fmxFireDAC;DBXOracleDriver;CustomIPTransport;dsnap;IndyIPServer;fmxase;IndyCore;Mitov_BasicLab_DXE6;IndyIPCommon;CloudService;FireDACIBDriver;FmxTeeUI;TextLabBasicPkgDXE6;DataSnapFireDAC;FireDACDBXDriver;soapserver;inetdbxpress;dsnapxml;FireDACInfxDriver;FireDACDb2Driver;SignalLabGenericBasicPkgDXE6;FireDACASADriver;OpenWirePkgDXE6;bindcompfmx;FireDACODBCDriver;RESTBackendComponents;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;inetdb;OpenWireBindingPkgDXE6;DataBindings;xmlrtl;DataSnapNativeClient;IndyProtocols;DBXMySQLDriver;OpenWireBindingDatabasePkgDXE6;FireDACCommonDriver;soaprtl;bindengine;bindcompdbx;FMXTee;FireDACADSDriver;FireDACMSSQLDriver;FireDAC;DBXInformixDriver;DataSnapServerMidas;DBXFirebirdDriver;inet;SignalLabAdditionalPkgDXE6;fmxobj;SignalLabBasicPkgDXE6;FireDACMySQLDriver;soapmidas;DBXSybaseASADriver;FireDACOracleDriver;fmxdae;RESTComponents;dbexpress;FireDACMSAccDriver;DataSnapIndy10ServerTransport;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UsePackage>Mitov_Runtime_DXE6;FireDACSqliteDriver;TimingLabBasicPkgDXE6;FireDACDSDriver;DBXSqliteDriver;TMSiCLPkgDXE6;SampleListViewMultiDetailAppearancePackage;FireDACPgDriver;fmx;IndySystem;TeeDB;tethering;inetdbbde;DBXInterBaseDriver;DataSnapClient;DataSnapServer;DataSnapCommon;AudioLabEssentialPkgDXE6;DataSnapProviderClient;DBXSybaseASEDriver;DbxCommonDriver;vclimg;dbxcds;DatasnapConnectorsFreePascal;MetropolisUILiveTile;DataBindingsVCL180;vcldb;vcldsnap;OpenWireBindingFmxPkgDXE6;fmxFireDAC;DBXDb2Driver;DBXOracleDriver;CustomIPTransport;vclribbon;dsnap;IndyIPServer;fmxase;vcl;IndyCore;Mitov_BasicLab_DXE6;Mitov_FMX_BasicLab_DXE6;DBXMSSQLDriver;IndyIPCommon;CloudService;IupOrmProject;FireDACIBDriver;FmxTeeUI;CodeSiteExpressPkg;TextLabBasicPkgDXE6;DataSnapFireDAC;FireDACDBXDriver;FMX_MediaLabBasicPkgDXE6;FMX_SignalLabScopePkgDXE6;soapserver;fmx.gtxControlsDXE6;inetdbxpress;dsnapxml;FireDACInfxDriver;FireDACDb2Driver;SignalLabGenericBasicPkgDXE6;adortl;FireDACASADriver;OpenWirePkgDXE6;bindcompfmx;vcl.gtxDBControlsDXE6;vcldbx;FireDACODBCDriver;RESTBackendComponents;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;inetdb;OpenWireBindingPkgDXE6;Tee;DataBindings;DBXOdbcDriver;OpenWireBindingVclPkgDXE6;vclFireDAC;Mitov_VCL_Runtime_DXE6;xmlrtl;DataSnapNativeClient;svnui;SignalLabScopePkgDXE6;IndyProtocols;DBXMySQLDriver;MediaLabPkgDXE6;OpenWireBindingDatabasePkgDXE6;FireDACCommonDriver;vclactnband;soaprtl;bindengine;bindcompdbx;FMXTee;TeeUI;bindcompvcl;Mitov_VCL_BasicLab_DXE6;MediaLabBasicPkgDXE6;vclie;FireDACADSDriver;vcltouch;VclSmp;FireDACMSSQLDriver;FireDAC;DBXInformixDriver;Intraweb;VCLRESTComponents;DataSnapConnectors;DataSnapServerMidas;FMX.dclgtxControlsDXE6;gtPDFkitDXE6ProP;dsnapcon;DBXFirebirdDriver;inet;SignalLabAdditionalPkgDXE6;fmxobj;SignalLabBasicPkgDXE6;AudioLabPkgDXE6;FireDACMySQLDriver;soapmidas;vclx;AudioLabBasicPkgDXE6;vcl.gtxControlsDXE6;svn;DBXSybaseASADriver;AudioLabGenericBasicPkgDXE6;FireDACOracleDriver;fmxdae;RESTComponents;bdertl;dbexpress;FireDACMSAccDriver;DataSnapIndy10ServerTransport;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>Mitov_Runtime_DXE6;FireDACSqliteDriver;TimingLabBasicPkgDXE6;FireDACDSDriver;DBXSqliteDriver;FireDACPgDriver;fmx;IndySystem;TeeDB;tethering;DBXInterBaseDriver;DataSnapClient;DataSnapServer;DataSnapCommon;AudioLabEssentialPkgDXE6;DataSnapProviderClient;DBXSybaseASEDriver;DbxCommonDriver;vclimg;dbxcds;DatasnapConnectorsFreePascal;MetropolisUILiveTile;vcldb;vcldsnap;OpenWireBindingFmxPkgDXE6;fmxFireDAC;DBXDb2Driver;DBXOracleDriver;CustomIPTransport;vclribbon;dsnap;IndyIPServer;fmxase;vcl;IndyCore;Mitov_BasicLab_DXE6;Mitov_FMX_BasicLab_DXE6;DBXMSSQLDriver;IndyIPCommon;CloudService;FireDACIBDriver;FmxTeeUI;TextLabBasicPkgDXE6;DataSnapFireDAC;FireDACDBXDriver;FMX_MediaLabBasicPkgDXE6;FMX_SignalLabScopePkgDXE6;soapserver;inetdbxpress;dsnapxml;FireDACInfxDriver;FireDACDb2Driver;SignalLabGenericBasicPkgDXE6;adortl;FireDACASADriver;OpenWirePkgDXE6;bindcompfmx;FireDACODBCDriver;RESTBackendComponents;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;inetdb;OpenWireBindingPkgDXE6;Tee;DataBindings;DBXOdbcDriver;OpenWireBindingVclPkgDXE6;vclFireDAC;Mitov_VCL_Runtime_DXE6;xmlrtl;DataSnapNativeClient;SignalLabScopePkgDXE6;IndyProtocols;DBXMySQLDriver;MediaLabPkgDXE6;OpenWireBindingDatabasePkgDXE6;FireDACCommonDriver;vclactnband;soaprtl;bindengine;bindcompdbx;FMXTee;TeeUI;bindcompvcl;Mitov_VCL_BasicLab_DXE6;MediaLabBasicPkgDXE6;vclie;FireDACADSDriver;vcltouch;VclSmp;FireDACMSSQLDriver;FireDAC;DBXInformixDriver;Intraweb;VCLRESTComponents;DataSnapConnectors;DataSnapServerMidas;dsnapcon;DBXFirebirdDriver;inet;SignalLabAdditionalPkgDXE6;fmxobj;SignalLabBasicPkgDXE6;AudioLabPkgDXE6;FireDACMySQLDriver;soapmidas;vclx;AudioLabBasicPkgDXE6;DBXSybaseASADriver;AudioLabGenericBasicPkgDXE6;FireDACOracleDriver;fmxdae;RESTComponents;dbexpress;FireDACMSAccDriver;DataSnapIndy10ServerTransport;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_RemoteDebug>true</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <DCC_RemoteDebug>false</DCC_RemoteDebug>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="IupOrm.MVVM.Interfaces.pas"/>
+        <DCCReference Include="IupOrm.MVVM.ViewModelBase.pas">
+            <Form>ioViewModelBase</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="..\ExtLibs\DMVC\ObjectsMappers.pas"/>
+        <DCCReference Include="..\ExtLibs\DMVC\DuckListU.pas"/>
+        <DCCReference Include="..\ExtLibs\DMVC\RTTIUtilsU.pas"/>
+        <DCCReference Include="..\ExtLibs\DMVC\DuckObjU.pas"/>
+        <DCCReference Include="IupOrm.MVVM.ALL.ViewModel.pas">
+            <Form>ioViewModel</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="IupOrm.MVVM.ViewModel.Commands.pas"/>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Source>
+                    <Source Name="MainSource">ImpOrm.MVVM.ALL.dpr</Source>
+                </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k200.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp200.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <Deployment/>
+            <Platforms>
+                <Platform value="OSX32">False</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+</Project>

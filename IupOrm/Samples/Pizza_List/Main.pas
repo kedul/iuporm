@@ -79,7 +79,7 @@ var
 
 implementation
 
-uses IupOrm, IupOrm.DB.DBCreator.Factory, IupOrm.CommonTypes;
+uses IupOrm, IupOrm.DB.DBCreator.Factory, IupOrm.CommonTypes, IOUtils;
 
 
 {$R *.fmx}
@@ -92,10 +92,12 @@ end;
 
 procedure TMainForml.acIupOrmInitExecute(Sender: TObject);
 begin
+  // ============ IupOrm initialization ====================
   // Set the directory name (under the Documents folder)
-  TIupOrm.SetDBFolderInDocuments('Pizza');
+  TIupOrm.ConnectionManager.NewSQLiteConnectionDef(TPath.Combine(TPath.GetDocumentsPath, 'Pizza.db')).Apply;
   // AutoCreation and AutoUpdate of the database
   TIupOrm.AutoCreateDatabase;
+  // ============ IupOrm initialization ====================
 end;
 
 procedure TMainForml.acLoadExecute(Sender: TObject);

@@ -11,7 +11,7 @@ uses
   ViewModel1 in 'ViewModel1.pas' {ioViewModel1: TDataModule},
   System.IOUtils,
   IupOrm,
-  IupOrm.MVVM.VCL.ViewModel in '..\..\Source\IupOrm.MVVM.VCL.ViewModel.pas' {ioViewModel: TDataModule};
+  IupOrm.MVVM.ALL.ViewModel in '..\..\Source\IupOrm.MVVM.ALL.ViewModel.pas' {ioViewModel: TDataModule};
 
 {$R *.res}
 {$STRONGLINKTYPES ON}

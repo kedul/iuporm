@@ -1,11 +1,11 @@
 inherited ioViewModel1: TioViewModel1
   inherited Commands: TActionList
     object acHello: TAction
-      Caption = 'acHello'
+      Caption = 'Hello'
       OnExecute = acHelloExecute
     end
     object acEnableDisable: TAction
-      Caption = 'acEnableDisable'
+      Caption = 'On/Off'
       OnExecute = acEnableDisableExecute
     end
   end

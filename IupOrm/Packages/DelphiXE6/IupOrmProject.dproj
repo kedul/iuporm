@@ -138,7 +138,6 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="dbrtl.dcp"/>
-        <DCCReference Include="fmx.dcp"/>
         <DCCReference Include="bindengine.dcp"/>
         <DCCReference Include="bindcomp.dcp"/>
         <DCCReference Include="FireDACCommon.dcp"/>
