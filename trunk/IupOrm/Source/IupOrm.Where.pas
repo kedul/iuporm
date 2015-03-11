@@ -9,17 +9,18 @@ uses
   IupOrm.Interfaces,
   IupOrm.SqlItems,
   IupOrm.Context.Properties.Interfaces, IupOrm.Context.Table.Interfaces,
-  System.Classes, Data.Bind.ObjectScope, IupOrm.Where.SqlItems.Interfaces;
+  System.Classes, Data.Bind.ObjectScope, IupOrm.Where.SqlItems.Interfaces,
+  IupOrm.Resolver.Interfaces, IupOrm.Containers.Interfaces;
 
 type
 
   // Where conditions (standard version)
   TioWhere = class (TioSqlItem)
-  strict protected
+  strict
+  protected
     FWhereItems: TWhereItems;
-    FClassRef: TioClassRef;
+    FTypeName, FTypeAlias: String;
     FDisableClassFromField: Boolean;
-    function IsAnInterface<T>: Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -27,14 +28,16 @@ type
     function GetSql(AProperties:IioContextProperties; AddWhere:Boolean=True): String; reintroduce;
     function GetSqlWithClassFromField(AProperties:IioContextProperties; AIsClassFromField:Boolean; AClassFromField: IioClassFromField): String;
     function GetDisableClassFromField: Boolean;
-    function GetClassRef: TioClassRef;
-    procedure SetClassRef(AClassRef:TioClassRef);
+    procedure SetType(const ATypeName, ATypeAlias: String);
     // ------ Destination methods
-    function ToObject: TObject;
-    function ToList<TDEST:class,constructor>(AOwnsObjects:Boolean=True): TDEST; overload;
-    procedure ToList(AList: TObject); overload;
+    function ToObject(const AObj:TObject=nil): TObject; virtual;
+    procedure ToList(const AList:TObject); overload;
+    function ToList(const AListRttiType:TRttiType; const AOwnsObjects:Boolean=True): TObject; overload;
+    function ToList(const AInterfacedListTypeName:String; const AAlias:String=''; const AOwnsObjects:Boolean=True): TObject; overload;
+    function ToList(const AListClassRef:TioClassRef; const AOwnsObjects:Boolean=True): TObject; overload;
+    function ToList<TRESULT>(const AAlias:String=''; const AOwnsObjects:Boolean=True): TRESULT; overload;
     function ToActiveListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
-    procedure Delete;
+    procedure Delete(AResolverMode:TioResolverMode=rmSingle);
     // ------ Conditions
     function ByOID(AOID:Integer): TioWhere;
     function Add(ATextCondition:String): TioWhere;
@@ -81,11 +84,14 @@ type
   end;
 
   // Where conditions (generic version)
-  TioWhere<T:class,constructor> = class (TioWhere)
+  TioWhere<T> = class (TioWhere)
   public
     // ------ Destination methods
-    function ToObject: T; overload;
-    function ToList(AOwnsObject:Boolean=True): TObjectList<T>; overload;
+    function ToObject(const AObj:TObject=nil): T; overload;
+    function ToList: TList<T>; overload;
+    function ToInterfacedList: IioList<T>; overload;
+//    function ToObjectList(const AOwnsObjects:Boolean=True): TObjectList<T>;
+//    function ToInterfacedObjectList(const AOwnsObjects:Boolean=True): IioList<T>; overload;
     function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     // ------ Conditions
     function ByOID(AOID:Integer): TioWhere<T>;
@@ -139,10 +145,11 @@ uses
   IupOrm.DB.Factory,
   IupOrm.Context.Factory, System.SysUtils,
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory,
-  IupOrm.ObjectsForge.Factory, IupOrm.Context.Interfaces,
+  IupOrm.ObjectsForge.Factory,
   IupOrm.RttiContext.Factory, IupOrm,
   IupOrm.LiveBindings.ActiveListBindSourceAdapter, IupOrm.Where.SqlItems,
-  IupOrm.DB.Interfaces;
+  IupOrm.DB.Interfaces, System.TypInfo, IupOrm.Resolver.Factory,
+  IupOrm.Rtti.Utilities, IupOrm.Context.Interfaces, IupOrm.Containers.Factory;
 
 { TioWhere }
 
@@ -281,19 +288,46 @@ begin
   FWhereItems := TWhereItems.Create;
 end;
 
-procedure TioWhere.Delete;
+procedure TioWhere.Delete(AResolverMode:TioResolverMode);
 var
+  AResolvedTypeList: IioResolvedTypeList;
+  AResolvedTypeName: String;
   AContext: IioContext;
-  AQuery: IioQuery;
+  ATransactionCollection: IioTransactionCollection;
+    // Nested
+    procedure NestedDelete;
+    var
+      AQuery: IioQuery;
+    begin
+      // Create & execute query
+      AQuery := TioDbFactory.QueryEngine.GetQueryDelete(AContext);
+      AQuery.ExecSQL;
+    end;
 begin
   try
-    // Create Context
-    AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
-    // Create & open query
-    AQuery := TioDbFactory.QueryEngine.GetQueryDelete(AContext);
-    AQuery.ExecSQL;
+    // Resolve the type and alias
+    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, AResolverMode);
+    // Get the transaction collection
+    ATransactionCollection := TioDBFactory.TransactionCollection;
+    try
+      // Loop for all classes in the sesolved type list
+      for AResolvedTypeName in AResolvedTypeList do
+      begin
+        // Get the Context for the current ResolverTypeName
+        AContext := TioContextFactory.Context(AResolvedTypeName, Self);
+        // Start transaction
+        ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+        // Load the current class data into the list
+        NestedDelete;
+      end;
+      // Commit ALL transactions
+      ATransactionCollection.CommitAll;
+    except
+      // Rollback ALL transactions
+      ATransactionCollection.RollbackAll;
+      raise;
+    end;
   finally
-    // Destroy itself at the end to avoid memory leak
     Self.Free;
   end;
 end;
@@ -308,11 +342,6 @@ function TioWhere.DisableClassFromField: TioWhere;
 begin
   Result := Self;
   FDisableClassFromField := True;
-end;
-
-function TioWhere.GetClassRef: TioClassRef;
-begin
-  Result := FClassRef;
 end;
 
 function TioWhere.GetDisableClassFromField: Boolean;
@@ -357,29 +386,32 @@ begin
   Result := FWhereItems;
 end;
 
-function TioWhere.IsAnInterface<T>: Boolean;
-begin
-  // Result is True if T si an interface
-  Result := (   TioRttiContextFactory.RttiContext.GetType(TypeInfo(T)) is TRttiInterfaceType   );
-end;
 
-procedure TioWhere.SetClassRef(AClassRef: TioClassRef);
+procedure TioWhere.SetType(const ATypeName, ATypeAlias: String);
 begin
-  FClassRef := AClassRef;
+  FTypeName := ATypeName;
+  FTypeAlias := ATypeAlias;
 end;
 
 function TioWhere.ToActiveListBindSourceAdapter(AOwner: TComponent;
   AOwnsObject: Boolean): TBindSourceAdapter;
 var
   AContext: IioContext;
+  AResolvedTypeList: IioResolvedTypeList;
 begin
   try
+    // Resolve the type and alias
+    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
     // Create Context
     // (without context the "Self.GetSql(False)" fail)
-    AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
+    // *** NB: PER IL MOMENTO, FINO A QUANDO NON CI SARA' IL SUPPORTO DELLE INTERFACCE ANCHE NEI BIND SOURCE ADAPTERS,
+    // ***      IN PRATICA USA IL CLASSREF DELLA PRIMA CLASSE CHE TROVA SENZA ANTENATI NELLA RESOLVEDTYPELIST (QUELLA PIU' IN
+    // ***      NELLA GERARCHIA), QUINDI SE CI SONO DUE CLASSI SENA ANTENATI (CIOE' CHE NON DISCENDONO DA UN ANTENATO COMUNE)
+    // ***      UNA DELLE DUE NON VERRA' TENUTA IN CONSIDEERAZIONE
+    AContext := TioContextFactory.Context(AResolvedTypeList[0], Self);
     // Create the adapter
     Result := TioActiveListBindSourceAdapter.Create(
-                                                      Self.FClassRef
+                                                      AContext.GetClassRef
                                                     , Self.GetSql(AContext.GetProperties, False)
                                                     , AOwner
                                                     , TObjectList<TObject>.Create    // Create an empty list for adapter creation only
@@ -393,80 +425,153 @@ begin
   end;
 end;
 
-procedure TioWhere.ToList(AList: TObject);
+
+
+
+
+procedure TioWhere.ToList(const AList: TObject);
 var
-  ADuckTypedList: IioDuckTypedList;
+  AResolvedTypeList: IioResolvedTypeList;
+  AResolvedTypeName: String;
   AContext: IioContext;
-  AQuery: IioQuery;
-  AObj: TObject;
-begin
-  // Init
-  AQuery := nil;
-  // Create Context
-  AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
-  // Start the transaction
-  TIupOrm.StartTransaction(AContext.GetConnectionDefName);
-  try try
-    // Wrap the DestList into a DuckTypedList
-    ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
-    // Create & open query
-    AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext);
-    AQuery.Open;
-    // Loop
-    while not AQuery.Eof do
+  ATransactionCollection: IioTransactionCollection;
+  ADuckTypedList: IioDuckTypedList;
+    // Nested
+    procedure NestedLoadToList;
+    var
+      AQuery: IioQuery;
+      AObj: TObject;
     begin
-      // Create the object as TObject
-      AObj := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
-      // Add current object to the list
-      ADuckTypedList.Add(AObj);
-      // Next
-      AQuery.Next;
+      // Create & open query
+      AQuery := TioDbFactory.QueryEngine.GetQuerySelectForList(AContext);
+      AQuery.Open;
+      try
+        // Loop
+        while not AQuery.Eof do
+        begin
+          // Clean the DataObject (it contains the previous)
+          AContext.DataObject := nil;
+          // Create the object as TObject
+          AObj := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+          // Add current object to the list
+          ADuckTypedList.Add(AObj);
+          // Next
+          AQuery.Next;
+        end;
+      finally
+        // Close query
+        AQuery.Close;
+      end;
     end;
-    // Close query
-    AQuery.Close;
-    TIupOrm.CommitTransaction(AContext.GetConnectionDefName);
-  except
-    TIupOrm.RollbackTransaction(AContext.GetConnectionDefName);
-    raise;
-  end;
+begin
+  try
+    // Resolve the type and alias
+    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
+    // Wrap the list into a DuckTypedList
+    ADuckTypedList := TioDuckTypedFactory.DuckTypedList(AList);
+    // Get the transaction collection
+    ATransactionCollection := TioDBFactory.TransactionCollection;
+    try
+      // Loop for all classes in the sesolved type list
+      for AResolvedTypeName in AResolvedTypeList do
+      begin
+        // Get the Context for the current ResolverTypeName
+        AContext := TioContextFactory.Context(AResolvedTypeName, Self);
+        // Start transaction
+        ATransactionCollection.StartTransaction(AContext.GetConnectionDefName);
+        // Load the current class data into the list
+        NestedLoadToList;
+      end;
+      // Commit ALL transactions
+      ATransactionCollection.CommitAll;
+    except
+      // Rollback ALL transactions
+      ATransactionCollection.RollbackAll;
+      raise;
+    end;
   finally
-    // Destroy itself at the end to avoid memory leak
     Self.Free;
   end;
 end;
 
-function TioWhere.ToList<TDEST>(AOwnsObjects:Boolean=True): TDEST;
+
+
+
+
+function TioWhere.ToList(const AInterfacedListTypeName, AAlias: String; const AOwnsObjects:Boolean): TObject;
+begin
+  Result := Self.ToList(
+              TIupOrm.DependencyInjection.Locate(AInterfacedListTypeName).Alias(AAlias).GetItem.RttiType,
+              AOwnsObjects
+            );
+end;
+
+function TioWhere.ToList(const AListRttiType: TRttiType; const AOwnsObjects:Boolean): TObject;
 begin
   // Create the list
-  Result := TioObjectMakerFactory.GetObjectMaker(False).CreateListByClassRef(TDEST) as TDEST;
+  Result := TioObjectMakerFactory.GetObjectMaker(False).CreateListByRttiType(AListRttiType, AOwnsObjects);
   // Fill the list
   Self.ToList(Result);
 end;
 
-function TioWhere.ToObject: TObject;
+function TioWhere.ToList(const AListClassRef: TioClassRef; const AOwnsObjects:Boolean=True): TObject;
+begin
+  Result := Self.ToList(
+              TioRttiUtilities.ClassRefToRttiType(AListClassRef),
+              AOwnsObjects
+            );
+end;
+
+function TioWhere.ToList<TRESULT>(const AAlias:String; const AOwnsObjects: Boolean): TRESULT;
+begin
+  if TioRttiUtilities.IsAnInterface<TRESULT> then
+    Result := TioRttiUtilities.CastObjectToGeneric<TRESULT>(
+                Self.ToList(
+                  TioRttiUtilities.GenericToString<TRESULT>,
+                  AAlias,
+                  AOwnsObjects
+                )
+              )
+  else
+    Result := TioRttiUtilities.CastObjectToGeneric<TRESULT>(
+                Self.ToList(
+                  TioRttiContextFactory.RttiContext.GetType(PTypeInfo(TypeInfo(TRESULT))),
+                  AOwnsObjects
+                )
+              );
+end;
+
+function TioWhere.ToObject(const AObj:TObject): TObject;
 var
+  AResolvedTypeList: IioResolvedTypeList;
   AContext: IioContext;
   AQuery: IioQuery;
 begin
-  // Init
-  Result := nil;
-  // Create Context
-  AContext := TioContextFactory.Context(Self.FClassRef.ClassName, Self);
-  TIupOrm.StartTransaction(AContext.GetConnectionDefName);
-  try try
-    // Create & open query
-    AQuery := TioDbFactory.QueryEngine.GetQuerySelectForObject(AContext);
-    AQuery.Open;
-    // Create the object as TObject
-    if not AQuery.IsEmpty then
-      Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
-    // Close query
-    AQuery.Close;
-    TIupOrm.CommitTransaction(AContext.GetConnectionDefName);
-  except
-    TIupOrm.RollbackTransaction(AContext.GetConnectionDefName);
-    raise;
-  end;
+  try
+    // Init
+    Result := AObj;
+    // Resolve the type and alias
+    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmSingle);
+    // Get the Context
+    AContext := TioContextFactory.Context(AResolvedTypeList.Items[0], Self, Result);
+    // Start the transaction
+    TIupOrm.StartTransaction(AContext.GetConnectionDefName);
+    try
+      // Create & open query
+      AQuery := TioDbFactory.QueryEngine.GetQuerySelectForObject(AContext);
+      AQuery.Open;
+      // Create the object as TObject
+      if not AQuery.IsEmpty then
+        Result := TioObjectMakerFactory.GetObjectMaker(AContext.IsClassFromField).MakeObject(AContext, AQuery);
+      // Close query
+      AQuery.Close;
+      // Commit the transaction
+      TIupOrm.CommitTransaction(AContext.GetConnectionDefName);
+    except
+      // Rollback the transaction
+      TIupOrm.RollbackTransaction(AContext.GetConnectionDefName);
+      raise;
+    end;
   finally
     // Destroy itself at the end to avoid memory leak
     Self.Free;
@@ -627,29 +732,63 @@ begin
   TioWhere(Self).DisableClassFromField;
 end;
 
-function TioWhere<T>.ToList(AOwnsObject:Boolean=True): TObjectList<T>;
+function TioWhere<T>.ToInterfacedList: IioList<T>;
 begin
-  Result := Self.ToList<TObjectList<T>>;
+  Result := TioContainersFactory.GetInterfacedList<T>;
+  Self.ToList(   TObject(Result)   );
+end;
+
+//function TioWhere<T>.ToInterfacedObjectList(const AOwnsObjects:Boolean): IioList<T>;
+//begin
+//  Result := TioContainersFactory.GetInterfacedObjectList<T>(AOwnsObjects);
+//  Self.ToList(   TObject(Result)   );
+//end;
+
+function TioWhere<T>.ToList: TList<T>;
+begin
+  Result := TList<T>.Create;
+  Self.ToList(Result);
 end;
 
 function TioWhere<T>.ToListBindSourceAdapter(AOwner: TComponent;
   AOwnsObject: Boolean): TBindSourceAdapter;
+var
+  AContext: IioContext;
+  AResolvedTypeList: IioResolvedTypeList;
 begin
-  Result := TListBindSourceAdapter<T>.Create(
-                                              AOwner
-                                            , Self.ToList<TObjectList<T>>
-                                            , AOwnsObject
-                                            );
+  try
+    // Resolve the type and alias
+    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
+    // Create Context
+    // (without context the "Self.GetSql(False)" fail)
+    // *** NB: PER IL MOMENTO, FINO A QUANDO NON CI SARA' IL SUPPORTO DELLE INTERFACCE ANCHE NEI BIND SOURCE ADAPTERS,
+    // ***      IN PRATICA USA IL CLASSREF DELLA PRIMA CLASSE CHE TROVA SENZA ANTENATI NELLA RESOLVEDTYPELIST (QUELLA PIU' IN
+    // ***      NELLA GERARCHIA), QUINDI SE CI SONO DUE CLASSI SENA ANTENATI (CIOE' CHE NON DISCENDONO DA UN ANTENATO COMUNE)
+    // ***      UNA DELLE DUE NON VERRA' TENUTA IN CONSIDEERAZIONE
+    AContext := TioContextFactory.Context(AResolvedTypeList[0], Self);
+    // Create the adapter
+    Result := TListBindSourceAdapter.Create(
+                                             AOwner
+                                           , Self.ToList<TList<TObject>>
+                                           , AContext.GetClassRef
+                                           , AOwnsObject
+                                           );
+  finally
+    // Destroy itself at the end to avoid memory leak
+    Self.Free;
+  end;
 end;
 
-function TioWhere<T>.ToObject: T;
-var
-  AObj: TObject;
+function TioWhere<T>.ToObject(const AObj:TObject): T;
 begin
-  Result := nil;
-  AObj := TioWhere(Self).ToObject;
-  if Assigned(AObj) then Exit(AObj as T);
+  Result := TioRttiUtilities.CastObjectToGeneric<T>(   TioWhere(Self).ToObject(AObj)   );
 end;
+
+//function TioWhere<T>.ToObjectList(const AOwnsObjects: Boolean): TObjectList<T>;
+//begin
+//  Result := TObjectList<T>.Create(AOwnsObjects);
+//  Self.ToList(Result);
+//end;
 
 function TioWhere<T>._And(ATextCondition: String): TioWhere<T>;
 begin

@@ -3,7 +3,7 @@ unit IupOrm.LazyLoad.Factory;
 interface
 
 uses
-  IupOrm.LazyLoad.Interfaces;
+  IupOrm.LazyLoad.LazyLoader, IupOrm.LazyLoad.Interfaces;
 
 type
 
@@ -13,9 +13,6 @@ type
   end;
 
 implementation
-
-uses
-  IupOrm.LazyLoad.LazyLoader;
 
 { TioLazyLoadFactory }
 

@@ -136,6 +136,14 @@ type
     class function _IsNotNull: IioSqlItem; virtual; abstract;
   end;
 
+  // Interface for TransactionColection
+  IioTransactionCollection = interface
+    ['{27836795-C804-4CB2-8A5A-98491643D5D9}']
+    procedure StartTransaction(AConnectionName:String='');
+    procedure CommitAll;
+    procedure RollbackAll;
+  end;
+
 implementation
 
 

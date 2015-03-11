@@ -26,13 +26,13 @@ uses
 class function TioObjectMaker.MakeObject(AContext: IioContext; AQuery: IioQuery): TObject;
 var
   CurrProp: IioContextProperty;
-  AList: TObject;
-  AValue: TValue;
+  AObj: TObject;
 begin
   inherited;
-  // DataObject creation
-  Result := Self.CreateObjectByClassRef(AContext.GetClassRef);
-  AContext.DataObject := Result;
+  // DataObject creation if not already exists
+  if not Assigned(AContext.DataObject) then
+    AContext.DataObject := Self.CreateObjectByClassRef(AContext.GetClassRef);
+  Result := AContext.DataObject;
   // ObjectStatus
   AContext.ObjectStatus := osClean;
   // Load properties values
@@ -41,6 +41,7 @@ begin
     // If the property is not ReadEnabled then skip it
     if not CurrProp.IsReadEnabled then Continue;
     case CurrProp.GetRelationType of
+// ------------------------------ NO RELATION --------------------------------------------------------------------------------------
       // If RelationType = ioRTNone then load normal property value (No relation)
       ioRTNone: begin
         // If it isn't related to a blob field then load as normal value
@@ -52,14 +53,21 @@ begin
         // If it's related to a blob field and it is a "streamable object" (has LoadFromStream and SaveToStream methods)
         else
           CurrProp.SetValue(Result, Self.LoadPropertyStreamable(AContext, AQuery, CurrProp));
+        // Next property
+        Continue;
       end;
-      // else if RelationType = BelongsTo then load object and assign it to the property
-      ioRTBelongsTo: CurrProp.SetValue(Result,   TIupOrm.Load(CurrProp.GetRelationChildClassRef).ByOID(AQuery.GetValue(CurrProp).AsInteger).ToObject as CurrProp.GetRelationChildClassRef   );
-      // else if RelationType = ioRTHasMany then load objects and assign it to the property  (list)
-      ioRTHasMany: CurrProp.SetValue(Result,   Self.LoadPropertyHasMany(AContext, AQuery, CurrProp)   );
-      // else if RelationType = ioRTHasOne then load object and assign it to the property
-      ioRTHasOne: CurrProp.SetValue(Result,   Self.LoadPropertyHasOne(AContext, AQuery, CurrProp)   );
+// ------------------------------ RELATION -----------------------------------------------------------------------------------------
+      // Load the related object/s
+      ioRTBelongsTo: AObj := Self.LoadPropertyBelongsTo(AContext, AQuery, CurrProp);
+      ioRTHasMany:   AObj := Self.LoadPropertyHasMany(AContext, AQuery, CurrProp);
+      ioRTHasOne:    AObj := Self.LoadPropertyHasOne(AContext, AQuery, CurrProp);
     end;
+    // If is an Interface property then adjust the RefCount to prevent an access violation
+    if CurrProp.IsInterface then
+      AObj.ioAsInterface<IInterface>._Release;  // Adjust the RefCount to prevent an access violation
+    // Assign the related object/s to the property
+    CurrProp.SetValue(Result,   AObj   );
+// ---------------------------------------------------------------------------------------------------------------------------------
   end;
 end;
 

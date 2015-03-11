@@ -34,8 +34,12 @@ type
     procedure SetValue(Instance: Pointer; AValue: TValue);
     function GetSqlValue(ADataObject: TObject): string;
     function GetRttiProperty: TRttiProperty;
+    function GetTypeName: String;
+    function GetTypeAlias: String;
+    function IsInterface: Boolean;
     function GetRelationType: TioRelationType;
-    function GetRelationChildClassRef: TioClassRef;
+    function GetRelationChildTypeName: String;
+    function GetRelationChildTypeAlias: String;
     function GetRelationChildPropertyName: String;
     function GetRelationLoadType: TioLoadType;
     function GetRelationChildObject(Instance: Pointer): TObject;

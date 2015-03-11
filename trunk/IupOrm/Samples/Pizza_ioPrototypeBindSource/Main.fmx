@@ -310,7 +310,7 @@ object MainForml: TMainForml
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ioClassName = 'TPizza'
+    ioTypeName = 'TPizza'
     ioAutoRefreshOnNotification = arEnabledNoReload
     Left = 232
     Top = 208

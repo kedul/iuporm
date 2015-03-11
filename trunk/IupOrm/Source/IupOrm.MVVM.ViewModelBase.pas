@@ -12,7 +12,7 @@ type
   private
     { Private declarations }
     FViewData: IioViewData;
-    FioClassName: String;
+    FioTypeName, FioTypeAlias: String;
     FIoMasterBindSource: TioMasterBindSource;
     FIoMasterPropertyName: String;
     FIoWhere: String;
@@ -32,8 +32,8 @@ type
     constructor Create(ADataObj:TObject); overload;
     [ioMarker('CreateByBindSourceAdapter')]
     constructor Create(ABindSourceAdapter:IioActiveBindSourceAdapter); overload;
-    [ioMarker('CreateByClassName')]
-    constructor Create(const AClassName:String; const AioWhere:String=''); overload;
+    [ioMarker('CreateByTypeName')]
+    constructor Create(const ATypeName, ATypeAlias:String; const AioWhere:String=''); overload;
     [ioMarker('CreateByClassRef')]
     constructor Create(const AClassRef:TioClassRef; const AioWhere:String=''); overload;
     [ioMarker('CreateByMasterBindSource')]
@@ -51,7 +51,8 @@ type
 {$ENDIF}
 // ---------------- End: section added for IInterface support ---------------
   published
-    property ioClassName:String read FioClassName write FioClassName;
+    property ioTypeName:String read FioTypeName write FioTypeName;
+    property ioTypeAlias:String read FioTypeAlias write FioTypeAlias;
     property ioWhere:String read FIoWhere write FIoWhere;
     property ioMasterBindSource:TioMasterBindSource read FIoMasterBindSource write FIoMasterBindSource;
     property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
@@ -214,17 +215,19 @@ begin
 {$ENDIF}
 end;
 
-constructor TioViewModelBase.Create(const AClassName, AioWhere: String);
+constructor TioViewModelBase.Create(const ATypeName, ATypeAlias, AioWhere: String);
 begin
   inherited Create(nil);
-  FioClassName := AClassName;
+  FioTypeName := ATypeName;
+  FioTypeAlias := ATypeAlias;
   FIoWhere := FIoWhere;
 end;
 
 constructor TioViewModelBase.Create(const AClassRef: TioClassRef; const AioWhere: String);
 begin
   inherited Create(nil);
-  FioClassName := AClassRef.ClassName;
+  FioTypeName := AClassRef.ClassName;
+  FioTypeAlias := '';
   FIoWhere := AioWhere;
 end;
 
@@ -242,8 +245,8 @@ var
 begin
   if Assigned(FViewData)
   then raise EIupOrmException.Create(Self.ClassName + ': "ViewData" is already assigned!')
-  else if (Self.FioClassName = '') and (not Assigned(Self.FIoMasterBindSource))
-  then raise EIupOrmException.Create(Self.ClassName + ': "ioClassName" or "ioMasterBindSource" property is required!');
+  else if (Self.FioTypeName = '') and (not Assigned(Self.FIoMasterBindSource))
+  then raise EIupOrmException.Create(Self.ClassName + ': "ioTypeName" or "ioMasterBindSource" property is required!');
   // If a ViewData object is NOT already assigned then retrieve a
   //  BindSourceAdapter by iupORM anche create it
   if  (not Assigned(FViewData)) then
@@ -251,7 +254,7 @@ begin
     //  else get the adapter directly from IupOrm
     if Assigned(Self.FIoMasterBindSource)
     then ABindSourceAdapter := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self, Self.FioMasterBindSource, Self.ioMasterPropertyName)
-    else ABindSourceAdapter := TioLiveBindingsFactory.GetBSAfromDB(Self, Self.FioClassName, Self.FioWhere);
+    else ABindSourceAdapter := TioLiveBindingsFactory.GetBSAfromDB(Self, Self.FioTypeName, Self.FioTypeAlias, Self.FioWhere);
   // If the BindSourceAdapter is assigned then extract the IioActiveBindSourceAdapter interface
   //  and creat the ViewData Object
   if Assigned(ABindSourceAdapter) then

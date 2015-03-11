@@ -63,8 +63,11 @@ end;
 class function TioSqlDataConverterSqLite.QueryToTValue(AQuery: IioQuery; AProperty: IioContextProperty): TValue;
 begin
   // If the field is null
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull
-    then Exit;
+  // HO levato questo controllo perchè nel caso in cui il campo fosse NULL mi dava un errore
+  //  'Invalid Type cast' dovuto al fatto che il TValue da ritornare non veniva
+  //  valorizzato per niente (nemmeno a NULL)
+//  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull
+//    then Exit;
   // Convert the field value to a TValue by TypeKind
   case AProperty.GetRttiProperty.PropertyType.TypeKind of
     tkInt64, tkInteger:

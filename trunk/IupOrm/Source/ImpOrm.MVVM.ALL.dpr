@@ -8,8 +8,7 @@ uses
   DuckListU in '..\ExtLibs\DMVC\DuckListU.pas',
   RTTIUtilsU in '..\ExtLibs\DMVC\RTTIUtilsU.pas',
   DuckObjU in '..\ExtLibs\DMVC\DuckObjU.pas',
-  IupOrm.MVVM.ALL.ViewModel in 'IupOrm.MVVM.ALL.ViewModel.pas' {ioViewModel: TDataModule},
-  IupOrm.MVVM.ViewModel.Commands in 'IupOrm.MVVM.ViewModel.Commands.pas';
+  IupOrm.MVVM.ALL.ViewModel in 'IupOrm.MVVM.ALL.ViewModel.pas' {ioViewModel: TDataModule};
 
 {$R *.res}
 

@@ -33,7 +33,7 @@ type
     procedure SetOwnsObjects(const Value: Boolean);
   public
     constructor Create;
-    procedure SetRelationInfo(ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationChildID:Integer);
+    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer);
     function GetInternalObject: TObject;
     // Part for the support of the IioLazyLoadable interfaces (Added by IupOrm)
     //  because is not implementing IInterface
@@ -344,10 +344,10 @@ begin
   ioLazyLoader.OwnsObjects := Value;
 end;
 
-procedure TioObjectList<T>.SetRelationInfo(ARelationChildClassRef: TioClassRef;
-  ARelationChildPropertyName: String; ARelationChildID: Integer);
+procedure TioObjectList<T>.SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias,
+  ARelationChildPropertyName: String; const ARelationChildID: Integer);
 begin
-  ioLazyLoader.SetRelationInfo(ARelationChildClassRef, ARelationChildPropertyName, ARelationChildID);
+  ioLazyLoader.SetRelationInfo(ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationChildID);
 end;
 
 procedure TioObjectList<T>.Sort(const AComparer: IComparer<T>);

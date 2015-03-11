@@ -21,6 +21,10 @@ type
     function ObjStatusExist: Boolean;
     // Blob field present
     function BlobFieldExists: Boolean;
+    // Reference to a map of the ancestor if the ancestor itself is mapped (is an entity)
+    function AncestorMap: Iiomap;
+    // True if the class has a mapped ancestor (the ancestor is even an entity)
+    function HasMappedAncestor: Boolean;
   end;
 
 implementation

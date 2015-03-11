@@ -26,6 +26,7 @@ type
     class function SqlDataConverter: TioSqlDataConverterRef;
     class function Connection(AConnectionName:String=''): IioConnection;
     class function NewConnection(AConnectionName:String): IioConnection;
+    class function TransactionCollection: IioTransactionCollection;
     class function Query(AConnectionDefName:String; AQueryIdentity:String=''): IioQuery;
     class function ConnectionContainer: TioConnectionContainerRef;
     class function ConnectionManager: TioConnectionManagerRef;
@@ -39,7 +40,8 @@ uses
   IupOrm.DB.SqLite.CompareOperators, System.IOUtils,
   IupOrm.DB.Connection, IupOrm.DB.SqLite.LogicRelations, IupOrm.DB.Query,
   IupOrm.DB.SqLite.SqlDataConverter, IupOrm.DB.SqLite.SqlGenerator,
-  IupOrm.Where.SqlItems, System.SysUtils, IupOrm.DB.QueryContainer;
+  IupOrm.Where.SqlItems, System.SysUtils, IupOrm.DB.QueryContainer,
+  IupOrm.DB.TransactionCollection;
 
 { TioDbBuilder }
 
@@ -129,6 +131,11 @@ end;
 class function TioDbFactory.SqlGenerator: TioSqlGeneratorRef;
 begin
   Result := TioSqlGeneratorSqLite;
+end;
+
+class function TioDbFactory.TransactionCollection: IioTransactionCollection;
+begin
+  Result := TioTransactionCollection.Create;
 end;
 
 class function TioDbFactory.WhereItemProperty(APropertyName:String): IioSqlItemWhere;

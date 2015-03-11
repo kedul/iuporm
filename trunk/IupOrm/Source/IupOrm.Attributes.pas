@@ -36,10 +36,13 @@ type
   // Base class for relation attribute
   TCustomRelationAttribute = class(TioCustomAttribute)
   strict private
-    FChildClassRef: TioClassRef;
+    FChildTypeName: String;
+    FChildTypeAlias: String;
   public
-    constructor Create(const AChildClassRef:TioClassRef);
-    property ChildClassRef: TioClassRef read FChildClassRef;
+    constructor Create(const AChildClassRef:TioClassRef); overload;
+    constructor Create(const AChildTypeName:String; const AChildTypeAlias:String=''); overload;
+    property ChildTypeName: String read FChildTypeName;
+    property ChildTypeAlias: String read FChildTypeAlias;
   end;
 
   // Standard AttributeLabel
@@ -103,7 +106,9 @@ type
     FChildPropertyName: String;
     FLoadType: TioLoadType;
   public
-    constructor Create(const AChildClassRef:TioClassRef; AChildPropertyName:String; ALoadType:TioLoadType=ioImmediateLoad);
+    constructor Create(const AChildClassRef:TioClassRef; const AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad); overload;
+    constructor Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad); overload;
+    constructor Create(const AChildTypeName, AChildPropertyName:String; const ALoadType:TioLoadType=ioImmediateLoad); overload;
     property ChildPropertyName: String read FChildPropertyName;
     property LoadType: TioLoadType read FLoadType;
   end;
@@ -118,6 +123,10 @@ type
 
   // WriteOnly attribute
   ioWriteOnly = class(TioCustomAttribute)
+  end;
+
+  // TypeAlias attribute
+  ioTypeAlias = class(TioCustomStringAttribute)
   end;
 
   // ---------------------------------------------------------------------------
@@ -205,19 +214,37 @@ end;
 
 constructor TCustomRelationAttribute.Create(const AChildClassRef: TioClassRef);
 begin
-  FChildClassRef := AChildClassRef;
+  Create(AChildClassRef.ClassName, '');
+end;
+
+constructor TCustomRelationAttribute.Create(const AChildTypeName, AChildTypeAlias: String);
+begin
+  FChildTypeName := AChildTypeName;
+  FChildTypeAlias := AChildTypeAlias;
 end;
 
 { ioHasMany }
 
 constructor ioHasMany.Create(const AChildClassRef: TioClassRef;
-  AChildPropertyName: String; ALoadType:TioLoadType=ioImmediateLoad);
+  const AChildPropertyName: String; const ALoadType:TioLoadType=ioImmediateLoad);
 begin
   inherited Create(AChildClassRef);
   FChildPropertyName := AChildPropertyName;
   FLoadType := ALoadType;
 end;
 
+
+constructor ioHasMany.Create(const AChildTypeName, AChildTypeAlias, AChildPropertyName: String; const ALoadType: TioLoadType);
+begin
+  inherited Create(AChildTypeName, AChildTypeAlias);
+  FChildPropertyName := AChildPropertyName;
+  FLoadType := ALoadType;
+end;
+
+constructor ioHasMany.Create(const AChildTypeName, AChildPropertyName: String; const ALoadType: TioLoadType);
+begin
+  Self.Create(AChildTypeName, '', AChildPropertyName, ALoadType);
+end;
 
 { ioJoin }
 

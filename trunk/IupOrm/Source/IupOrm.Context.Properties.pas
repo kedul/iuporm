@@ -17,13 +17,15 @@ type
   strict private
     FIsID: Boolean;
     FRttiProperty: TRttiProperty;
+    FTypeAlias: String;
     FFieldDefinitionString, FSqlFieldTableName, FSqlFieldName, FSqlFieldAlias: String;
     FQualifiedSqlFieldName: String;
     FFullQualifiedSqlFieldName: String;
     FLoadSql: String;
     FFieldType: String;
     FRelationType: TioRelationType;
-    FRelationChildClassRef: TioClassRef;
+    FRelationChildTypeName: String;
+    FRelationChildTypeAlias: String;
     FRelationChildPropertyName: String;
     FRelationLoadType: TioLoadType;
     FTable:IioContextTable;
@@ -32,7 +34,7 @@ type
     // NB: Gli altri due attributes (ioEmbeddedSkip e ioEmbeddedStreamable) non sono necessari qui
     //      perchè li usa solo l'ObjectsMappers al suo interno, iupORM non li usa
   public
-    constructor Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; ALoadSql:String; AFieldType:String; AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationLoadType:TioLoadType);
+    constructor Create(const ARttiProperty:TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String; const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType);
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: String;
@@ -49,8 +51,12 @@ type
     procedure SetValue(Instance: Pointer; AValue:TValue);
     function GetSqlValue(ADataObject:TObject): String;
     function GetRttiProperty: TRttiProperty;
+    function GetTypeName: String;
+    function GetTypeAlias: String;
+    function IsInterface: Boolean;
     function GetRelationType: TioRelationType;
-    function GetRelationChildClassRef: TioClassRef;
+    function GetRelationChildTypeName: String;
+    function GetRelationChildTypeAlias: String;
     function GetRelationChildPropertyName: String;
     function GetRelationLoadType: TioLoadType;
     function GetRelationChildObject(Instance: Pointer): TObject;
@@ -110,18 +116,20 @@ uses
 
 { TioProperty }
 
-constructor TioProperty.Create(ARttiProperty:TRttiProperty; AFieldDefinitionString:String; ALoadSql:String; AFieldType:String;
-AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef;
-ARelationChildPropertyName:String; ARelationLoadType:TioLoadType);
+constructor TioProperty.Create(const ARttiProperty: TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql,
+  AFieldType: String; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
+  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType);
 begin
   FRttiProperty := ARttiProperty;
+  FTypeAlias := ATypeAlias;
   FFieldDefinitionString := AFieldDefinitionString;
   FFieldType := AFieldType;
   FReadWrite := AReadWrite;
   FLoadSql := ALoadSql;
   // Relation fields
   FRelationType := ARelationType;
-  FRelationChildClassRef := ARelationChildClassRef;
+  FRelationChildTypeName := ARelationChildTypeName;
+  FRelationChildTypeAlias := ARelationChildTypeAlias;
   FRelationChildPropertyName := ARelationChildPropertyName;
   FRelationLoadType := ARelationLoadType;
 end;
@@ -148,9 +156,14 @@ begin
   Result := FRttiProperty.Name;
 end;
 
-function TioProperty.GetRelationChildClassRef: TioClassRef;
+function TioProperty.GetRelationChildTypeAlias: String;
 begin
-  Result := FRelationChildClassRef;
+  Result := FRelationChildTypeAlias;
+end;
+
+function TioProperty.GetRelationChildTypeName: String;
+begin
+  Result := FRelationChildTypeName;
 end;
 
 function TioProperty.GetRelationChildObject(Instance: Pointer): TObject;
@@ -204,6 +217,16 @@ begin
   Result := FRttiProperty;
 end;
 
+function TioProperty.GetTypeAlias: String;
+begin
+  Result := FTypeAlias;
+end;
+
+function TioProperty.GetTypeName: String;
+begin
+  Result := FRttiProperty.PropertyType.Name;
+end;
+
 function TioProperty.GetSqlFieldAlias: String;
 begin
   Result := FSqlFieldAlias;
@@ -252,6 +275,11 @@ end;
 function TioProperty.IsID: Boolean;
 begin
   Result := FIsID;
+end;
+
+function TioProperty.IsInterface: Boolean;
+begin
+  Result := (FRttiProperty.PropertyType.TypeKind = tkInterface);
 end;
 
 function TioProperty.IsReadEnabled: Boolean;

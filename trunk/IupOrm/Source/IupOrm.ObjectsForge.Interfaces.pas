@@ -15,8 +15,10 @@ type
   // ObjectMaker interface
   TioObjectMakerIntf = class abstract
   strict protected
+    class function CheckOrCreateRelationChildObject(const AContext:IioContext; const AProperty:IioContextProperty): TObject;
     class function LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
+    class function LoadPropertyBelongsTo(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class procedure LoadPropertyStream(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
     class function InternalFindMethod(ARttiType:TRttiType; AMethodName,AMarkerText:String; IsConstructor:Boolean; const AParameters:Array of TValue): TRttiMethod;
@@ -29,7 +31,7 @@ type
     class function CreateObjectByRttiType(ARttiType:TRttiType): TObject;
     class function CreateObjectByRttiTypeEx(ARttiType:TRttiType; const AConstructorParams:array of TValue; AConstructorMarkerText:String=''; AConstructorMethodName:String=''): TObject;
     class function CreateListByClassRef(AClassRef:TClass; AOwnsObjects:Boolean=True): TObject;
-    class function CreateListByRttiType(ARttiType: TRttiType): TObject;
+    class function CreateListByRttiType(const ARttiType:TRttiType; const AOwnsObject:Boolean=True): TObject;
     class function MakeObject(AContext:IioContext; AQuery:IioQuery): TObject; virtual; abstract;
   end;
 
@@ -38,18 +40,41 @@ implementation
 uses
   System.TypInfo, IupOrm.Exceptions, IupOrm, IupOrm.RttiContext.Factory,
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory, System.Classes,
-  Data.DB, IupOrm.LazyLoad.Interfaces, System.SysUtils, IupOrm.Attributes;
+  Data.DB, IupOrm.LazyLoad.Interfaces, System.SysUtils, IupOrm.Attributes, FMX.Dialogs,
+  IupOrm.Resolver.Interfaces, IupOrm.Resolver.Factory;
 
 { TioObjectMakerIntf }
+
+class function TioObjectMakerIntf.CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioContextProperty): TObject;
+begin
+  // If the AProperty is of interface type...
+  if AProperty.IsInterface then
+  begin
+    // Create the list if it isn't not already created by the master class constructor
+    Result := AProperty.GetValue(AContext.DataObject).AsInterface as TObject;
+    if not Assigned(Result) then
+      Result := TIupOrm.DependencyInjection.Locate(AProperty.GetTypeName).Alias(AProperty.GetTypeAlias).Get;
+    Result.ioAsInterface<IInterface>._AddRef;    // Adjust the RefCount to prevent an access violation
+  end else
+  // If the AProperty is of instance (class) type...
+  begin
+    // Create the list if it isn't not already created by the master class constructor
+    Result := AProperty.GetValue(AContext.DataObject).AsObject;
+    if not Assigned(Result) then
+      if AProperty.GetRelationType = ioRTHasMany then
+        Result := Self.CreateListByRttiType(   AProperty.GetRttiProperty.PropertyType   )
+      else
+        Result := Self.CreateObjectByRttiType(   AProperty.GetRttiProperty.PropertyType   );
+  end;
+end;
 
 class function TioObjectMakerIntf.CreateListByClassRef(AClassRef: TClass;
   AOwnsObjects: Boolean): TObject;
 begin
-  Result := Self.CreateListByRttiType(   TioRttiContextFactory.RttiContext.GetType(AClassref)   );
+  Result := Self.CreateListByRttiType(   TioRttiContextFactory.RttiContext.GetType(AClassref)   , AOwnsObjects);
 end;
 
-class function TioObjectMakerIntf.CreateListByRttiType(
-  ARttiType: TRttiType): TObject;
+class function TioObjectMakerIntf.CreateListByRttiType(const ARttiType:TRttiType; const AOwnsObject:Boolean): TObject;
 var
   Prop: TRttiProperty;
 begin
@@ -61,7 +86,7 @@ begin
   // Create object
   Result := Self.CreateObjectByRttiType(ARttiType);
   // Set "OwnsObjects" if exists
-  if Assigned(Prop) then Prop.SetValue(PTypeInfo(Result), True);
+  if Assigned(Prop) then Prop.SetValue(PTypeInfo(Result), AOwnsObject);
 end;
 
 class function TioObjectMakerIntf.CreateObjectByClassRef(
@@ -176,38 +201,56 @@ begin
   Result := Self.InternalFindMethod(ARttiType, AMethodName, AMarkerText, True, AParameters);
 end;
 
+class function TioObjectMakerIntf.LoadPropertyBelongsTo(AContext: IioContext; AQuery: IioQuery;
+  AProperty: IioContextProperty): TObject;
+begin
+  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
+  //  then create it
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
+  // Load the relation child object
+  TIupOrm.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)
+    .ByOID(AQuery.GetValue(AProperty).AsInteger)
+    .ToObject(Result);
+end;
+
 class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;
   AQuery: IioQuery; AProperty: IioContextProperty): TObject;
 var
   ALazyLoadableObj: IioLazyLoadable;
+  AResolvedTypeList: IioResolvedTypeList;
+  AInterface: IInterface;
 begin
-  // Create the list if it isn't not already created by the master class constructor
-  Result := AProperty.GetValue(AContext.DataObject).AsObject;
-  if not Assigned(Result)
-    then Result := Self.CreateListByRttiType(   AProperty.GetRttiProperty.PropertyType   );
+  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
+  //  then create it
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // If LazyLoadable then set LazyLoad data
   if (AProperty.GetRelationLoadType = ioLazyLoad)
   and Supports(Result, IioLazyLoadable, ALazyLoadableObj)
     // Set the lazy load relation data
-    then ALazyLoadableObj.SetRelationInfo(AProperty.GetRelationChildClassRef
-                                         ,AProperty.GetRelationChildPropertyName
-                                         ,AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger
-                                         )
+    then ALazyLoadableObj.SetRelationInfo(
+       AProperty.GetRelationChildTypeName
+      ,AProperty.GetRelationChildTypeAlias
+      ,AProperty.GetRelationChildPropertyName
+      ,AQuery.GetValue(AContext.GetProperties.GetIdProperty).AsInteger
+    )
     // Fill the list
-    else TIupOrm.Load(AProperty.GetRelationChildClassRef)._Where
-                                                         ._Property(AProperty.GetRelationChildPropertyName)
-                                                         ._EqualTo(AQuery.GetValue(AContext.GetProperties.GetIdProperty))
-                                                         .ToList(Result);
+    else TIupOrm.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)._Where
+      ._Property(AProperty.GetRelationChildPropertyName)
+      ._EqualTo(AQuery.GetValue(AContext.GetProperties.GetIdProperty))
+      .ToList(Result);
 end;
 
 class function TioObjectMakerIntf.LoadPropertyHasOne(AContext: IioContext;
   AQuery: IioQuery; AProperty: IioContextProperty): TObject;
 begin
+  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
+  //  then create it
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // Load the relation child object
-  Result := TIupOrm.Load(AProperty.GetRelationChildClassRef)._Where
-                                                            ._Property(AProperty.GetRelationChildPropertyName)
-                                                            ._EqualTo(AQuery.GetValue(AContext.GetProperties.GetIdProperty))
-                                                            .ToObject;
+  TIupOrm.Load(AProperty.GetRelationChildTypeName, AProperty.GetRelationChildTypeAlias)._Where
+    ._Property(AProperty.GetRelationChildPropertyName)
+    ._EqualTo(AQuery.GetValue(AContext.GetProperties.GetIdProperty))
+    .ToObject(Result);
 end;
 
 class procedure TioObjectMakerIntf.LoadPropertyStream(AContext: IioContext; AQuery: IioQuery; AProperty: IioContextProperty);
@@ -237,10 +280,9 @@ var
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
   ABlobStream: TStream;
 begin
-  // Create the object if it isn't not already created by the master class constructor
-  Result := AProperty.GetValue(AContext.DataObject).AsObject;
-  if not Assigned(Result)
-    then Result := Self.CreateObjectByRttiType(   AProperty.GetRttiProperty.PropertyType   );
+  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
+  //  then create it
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
   // If the field is null then exit
   if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
   // Wrap the object into a DuckTypedStreamObject

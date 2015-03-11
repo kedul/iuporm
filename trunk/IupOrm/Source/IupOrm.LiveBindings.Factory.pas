@@ -17,7 +17,7 @@ type
     class function NaturalObjectBindSourceAdapter(AOwner:TComponent; ASourceAdapter:IioNaturalBindSourceAdapterSource): TBindSourceAdapter;
     class function Notification(ASender:TObject; ASubject:TObject; ANotificationType:TioBSANotificationType): IioBSANotification;
     class function GetBSAfromMasterBindSource(AOwner:TComponent; AMAsterBindSource:TioMasterBindSource; AMasterPropertyName:String=''): TBindSourceAdapter;
-    class function GetBSAfromDB(AOwner:TComponent; AClassName:String; AWhere:String=''): TBindSourceAdapter;
+    class function GetBSAfromDB(const AOwner:TComponent; const ATypeName, ATypeAlias:String; const AWhere:String=''): TBindSourceAdapter;
   end;
 
 implementation
@@ -29,31 +29,60 @@ uses
   IupOrm.LiveBindings.ActiveObjectBindSourceAdapter,
   IupOrm.LiveBindings.Notification,
   IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter,
-  IupOrm.Context.Container;
+  IupOrm.Context.Container, IupOrm.Context.Interfaces,
+  IupOrm.Resolver.Interfaces, IupOrm.Resolver.Factory, IupOrm.Context.Factory;
 
 { TioLiveBindingsFactory }
 
 class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(AOwner:TComponent; AMasterProperty:IioContextProperty): IioContainedBindSourceAdapter;
+var
+  AContext: IioContext;
+  AResolvedTypeList: IioResolvedTypeList;
 begin
-  Result := TioActiveListBindSourceAdapter.Create(AMasterProperty.GetRelationChildClassRef
-                                                 ,''
-                                                 ,AOwner
-                                                 ,TList<TObject>.Create
-                                                 ,False
-                                                 ,False
-                                                 );
+  // Resolve the type and alias
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, rmAll);
+  // Create Context
+  // (without context the "Self.GetSql(False)" fail)
+  // *** NB: PER IL MOMENTO, FINO A QUANDO NON CI SARA' IL SUPPORTO DELLE INTERFACCE ANCHE NEI BIND SOURCE ADAPTERS,
+  // ***      IN PRATICA USA IL CLASSREF DELLA PRIMA CLASSE CHE TROVA SENZA ANTENATI NELLA RESOLVEDTYPELIST (QUELLA PIU' IN
+  // ***      NELLA GERARCHIA), QUINDI SE CI SONO DUE CLASSI SENA ANTENATI (CIOE' CHE NON DISCENDONO DA UN ANTENATO COMUNE)
+  // ***      UNA DELLE DUE NON VERRA' TENUTA IN CONSIDEERAZIONE
+  AContext := TioContextFactory.Context(AResolvedTypeList[0]);
+  // Get the ActiveBindSourceAdapter
+  Result := TioActiveListBindSourceAdapter.Create(
+     AContext.GetClassRef
+    ,''
+    ,AOwner
+    ,TList<TObject>.Create
+    ,False
+    ,False
+  );
   Result.SetMasterProperty(AMasterProperty);
 end;
 
 class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(AOwner:TComponent; AMasterProperty:IioContextProperty): IioContainedBindSourceAdapter;
+var
+  AContext: IioContext;
+  AResolvedTypeList: IioResolvedTypeList;
 begin
-  Result := TioActiveObjectBindSourceAdapter.Create(AMasterProperty.GetRelationChildClassRef
-                                                   ,''
-                                                   ,AOwner
-                                                   ,TObject.Create
-                                                   ,False
-                                                   ,False
-                                                   );
+  // Resolve the type and alias
+  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, rmAll);
+  // Create Context
+  // (without context the "Self.GetSql(False)" fail)
+  // *** NB: PER IL MOMENTO, FINO A QUANDO NON CI SARA' IL SUPPORTO DELLE INTERFACCE ANCHE NEI BIND SOURCE ADAPTERS,
+  // ***      IN PRATICA USA IL CLASSREF DELLA PRIMA CLASSE CHE TROVA SENZA ANTENATI NELLA RESOLVEDTYPELIST (QUELLA PIU' IN
+  // ***      NELLA GERARCHIA), QUINDI SE CI SONO DUE CLASSI SENA ANTENATI (CIOE' CHE NON DISCENDONO DA UN ANTENATO COMUNE)
+  // ***      UNA DELLE DUE NON VERRA' TENUTA IN CONSIDEERAZIONE
+  AContext := TioContextFactory.Context(AResolvedTypeList[0]);
+  // Get the ActiveBindSourceAdapter
+  Result := TioActiveObjectBindSourceAdapter.Create(
+     AContext.GetClassRef
+    ,''
+    ,AOwner
+    ,TObject.Create
+    ,False
+    ,False
+  );
   Result.SetMasterProperty(AMasterProperty);
 end;
 
@@ -62,10 +91,11 @@ begin
   Result := TioDetailAdaptersContainer.Create(AMasterAdapter);
 end;
 
-class function TioLiveBindingsFactory.GetBSAfromDB(AOwner:TComponent; AClassName, AWhere: String): TBindSourceAdapter;
+class function TioLiveBindingsFactory.GetBSAfromDB(const AOwner: TComponent; const ATypeName, ATypeAlias,
+  AWhere: String): TBindSourceAdapter;
 begin
   // Get the adapter directly from IupOrm
-  Result := TIupOrm.Load(   TioMapContainer.GetClassRef(AClassName)   )
+  Result := TIupOrm.Load(ATypeName, ATypeAlias)
                    ._Where(AWhere)
                    .ToActiveListBindSourceAdapter(AOwner);
 end;

@@ -6,7 +6,7 @@ uses
   IupOrm.Context.Factory, IupOrm.DB.DBCreator.Factory, IupOrm.DB.Factory,
   IupOrm.DuckTyped.Factory, IupOrm.LazyLoad.Factory,
   IupOrm.LiveBindings.Factory, IupOrm.ObjectsForge.Factory,
-  IupOrm.RttiContext.Factory, IupOrm.MVVM.Factory;
+  IupOrm.RttiContext.Factory, IupOrm.MVVM.Factory, IupOrm.Containers.Factory;
 
 Type
 
@@ -19,6 +19,7 @@ Type
   TioObjectMakerFactoryRef = class of TioObjectMakerFactory;
   TioRttiContextFactoryRef = class of TioRttiContextFactory;
   TioMVVMFactoryRef = class of TioMVVMFactory;
+  TioContainersFactoryRef = class of TioContainersFactory;
 
   TioGlobalFactory = class
   public
@@ -31,6 +32,7 @@ Type
     class function ObjectMakerFactory: TioObjectMakerFactoryRef;
     class function RttiFactory: TioRttiContextFactoryRef;
     class function MVVMFactory: TioMVVMFactoryRef;
+    class function ContainersFactory: TioContainersFactoryRef;
   end;
 
   TioGlobalFactoryRef = class of TioGlobalFactory;
@@ -41,6 +43,11 @@ implementation
 
 
 { TioGlobalFactory }
+
+class function TioGlobalFactory.ContainersFactory: TioContainersFactoryRef;
+begin
+  Result := TioContainersFactory;
+end;
 
 class function TioGlobalFactory.ContextFactory: TioContextFactoryRef;
 begin
@@ -88,6 +95,10 @@ begin
 end;
 
 end.
+
+
+
+
 
 
 

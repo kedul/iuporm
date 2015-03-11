@@ -4,14 +4,23 @@ interface
 
 uses
   System.Rtti, IupOrm.MVVM.Interfaces, IupOrm.LiveBindings.PrototypeBindSource,
-  IupOrm.LiveBindings.Interfaces;
+  IupOrm.LiveBindings.Interfaces,
+  IupOrm.CommonTypes, System.Generics.Collections;
 
 type
+
+  // Dependency Injection Container Implementers Item (SubContainer value)
+  TioDIContainerImplementersItem = record
+    ClassRef: TioClassref;
+    ClassName: String;
+    RttiType: TRttiInstanceType;
+  end;
 
   IioDependencyInjectionLocator = interface
     ['{51289FD7-AA55-43D9-BF5B-EDA5BF27D301}']
     function Exist: Boolean;
     function Get: TObject;
+    function GetItem: TioDIContainerImplementersItem;
     function Alias(const AAlias:String): IioDependencyInjectionLocator;
     function ConstructorParams(const AParams: array of TValue): IioDependencyInjectionLocator;
     function ConstructorMethod(const AConstructorMethod: String): IioDependencyInjectionLocator;

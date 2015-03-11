@@ -48,10 +48,12 @@ type
   public
     class function GlobalFactory: TioGlobalFactoryRef;
     class function DependencyInjection: TioDependencyInjectionRef;
-    class function RefTo(AClassRef:TioClassRef): TioWhere; overload;
-    class function RefTo<T:class,constructor>: TioWhere<T>; overload;
-    class function Load(AClassRef:TioClassRef): TioWhere; overload;
-    class function Load<T:class,constructor>: TioWhere<T>; overload;
+    class function RefTo(const ATypeName:String; const ATypeAlias:String=''): TioWhere; overload;
+    class function RefTo(const AClassRef:TioClassRef; const ATypeAlias:String=''): TioWhere; overload;
+    class function RefTo<T>(const ATypeAlias:String=''): TioWhere<T>; overload;
+    class function Load(const ATypeName:String; const ATypeAlias:String=''): TioWhere; overload;
+    class function Load(const AClassRef:TioClassRef; const ATypeAlias:String=''): TioWhere; overload;
+    class function Load<T>(const ATypeAlias:String=''): TioWhere<T>; overload;
     class procedure Delete(AObj: TObject);
     class procedure Persist(AObj: TObject);
     class procedure PersistCollection(ACollection: TObject);
@@ -75,14 +77,21 @@ uses
   System.SysUtils,
   System.TypInfo,
   IupOrm.DB.Factory,
-  IupOrm.DB.DBCreator.Factory;
+  IupOrm.DB.DBCreator.Factory, IupOrm.Rtti.Utilities;
 
 
 { TIupOrm }
 
-class function TIupOrm.Load<T>: TioWhere<T>;
+class function TIupOrm.Load(const ATypeName, ATypeAlias: String): TioWhere;
 begin
-  Result := Self.RefTo<T>;
+  Result := TioWhere.Create;
+  Result.SetType(ATypeName, ATypeAlias);
+end;
+
+class function TIupOrm.Load<T>(const ATypeAlias:String): TioWhere<T>;
+begin
+  Result := TioWhere<T>.Create;
+  Result.SetType(TioRttiUtilities.GenericToString<T>, ATypeAlias);
 end;
 
 class function TIupOrm.ObjectExists(AContext: IioContext): Boolean;
@@ -274,16 +283,19 @@ begin
   end;
 end;
 
-class function TIupOrm.RefTo(AClassRef: TioClassRef): TioWhere;
+class function TIupOrm.RefTo(const AClassRef: TioClassRef; const ATypeAlias:String=''): TioWhere;
 begin
-  Result := TioWhere.Create;
-  Result.SetClassRef(AClassRef);
+  Result := Self.Load(AClassRef, ATypeAlias);
 end;
 
-class function TIupOrm.RefTo<T>: TioWhere<T>;
+class function TIupOrm.RefTo(const ATypeName, ATypeAlias: String): TioWhere;
 begin
-  Result := TioWhere<T>.Create;
-  Result.SetClassRef(T);
+  Result := Self.Load(ATypeName, ATypeAlias);
+end;
+
+class function TIupOrm.RefTo<T>(const ATypeAlias:String=''): TioWhere<T>;
+begin
+  Result := Self.Load<T>(ATypeAlias);
 end;
 
 class procedure TIupOrm.RollbackTransaction(AConnectionName:String);
@@ -375,9 +387,9 @@ begin
   // -----------------------------------------------------------
 end;
 
-class function TIupOrm.Load(AClassRef:TioClassRef): TioWhere;
+class function TIupOrm.Load(const AClassRef:TioClassRef; const ATypeAlias:String): TioWhere;
 begin
-  Result := Self.RefTo(AClassRef);
+  Result := Self.Load(AClassRef.ClassName, ATypeAlias);
 end;
 
 { TioTObjectHelper }
