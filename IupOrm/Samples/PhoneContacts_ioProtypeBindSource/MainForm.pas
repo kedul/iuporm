@@ -57,9 +57,7 @@ type
     LinkControlToField4: TLinkControlToField;
     LinkControlToField5: TLinkControlToField;
     LinkControlToField6: TLinkControlToField;
-    Button3: TButton;
     procedure FormCreate(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -75,12 +73,6 @@ uses
   Model;
 
 {$R *.fmx}
-
-procedure TForm1.Button3Click(Sender: TObject);
-begin
-  TPerson(MasterBS.Current).FirstName := 'CHANGED!!!';
-  MasterBS.Refresh;
-end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin

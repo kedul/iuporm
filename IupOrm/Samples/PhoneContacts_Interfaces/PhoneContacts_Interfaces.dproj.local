@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2015/03/02 10:34:05.000.454,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\Model.pas</Transaction>
+    <Transaction>2015/03/02 11:23:21.000.599,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\Unit1.pas</Transaction>
+    <Transaction>2015/03/02 11:23:42.000.852,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\Interfaces.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\Unit1.pas</Transaction>
+    <Transaction>2015/03/02 11:33:27.000.541,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\PhoneContacts_Interfaces.dproj=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\TabbedwithNavigation.dproj</Transaction>
+    <Transaction>2015/03/02 11:53:50.000.480,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\SampleData.pas</Transaction>
+    <Transaction>2015/03/02 12:07:01.000.827,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\Interfaces.pas=</Transaction>
+    <Transaction>2015/03/02 12:09:28.000.683,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\SampleData.pas=</Transaction>
+    <Transaction>2015/03/02 12:13:06.000.058,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\SampleData.pas</Transaction>
+    <Transaction>2015/03/02 12:13:17.000.698,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\Interfaces.pas</Transaction>
+    <Transaction>2015/03/02 12:33:53.000.386,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\Unit1.pas</Transaction>
+    <Transaction>2015/03/02 12:34:20.000.786,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Samples\PhoneContacts_Interfaces\RegisterClassesUnit.pas</Transaction>
+  </Transactions>
+	<ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="Interfaces.pas"/>
+    <File Path="Model.pas"/>
+    <File Path="RegisterClassesUnit.pas"/>
+    <File Path="SampleData.pas"/>
+    <File Path="TabbedFormwithNavigation.pas"/>
+    <File Path="TabbedFormwithNavigation.fmx"/>
+  </ProjectSortOrder>
+</BorlandProject>

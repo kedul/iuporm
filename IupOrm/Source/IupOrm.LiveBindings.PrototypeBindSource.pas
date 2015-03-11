@@ -14,13 +14,14 @@ type
 
   TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource)
   strict private
-    FioClassName: String;
+    FioTypeName: String;
+    FioTypeAlias: String;
     FioMasterBindSource: TioMasterBindSource;
     FioMasterPropertyName: String;
     FioWhere: TStrings;
     FonNotify: TioBSANotificationEvent;
     FioAutoRefreshOnNotification: TioAutoRefreshType;
-    FioViewModelInterface: String;
+    FioViewModelInterface, FioViewModelAlias: String;
     FioViewModel: IioViewModel;
     // FioLoaded flag for IupOrm DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
@@ -55,12 +56,14 @@ type
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
 
-    property ioClassName:String read FioClassName write FioClassName;
+    property ioTypeName:String read FioTypeName write FioTypeName;
+    property ioTypeAlias:String read FioTypeAlias write FioTypeAlias;
     property ioWhere:TStrings read FIoWhere write FIoWhere;
     property ioMasterBindSource:TioMasterBindSource read FIoMasterBindSource write FIoMasterBindSource;
     property ioMasterPropertyName:String read FIoMasterPropertyName write FIoMasterPropertyName;
     property ioAutoRefreshOnNotification:TioAutoRefreshType read FioAutoRefreshOnNotification write FioAutoRefreshOnNotification;
     property ioViewModelInterface:String read FioViewModelInterface write FioViewModelInterface;
+    property ioViewModelAlias:String read FioViewModelAlias write FioViewModelAlias;
   end;
 
 implementation
@@ -167,13 +170,13 @@ begin
   // If AdataObject is NOT already assigned (by onCreateAdapter event handler) then
   //  retrieve a BindSourceAdapter automagically by iupORM
   if  (not Assigned(ADataObject))
-  and (ioClassName.Trim <> '') then
+  and (ioTypeName.Trim <> '') then
   begin
     // If this is a detail BindSource then retrieve the adapter from the master BindSource
     //  else get the adapter directly from IupOrm
     if Assigned(Self.ioMasterBindSource)
       then ADataObject := TioLiveBindingsFactory.GetBSAfromMasterBindSource(Self, Self.FioMasterBindSource, Self.ioMasterPropertyName)
-      else ADataObject := TioLiveBindingsFactory.GetBSAfromDB(Self, Self.FioClassName, Self.FioWhere.Text);
+      else ADataObject := TioLiveBindingsFactory.GetBSAfromDB(Self, Self.FioTypeName, Self.FioTypeAlias, Self.FioWhere.Text);
   end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // If Self is a Notifiable bind source then register a reference to itself
@@ -189,6 +192,7 @@ begin
   and (not Assigned(Self.ioViewModel))
   then
     Self.ioViewModel := TioDependencyInjection.Locate(Self.ioViewModelInterface)
+                                                   .Alias(Self.ioViewModelAlias)
                                                    .ConstructorParams([TValue.From(AActiveBSA)])
                                                    .ConstructorMarker('CreateByBindSourceAdapter')
                                                    .Get

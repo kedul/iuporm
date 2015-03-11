@@ -2,13 +2,13 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2014/05/30 15:33:58.000.156,=rtl.dcp</Transaction>
-    <Transaction>2014/05/30 15:35:07.000.516,C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Package1.dproj=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Packages\DelphiXE6\IupOrmProject_DesignTime.dproj</Transaction>
+    <Transaction>2014/05/30 15:35:07.000.516,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Packages\DelphiXE6\IupOrmProject_DesignTime.dproj=C:\Users\Maurizio Del Magno\Documents\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
     <Transaction>2014/05/30 15:37:59.000.385,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Packages\DelphiXE6\Unit1.pas</Transaction>
-    <Transaction>2014/05/30 15:39:07.000.671,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Packages\DelphiXE6\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.LiveBindings.PrototypeBindSource.DesignTime.pas</Transaction>
+    <Transaction>2014/05/30 15:39:07.000.671,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.LiveBindings.PrototypeBindSource.DesignTime.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Packages\DelphiXE6\Unit1.pas</Transaction>
     <Transaction>2014/05/30 15:58:29.000.053,=Designide.dcp</Transaction>
     <Transaction>2014/05/30 15:59:21.000.423,=IupOrmProject.dcp</Transaction>
     <Transaction>2014/11/19 10:51:03.000.961,=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Packages\DelphiXE6\Unit1.pas</Transaction>
-    <Transaction>2014/11/19 10:52:06.000.909,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Packages\DelphiXE6\Unit1.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModelBase.DesignTime.pas</Transaction>
+    <Transaction>2014/11/19 10:52:06.000.909,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModelBase.DesignTime.pas=C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Packages\DelphiXE6\Unit1.pas</Transaction>
     <Transaction>2014/11/19 11:30:54.000.686,C:\Users\Maurizio Del Magno\Documents\Projects\IupOrm\Source\IupOrm.MVVM.ViewModelBase.DesignTime.pas=</Transaction>
   </Transactions>
 </BorlandProject>

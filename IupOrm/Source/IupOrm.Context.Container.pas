@@ -38,7 +38,7 @@ type
     class function GetContainer: TioMapContainerInstance;
     class function Exist(AClassName:String): Boolean;
     class function GetClassRef(AClassName:String): TioClassRef;
-    class function GetMap(AClassName:String): IioMap;
+    class function GetMap(AClassName:String; RaiseAnExceptionIfNotFound:Boolean=True): IioMap;
   end;
 
 implementation
@@ -75,12 +75,13 @@ begin
   Result := ioMapContainerInstance;
 end;
 
-class function TioMapContainer.GetMap(AClassName: String): IioMap;
+class function TioMapContainer.GetMap(AClassName: String; RaiseAnExceptionIfNotFound:Boolean): IioMap;
 begin
   Result := nil;
   if Self.Exist(AClassName)
     then Result := ioMapContainerInstance.Items[AClassName].GetMap
-    else raise EIupOrmException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
+    else if RaiseAnExceptionIfNotFound then
+      raise EIupOrmException.Create(Self.ClassName + ': class "' + AClassName + '" not found.');
 end;
 
 class procedure TioMapContainer.Init;
@@ -95,8 +96,8 @@ begin
   for Typ in Ctx.GetTypes do
   begin
     // Only instance type
-    if not (Typ is TRttiInstanceType) then Continue;
-    Inst := TRttiInstanceType(Typ);
+    if not Typ.IsInstance then Continue;
+    Inst := Typ.AsInstance;
     // Only classes with explicit ioTable attribute
     if not Self.IsValidEntity(Inst) then Continue;
     // Load the current class (entity) into the ContextContainer

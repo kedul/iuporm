@@ -117,6 +117,15 @@ contains
   IupOrm.DMVC.ObjectsMappersAdapter in '..\..\Source\IupOrm.DMVC.ObjectsMappersAdapter.pas',
   IupOrm.DB.QueryContainer in '..\..\Source\IupOrm.DB.QueryContainer.pas',
   IupOrm.DB.QueryEngine in '..\..\Source\IupOrm.DB.QueryEngine.pas',
-  IupOrm.Where.SqlItems.Interfaces in '..\..\Source\IupOrm.Where.SqlItems.Interfaces.pas';
+  IupOrm.Where.SqlItems.Interfaces in '..\..\Source\IupOrm.Where.SqlItems.Interfaces.pas',
+  IupOrm.Containers.Interfaces in '..\..\Source\IupOrm.Containers.Interfaces.pas',
+  IupOrm.Containers.List in '..\..\Source\IupOrm.Containers.List.pas',
+  IupOrm.Containers.Factory in '..\..\Source\IupOrm.Containers.Factory.pas',
+  IupOrm.Containers.ObjectList in '..\..\Source\IupOrm.Containers.ObjectList.pas',
+  IupOrm.Resolver.Interfaces in '..\..\Source\IupOrm.Resolver.Interfaces.pas',
+  IupOrm.Rtti.Utilities in '..\..\Source\IupOrm.Rtti.Utilities.pas',
+  IupOrm.Resolver.Factory in '..\..\Source\IupOrm.Resolver.Factory.pas',
+  IupOrm.Resolver.ByDependencyInjection in '..\..\Source\IupOrm.Resolver.ByDependencyInjection.pas',
+  IupOrm.DB.TransactionCollection in '..\..\Source\IupOrm.DB.TransactionCollection.pas';
 
 end.

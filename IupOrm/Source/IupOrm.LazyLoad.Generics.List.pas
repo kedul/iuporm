@@ -5,11 +5,11 @@ interface
 uses
   IupOrm.CommonTypes, System.Types,
   System.Generics.Defaults, System.Generics.Collections,
-  IupOrm.LazyLoad.Interfaces;
+  IupOrm.LazyLoad.Interfaces, IupOrm.Containers.Interfaces;
 
 type
 
-  TioList<T> = class(TList<T>, IioLazyLoadable)
+  TioList<T> = class(TList<T>, IioList<T>, IioLazyLoadable, IInterface)
 
 
 
@@ -28,22 +28,33 @@ type
     procedure SetCapacity(const Value: Integer);
     procedure SetCount(const Value: Integer);
     procedure SetItem(Index: Integer; const Value: T);
-  strict protected
-    function ioLazyLoader: IioLazyLoader<TInternalObjType>;
-  public
-    constructor Create;
-    procedure SetRelationInfo(ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationChildID:Integer);
-    function GetInternalObject: TObject;
-    // Part for the support of the IioLazyLoadable interfaces (Added by IupOrm)
-    //  because is not implementing IInterface
+  protected
+// ---------------- Start: section added for IInterface support ---------------
+{$IFNDEF AUTOREFCOUNT}
+    [Volatile] FRefCount: Integer;
+{$ENDIF}
     function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
     function _AddRef: Integer; stdcall;
     function _Release: Integer; stdcall;
+// ---------------- End: section added for IInterface support ---------------
+    function ioLazyLoader: IioLazyLoader<TInternalObjType>;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer);
+    function GetInternalObject: TObject;
   // ===========================================================================
 
 
 
-  public
+// ---------------- Start: section added for IInterface support ---------------
+{$IFNDEF AUTOREFCOUNT}
+    procedure AfterConstruction; override;
+    procedure BeforeDestruction; override;
+    class function NewInstance: TObject; override;
+    property RefCount: Integer read FRefCount;
+{$ENDIF}
+// ---------------- End: section added for IInterface support ---------------
 
     class procedure Error(const Msg: string; Data: NativeInt); overload; virtual;
 {$IFNDEF NEXTGEN}
@@ -103,6 +114,11 @@ type
 
     function GetEnumerator: TList<T>.TEnumerator;
   end;
+// ---------------- Start: section added for IInterface support ---------------
+  {$IFNDEF SYSTEM_HPP_DEFINES_OBJECTS}
+//  {$NODEFINE TInterfacedObject}         { defined in systobj.h }
+  {$ENDIF}
+// ---------------- End: section added for IInterface support ---------------
 
 implementation
 
@@ -110,6 +126,30 @@ uses
   IupOrm, IupOrm.LazyLoad.Factory;
 
 { TioList<T> }
+
+// ---------------- Start: section added for IInterface support ---------------
+{$IFNDEF AUTOREFCOUNT}
+procedure TioList<T>.AfterConstruction;
+begin
+// Release the constructor's implicit refcount
+  AtomicDecrement(FRefCount);
+end;
+
+procedure TioList<T>.BeforeDestruction;
+begin
+  if RefCount <> 0 then
+    System.Error(reInvalidPtr);
+end;
+
+class function TioList<T>.NewInstance: TObject;
+begin
+  Result := inherited NewInstance;
+  TioList<T>(Result).FRefCount := 1;
+end;
+{$ENDIF}
+// ---------------- End: section added for IInterface support ---------------
+
+
 
 function TioList<T>.Add(const Value: T): Integer;
 begin
@@ -166,6 +206,12 @@ end;
 procedure TioList<T>.DeleteRange(AIndex, ACount: Integer);
 begin
   ioLazyLoader.GetInternalObj.DeleteRange(AIndex, ACount);
+end;
+
+destructor TioList<T>.Destroy;
+begin
+
+  inherited;
 end;
 
 class procedure TioList<T>.Error(const Msg: string; Data: NativeInt);
@@ -294,7 +340,6 @@ end;
 
 function TioList<T>.QueryInterface(const IID: TGUID; out Obj): HResult;
 begin
-  // The interfaces support is intended only as LazyLoadable support flag
   if GetInterface(IID, Obj) then
     Result := 0
   else
@@ -331,10 +376,10 @@ begin
   ioLazyLoader.GetInternalObj.Items[Index] := Value;
 end;
 
-procedure TioList<T>.SetRelationInfo(ARelationChildClassRef: TioClassRef;
-  ARelationChildPropertyName: String; ARelationChildID: Integer);
+procedure TioList<T>.SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName: String;
+  const ARelationChildID: Integer);
 begin
-  ioLazyLoader.SetRelationInfo(ARelationChildClassRef, ARelationChildPropertyName, ARelationChildID);
+  ioLazyLoader.SetRelationInfo(ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName, ARelationChildID);
 end;
 
 procedure TioList<T>.Sort(const AComparer: IComparer<T>);
@@ -355,12 +400,22 @@ end;
 
 function TioList<T>._AddRef: Integer;
 begin
-  // Nothing, the interfaces support is intended only as LazyLoadable support flag
+{$IFNDEF AUTOREFCOUNT}
+  Result := AtomicIncrement(FRefCount);
+{$ELSE}
+  Result := __ObjAddRef;
+{$ENDIF}
 end;
 
 function TioList<T>._Release: Integer;
 begin
-  // Nothing, the interfaces support is intended only as LazyLoadable support flag
+{$IFNDEF AUTOREFCOUNT}
+  Result := AtomicDecrement(FRefCount);
+  if Result = 0 then
+    Destroy;
+{$ELSE}
+  Result := __ObjRelease;
+{$ENDIF}
 end;
 
 end.

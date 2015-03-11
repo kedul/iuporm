@@ -11,7 +11,8 @@ type
   strict private
     FInternalObj: T;
     FOwnsObjects: Boolean;
-    FioRelationChildClassRef: TioClassRef;
+    FioRelationChildTypeName: String;
+    FioRelationChildTypeAlias: String;
     FioRelationChildPropertyName: String;
     FioRelationChildID: Integer;
   strict protected
@@ -19,7 +20,7 @@ type
   public
     constructor Create(AOwnsObjects:Boolean=True); overload;
     destructor Destroy; override;
-    procedure SetRelationInfo(ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationChildID:Integer);
+    procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer);
     function GetInternalObj: T;
     // OwnsObject property
     procedure SetOwnsObjects(Value: Boolean);
@@ -44,9 +45,9 @@ procedure TioLazyLoader<T>.CreateInternalObj;
 begin
   if Self.FioRelationChildPropertyName = ''
     then FInternalObj := T.Create
-    else FInternalObj := TIupOrm.Load(Self.FioRelationChildClassRef)
+    else FInternalObj := TIupOrm.Load(FioRelationChildTypeName, FioRelationChildTypeAlias)
                                 ._PropertyEqualsTo(Self.FioRelationChildPropertyName, Self.FioRelationChildID)
-                                .ToList<T>(Self.FOwnsObjects);
+                                .ToList<T>('', Self.FOwnsObjects);
 end;
 
 destructor TioLazyLoader<T>.Destroy;
@@ -72,12 +73,13 @@ begin
   FOwnsObjects := Value;
 end;
 
-procedure TioLazyLoader<T>.SetRelationInfo(ARelationChildClassRef: TioClassRef;
-  ARelationChildPropertyName: String; ARelationChildID: Integer);
+procedure TioLazyLoader<T>.SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias,
+  ARelationChildPropertyName: String; const ARelationChildID: Integer);
 begin
-  Self.FioRelationChildClassRef := ARelationChildClassRef;
-  Self.FioRelationChildPropertyName := ARelationChildPropertyName;
-  Self.FioRelationChildID := ARelationChildID;
+  FioRelationChildTypeName := ARelationChildTypeName;
+  FioRelationChildTypeAlias := ARelationChildTypeAlias;
+  FioRelationChildPropertyName := ARelationChildPropertyName;
+  FioRelationChildID := ARelationChildID;
 end;
 
 end.

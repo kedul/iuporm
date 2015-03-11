@@ -16,7 +16,7 @@ type
   TioContextFactory = class
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(ARttiProperty:TRttiProperty; ASqlFieldName:String; ALoadSql:String; AFieldType:String; AReadWrite:TioReadWrite; ARelationType:TioRelationType; ARelationChildClassRef:TioClassRef; ARelationChildPropertyName:String; ARelationLoadType:TioLoadType): IioContextProperty;
+    class function GetProperty(const ARttiProperty:TRttiProperty; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType:String; const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType): IioContextProperty;
     class function Properties(Typ: TRttiInstanceType): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; ASqlFieldName:String=IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Joins: IioJoins;
@@ -67,23 +67,23 @@ begin
                               );
 end;
 
-class function TioContextFactory.GetProperty(ARttiProperty: TRttiProperty;
-  ASqlFieldName, ALoadSql, AFieldType: String; AReadWrite:TioReadWrite; ARelationType: TioRelationType;
-  ARelationChildClassRef: TioClassRef; ARelationChildPropertyName: String;
-  ARelationLoadType:TioLoadType): IioContextProperty;
+class function TioContextFactory.GetProperty(const ARttiProperty: TRttiProperty; const ATypeAlias, ASqlFieldName, ALoadSql,
+  AFieldType: String; const AReadWrite: TioReadWrite; const ARelationType: TioRelationType; const ARelationChildTypeName,
+  ARelationChildTypeAlias, ARelationChildPropertyName: String; const ARelationLoadType: TioLoadType): IioContextProperty;
 begin
   Result :=  TioProperty.Create(ARttiProperty
+                               ,ATypeAlias
                                ,ASqlFieldName
                                ,ALoadSql
                                ,AFieldType
                                ,AReadWrite
                                ,ARelationType
-                               ,ARelationChildClassRef
+                               ,ARelationChildTypeName
+                               ,ARelationChildTypeAlias
                                ,ARelationChildPropertyName
                                ,ARelationLoadType
                                );
 end;
-
 
 class function TioContextFactory.GroupBy(ASqlText:String): IioGroupBy;
 begin
@@ -110,7 +110,7 @@ var
 begin
   // Rtti init
   ARttiContext := TioRttiContextFactory.RttiContext;
-  ARttiType := ARttiContext.GetType(AClassRef) as TRttiInstanceType;
+  ARttiType := ARttiContext.GetType(AClassRef).AsInstance;
   // Create the context
   Result := TioMap.Create(AClassRef,
                           ARttiContext,
@@ -126,13 +126,15 @@ var
   Prop: TRttiProperty;
   Attr: TCustomAttribute;
   PropID: Boolean;
+  PropTypeAlias: String;
   PropFieldName: String;
   PropFieldType: String;
   PropLoadSql: String;
   PropSkip: Boolean;
   PropReadWrite: TioReadWrite;
   PropRelationType: TioRelationType;
-  PropRelationChildClassRef: TioClassRef;
+  PropRelationChildTypeName: String;
+  PropRelationChildTypeAlias: String;
   PropRelationChildPropertyName: String;
   PropRelationChildLoadType: TioLoadType;
 begin
@@ -148,21 +150,27 @@ begin
     // ObjStatus property
     if Prop.Name = 'ObjStatus' then
     begin
-      Result.ObjStatusProperty := Self.GetProperty(Prop, '', '', '', iorwReadOnly, ioRTNone, nil, '', ioImmediateLoad);
+      Result.ObjStatusProperty := Self.GetProperty(Prop, '', '', '', '', iorwReadOnly, ioRTNone, '', '', '', ioImmediateLoad);
       Continue;
     end;
     // Prop Init
     PropId := (Uppercase(Prop.Name) = 'ID');  // Is a OID property if the name of the property itself is 'ID'
+    PropTypeAlias := '';
     PropFieldName := Prop.Name;
+    PropFieldType := '';
     PropLoadSql := '';
     PropSkip := False;
     PropReadWrite := iorwReadWrite;
     PropRelationType := ioRTNone;
+    PropRelationChildTypeName := '';
+    PropRelationChildTypeAlias := '';
+    PropRelationChildPropertyName := '';
     PropRelationChildLoadType := ioImmediateLoad;
     // Check attributes
     for Attr in Prop.GetAttributes do
     begin
       if Attr is ioOID then PropID := True;
+      if Attr is ioTypeAlias then PropTypeAlias := ioTypeAlias(Attr).Value;
       if Attr is ioField then PropFieldName := ioField(Attr).Value;
       if Attr is ioFieldType then PropFieldType := ioFieldType(Attr).Value;
       if Attr is ioLoadSql then PropLoadSql := ioLoadSql(Attr).Value;
@@ -172,30 +180,35 @@ begin
       if Attr is ioBelongsTo then
       begin
         PropRelationType := ioRTBelongsTo;
-        PropRelationChildClassRef := ioBelongsTo(Attr).ChildClassRef;
+        PropRelationChildTypeName := ioBelongsTo(Attr).ChildTypeName;
+        PropRelationChildTypeAlias := ioBelongsTo(Attr).ChildTypeAlias;
       end;
       if Attr is ioHasMany then
       begin
         PropRelationType := ioRTHasMany;
-        PropRelationChildClassRef := ioHasMany(Attr).ChildClassRef;
+        PropRelationChildTypeName := ioHasMany(Attr).ChildTypeName;
+        PropRelationChildTypeAlias := ioHasMany(Attr).ChildTypeAlias;
         PropRelationChildPropertyName := ioHasMany(Attr).ChildPropertyName;
         PropRelationChildLoadType := ioHasMany(Attr).LoadType;
       end;
       if Attr is ioHasOne then
       begin
         PropRelationType := ioRTHasOne;
-        PropRelationChildClassRef := ioHasOne(Attr).ChildClassRef;
+        PropRelationChildTypeName := ioHasOne(Attr).ChildTypeName;
+        PropRelationChildTypeAlias := ioHasOne(Attr).ChildTypeAlias;
         PropRelationChildPropertyName := ioHasOne(Attr).ChildPropertyName;
       end;
     end;
     // Create and add property
     if not PropSkip then Result.Add(Self.GetProperty(Prop
+                                                    ,PropTypeAlias
                                                     ,PropFieldName
                                                     ,PropLoadSql
                                                     ,PropFieldType
                                                     ,PropReadWrite
                                                     ,PropRelationType
-                                                    ,PropRelationChildClassRef
+                                                    ,PropRelationChildTypeName
+                                                    ,PropRelationChildTypeAlias
                                                     ,PropRelationChildPropertyName
                                                     ,PropRelationChildLoadType)
                                     ,PropId
