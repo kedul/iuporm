@@ -5,7 +5,8 @@ interface
 uses
   IupOrm.LiveBindings.Interfaces, IupOrm.CommonTypes, System.Classes,
   System.Generics.Collections, IupOrm.Context.Properties.Interfaces,
-  Data.Bind.ObjectScope, IupOrm.LiveBindings.PrototypeBindSource;
+  Data.Bind.ObjectScope, IupOrm.LiveBindings.PrototypeBindSource,
+  IupOrm.Rtti.Utilities;
 
 type
 
@@ -30,59 +31,69 @@ uses
   IupOrm.LiveBindings.Notification,
   IupOrm.LiveBindings.NaturalActiveObjectBindSourceAdapter,
   IupOrm.Context.Container, IupOrm.Context.Interfaces,
-  IupOrm.Resolver.Interfaces, IupOrm.Resolver.Factory, IupOrm.Context.Factory;
+  IupOrm.Resolver.Interfaces, IupOrm.Resolver.Factory, IupOrm.Context.Factory,
+  IupOrm.LiveBindings.ActiveInterfaceListBindSourceAdapter,
+  IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter;
 
 { TioLiveBindingsFactory }
 
 class function TioLiveBindingsFactory.ContainedListBindSourceAdapter(AOwner:TComponent; AMasterProperty:IioContextProperty): IioContainedBindSourceAdapter;
 var
   AContext: IioContext;
-  AResolvedTypeList: IioResolvedTypeList;
 begin
-  // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, rmAll);
-  // Create Context
-  // (without context the "Self.GetSql(False)" fail)
-  // *** NB: PER IL MOMENTO, FINO A QUANDO NON CI SARA' IL SUPPORTO DELLE INTERFACCE ANCHE NEI BIND SOURCE ADAPTERS,
-  // ***      IN PRATICA USA IL CLASSREF DELLA PRIMA CLASSE CHE TROVA SENZA ANTENATI NELLA RESOLVEDTYPELIST (QUELLA PIU' IN
-  // ***      NELLA GERARCHIA), QUINDI SE CI SONO DUE CLASSI SENA ANTENATI (CIOE' CHE NON DISCENDONO DA UN ANTENATO COMUNE)
-  // ***      UNA DELLE DUE NON VERRA' TENUTA IN CONSIDEERAZIONE
-  AContext := TioContextFactory.Context(AResolvedTypeList[0]);
-  // Get the ActiveBindSourceAdapter
-  Result := TioActiveListBindSourceAdapter.Create(
-     AContext.GetClassRef
-    ,''
-    ,AOwner
-    ,TList<TObject>.Create
-    ,False
-    ,False
-  );
+  // If the master property type is an interface...
+  if TioRttiUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
+    Result := TioActiveInterfaceListBindSourceAdapter.Create(
+      AMasterProperty.GetRelationChildTypeName,
+      AMasterProperty.GetRelationChildTypeAlias,
+      '',
+      AOwner,
+      TList<IInterface>.Create,
+      False,
+      False)
+  // else if the master property type is a class...
+  else
+  begin
+    AContext := TioContextFactory.Context(AMasterProperty.GetRelationChildTypeName);
+    Result := TioActiveListBindSourceAdapter.Create(
+       AContext.GetClassRef
+      ,''
+      ,AOwner
+      ,TList<TObject>.Create
+      ,False
+      ,False);
+  end;
+  // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
 end;
 
 class function TioLiveBindingsFactory.ContainedObjectBindSourceAdapter(AOwner:TComponent; AMasterProperty:IioContextProperty): IioContainedBindSourceAdapter;
 var
   AContext: IioContext;
-  AResolvedTypeList: IioResolvedTypeList;
 begin
-  // Resolve the type and alias
-  AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(AMasterProperty.GetRelationChildTypeName, AMasterProperty.GetRelationChildTypeAlias, rmAll);
-  // Create Context
-  // (without context the "Self.GetSql(False)" fail)
-  // *** NB: PER IL MOMENTO, FINO A QUANDO NON CI SARA' IL SUPPORTO DELLE INTERFACCE ANCHE NEI BIND SOURCE ADAPTERS,
-  // ***      IN PRATICA USA IL CLASSREF DELLA PRIMA CLASSE CHE TROVA SENZA ANTENATI NELLA RESOLVEDTYPELIST (QUELLA PIU' IN
-  // ***      NELLA GERARCHIA), QUINDI SE CI SONO DUE CLASSI SENA ANTENATI (CIOE' CHE NON DISCENDONO DA UN ANTENATO COMUNE)
-  // ***      UNA DELLE DUE NON VERRA' TENUTA IN CONSIDEERAZIONE
-  AContext := TioContextFactory.Context(AResolvedTypeList[0]);
-  // Get the ActiveBindSourceAdapter
-  Result := TioActiveObjectBindSourceAdapter.Create(
-     AContext.GetClassRef
-    ,''
-    ,AOwner
-    ,TObject.Create
-    ,False
-    ,False
-  );
+  // If the master property type is an interface...
+  if TioRttiUtilities.IsAnInterfaceTypeName(AMasterProperty.GetRelationChildTypeName) then
+    Result := TioActiveInterfaceObjectBindSourceAdapter.Create(
+      AMasterProperty.GetRelationChildTypeName,
+      AMasterProperty.GetRelationChildTypeAlias,
+      '',
+      AOwner,
+      nil,     // AObject:TObject;
+      False,
+      False)
+  // else if the master property type is a class...
+  else
+  begin
+    AContext := TioContextFactory.Context(AMasterProperty.GetRelationChildTypeName);
+    Result := TioActiveObjectBindSourceAdapter.Create(
+       AContext.GetClassRef
+      ,''
+      ,AOwner
+      ,nil     // AObject:TObject;
+      ,False
+      ,False);
+  end;
+  // Set MasterProperty for the adapter
   Result.SetMasterProperty(AMasterProperty);
 end;
 

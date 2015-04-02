@@ -13,9 +13,12 @@ type
   strict protected
     FListObject: TObject;
     FCountProperty: TRttiProperty;
+    FOwnsObjectsProperty: TRttiProperty;
     FAddMethod: TRttiMethod;
     FClearMethod: TRttiMethod;
     FGetItemMethod: TRttiMethod;
+    procedure SetOwnsObjects(AValue:Boolean);
+    function GetOwnsObjects: Boolean;
   public
     constructor Create(AListObject: TObject);
     procedure Add(AObject: TObject);
@@ -23,6 +26,7 @@ type
     function Count: Integer;
     function GetItem(Index: Integer): TObject;
     function GetEnumerator: IEnumerator;
+    property OwnsObjects:Boolean read GetOwnsObjects write SetOwnsObjects;
   end;
 
   // DuckTypedListEnumerator
@@ -70,6 +74,9 @@ begin
   // Init Rtti
   Ctx := TioRttiContextFactory.RttiContext;
   Typ := Ctx.GetType(AListObject.ClassInfo);
+  // OwnsObjects Property (No exception if not exist)
+  FOwnsObjectsProperty := nil;
+  FOwnsObjectsProperty := Typ.GetProperty('OwnsObjects');
   // Count Property
   FCountProperty := Typ.GetProperty('Count');
   if not Assigned(FCountProperty) then EIupOrmException.Create('DuckTypedList: "Count" property not found in the object');
@@ -96,6 +103,19 @@ end;
 function TioDuckTypedList.GetItem(Index: Integer): TObject;
 begin
   Result := FGetItemMethod.Invoke(FListObject, [index]).AsObject;
+end;
+
+function TioDuckTypedList.GetOwnsObjects: Boolean;
+begin
+  Result := False;
+  if Assigned(FOwnsObjectsProperty) then
+    Result := FOwnsObjectsProperty.GetValue(FListObject).AsBoolean;
+end;
+
+procedure TioDuckTypedList.SetOwnsObjects(AValue: Boolean);
+begin
+  if Assigned(FOwnsObjectsProperty) then
+    FOwnsObjectsProperty.SetValue(FListObject, AValue);
 end;
 
 { TioDuckTypedListEnumerator }

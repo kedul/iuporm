@@ -5,7 +5,9 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Graphics, FMX.Forms, FMX.Dialogs, FMX.TabControl, FMX.StdCtrls,
-  System.Actions, FMX.ActnList, FMX.Gestures, FMX.Edit;
+  System.Actions, FMX.ActnList, FMX.Gestures, FMX.Edit, FMX.ListView.Types, Data.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
+  System.Rtti, System.Bindings.Outputs, Fmx.Bind.Editors, Data.Bind.Components, Data.Bind.Grid, Data.Bind.ObjectScope,
+  IupOrm.LiveBindings.PrototypeBindSource, FMX.ListView, Fmx.Bind.GenData;
 
 type
   TTabbedwithNavigationForm = class(TForm)
@@ -33,14 +35,25 @@ type
     btnBack: TSpeedButton;
     btnNext: TSpeedButton;
     GestureManager1: TGestureManager;
+    Edit1: TEdit;
     Button1: TButton;
     Button2: TButton;
-    Edit1: TEdit;
     Button3: TButton;
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
     Button7: TButton;
+    DetailListView: TListView;
+    MasterListView: TListView;
+    TabControl3: TTabControl;
+    EditFirstName: TEdit;
+    Button8: TButton;
+    BSMaster: TioPrototypeBindSource;
+    BindingsList1: TBindingsList;
+    LinkListControlToField1: TLinkListControlToField;
+    LinkControlToField1: TLinkControlToField;
+    BSDetail: TioPrototypeBindSource;
+    LinkListControlToField2: TLinkListControlToField;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
@@ -66,7 +79,8 @@ implementation
 
 uses
   Model, IupOrm, Interfaces, System.Generics.Collections, IupOrm.Containers.List,
-  IupOrm.Containers.Interfaces;
+  IupOrm.Containers.Interfaces, IupOrm.LiveBindings.InterfaceListBindSourceAdapter,
+  IupOrm.Rtti.Utilities;
 
 {$R *.fmx}
 
@@ -83,7 +97,7 @@ procedure TTabbedwithNavigationForm.Button2Click(Sender: TObject);
 var
   APerson: IPerson;
 begin
-  APerson := TIupOrm.Load<IPerson>.ByOID(Edit1.Text.ToInteger).ToObject;
+  APerson := TIupOrm.Load<TPerson>.ByOID(Edit1.Text.ToInteger).ToObject;
   ShowMessage(APerson.ID.ToString + ' - ' + APerson.FullName + ' (' + APerson.ClassNameProp + ') ' + APerson.Phones.Count.ToString + ' Numbers');
 end;
 

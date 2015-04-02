@@ -74,6 +74,96 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
               Position.X = 319.000000000000000000
               Width = 60.000000000000000000
             end
+            object Button8: TButton
+              Height = 44.000000000000000000
+              Position.X = 32.000000000000000000
+              TabOrder = 1
+              Text = 'Post'
+              Width = 73.000000000000000000
+            end
+          end
+          object DetailListView: TListView
+            ItemAppearanceClassName = 'TListItemRightDetailAppearance'
+            ItemEditAppearanceClassName = 'TListItemRightDetailDeleteAppearance'
+            HeaderAppearanceClassName = 'TListHeaderObjects'
+            FooterAppearanceClassName = 'TListHeaderObjects'
+            ItemIndex = 0
+            Align = Bottom
+            Height = 143.000000000000000000
+            Position.Y = 375.000000000000000000
+            TabOrder = 4
+            Width = 384.000000000000000000
+            object EditFirstName: TEdit
+              Touch.InteractiveGestures = [LongTap, DoubleTap]
+              Align = Bottom
+              TabOrder = 0
+              Text = 'Bitmap28'
+              Position.Y = 111.000000000000000000
+              Width = 384.000000000000000000
+              Height = 32.000000000000000000
+            end
+          end
+          object MasterListView: TListView
+            ItemAppearanceClassName = 'TListItemAppearance'
+            ItemEditAppearanceClassName = 'TListItemDeleteAppearance'
+            HeaderAppearanceClassName = 'TListHeaderObjects'
+            FooterAppearanceClassName = 'TListHeaderObjects'
+            ItemIndex = 1
+            Align = Client
+            Height = 327.000000000000000000
+            TabOrder = 3
+            Width = 384.000000000000000000
+            object TabControl3: TTabControl
+              FullSize = True
+              Height = 200.000000000000000000
+              Position.X = 224.000000000000000000
+              Position.Y = 168.000000000000000000
+              TabHeight = 49.000000000000000000
+              TabOrder = 0
+              Width = 200.000000000000000000
+            end
+          end
+        end
+        object TabItem6: TTabItem
+          CustomIcon = <
+            item
+            end>
+          Height = 8.000000000000000000
+          IsSelected = False
+          TabOrder = 0
+          Text = 'TabItem6'
+          Width = 8.000000000000000000
+          object ToolBar2: TToolBar
+            Height = 48.000000000000000000
+            TabOrder = 0
+            Width = 384.000000000000000000
+            object lblTitle2: TLabel
+              Align = Contents
+              Height = 48.000000000000000000
+              StyleLookup = 'toollabel'
+              TextSettings.HorzAlign = Center
+              Text = 'Title'
+              Width = 384.000000000000000000
+            end
+            object btnBack: TSpeedButton
+              Action = ChangeTabAction2
+              Align = Left
+              Height = 48.000000000000000000
+              Margins.Left = 5.000000000000000000
+              Position.X = 5.000000000000000000
+              StyleLookup = 'backtoolbutton'
+              Width = 67.000000000000000000
+            end
+          end
+          object Edit1: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            TabOrder = 8
+            Text = '1'
+            TextSettings.HorzAlign = Center
+            Position.X = 8.000000000000000000
+            Position.Y = 56.000000000000000000
+            Width = 49.000000000000000000
+            Height = 32.000000000000000000
           end
           object Button1: TButton
             Height = 44.000000000000000000
@@ -92,16 +182,6 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
             Text = 'by Interface'
             Width = 137.000000000000000000
             OnClick = Button2Click
-          end
-          object Edit1: TEdit
-            Touch.InteractiveGestures = [LongTap, DoubleTap]
-            TabOrder = 8
-            Text = '1'
-            TextSettings.HorzAlign = Center
-            Position.X = 8.000000000000000000
-            Position.Y = 56.000000000000000000
-            Width = 49.000000000000000000
-            Height = 32.000000000000000000
           end
           object Button3: TButton
             Height = 44.000000000000000000
@@ -147,38 +227,6 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
             Text = 'IioList<IPerson> alias Customer'
             Width = 353.000000000000000000
             OnClick = Button7Click
-          end
-        end
-        object TabItem6: TTabItem
-          CustomIcon = <
-            item
-            end>
-          Height = 8.000000000000000000
-          IsSelected = False
-          TabOrder = 0
-          Text = 'TabItem6'
-          Width = 8.000000000000000000
-          object ToolBar2: TToolBar
-            Height = 48.000000000000000000
-            TabOrder = 0
-            Width = 384.000000000000000000
-            object lblTitle2: TLabel
-              Align = Contents
-              Height = 48.000000000000000000
-              StyleLookup = 'toollabel'
-              TextSettings.HorzAlign = Center
-              Text = 'Title'
-              Width = 384.000000000000000000
-            end
-            object btnBack: TSpeedButton
-              Action = ChangeTabAction2
-              Align = Left
-              Height = 48.000000000000000000
-              Margins.Left = 5.000000000000000000
-              Position.X = 5.000000000000000000
-              StyleLookup = 'backtoolbutton'
-              Width = 67.000000000000000000
-            end
           end
         end
       end
@@ -282,5 +330,94 @@ object TabbedwithNavigationForm: TTabbedwithNavigationForm
             GestureID = sgiRight
           end>
       end>
+  end
+  object BSMaster: TioPrototypeBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'FirstName'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'LastName'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'FullName'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'ClassNameProp'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ioTypeName = 'IPerson'
+    ioAutoRefreshOnNotification = arEnabledNoReload
+    Left = 256
+    Top = 112
+  end
+  object BindingsList1: TBindingsList
+    Methods = <>
+    OutputConverters = <>
+    Left = 20
+    Top = 5
+    object LinkListControlToField1: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'FullName'
+      Control = MasterListView
+      FillExpressions = <>
+      FillHeaderExpressions = <>
+      FillBreakFieldName = 'ClassNameProp'
+      FillHeaderFieldName = 'ClassNameProp'
+      FillBreakGroups = <>
+    end
+    object LinkControlToField1: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSMaster
+      FieldName = 'FirstName'
+      Control = EditFirstName
+      Track = False
+    end
+    object LinkListControlToField2: TLinkListControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSDetail
+      FieldName = 'PhoneNumber'
+      Control = DetailListView
+      FillExpressions = <
+        item
+          SourceMemberName = 'PhoneType'
+          ControlMemberName = 'Detail'
+        end>
+      FillHeaderExpressions = <>
+      FillBreakGroups = <>
+    end
+  end
+  object BSDetail: TioPrototypeBindSource
+    AutoActivate = True
+    AutoPost = False
+    FieldDefs = <
+      item
+        Name = 'PhoneType'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'PhoneNumber'
+        Generator = 'BitmapNames'
+        ReadOnly = False
+      end>
+    ScopeMappings = <>
+    ioTypeName = 'IPhoneNumber'
+    ioMasterBindSource = BSMaster
+    ioMasterPropertyName = 'Phones'
+    ioAutoRefreshOnNotification = arEnabledNoReload
+    Left = 256
+    Top = 176
   end
 end

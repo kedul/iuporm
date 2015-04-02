@@ -568,7 +568,7 @@ begin
   Result := TioResolverFactory.GetResolvedTypeList;
   // If ATypeName is not an interface (is a class) then
   //  return it and exit;
-  if not ATypeName.StartsWith('I') then
+  if not TioRttiUtilities.IsAnInterfaceTypeName(ATypeName) then
   begin
     Result.Add(ATypeName);
     Exit;

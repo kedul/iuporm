@@ -8,7 +8,7 @@ uses
 
 type
 
-  TioObjectList<T: class> = class(TObjectList<T>, IioLazyLoadable)
+  TioObjectList<T: class> = class(TObjectList<T>, IioLazyLoadable, IInterface)
 
 
 
@@ -19,6 +19,7 @@ type
     TInternalObjType = TObjectList<T>;
     arrayofT = array of T;  // Già presente nell'antenato
   strict private
+    FOwnsObjects: Boolean;
     FioLazyLoader: IioLazyLoader<TInternalObjType>;
     function GetCapacity: Integer;
     function GetCount: Integer;
@@ -32,7 +33,9 @@ type
     function GetOwnsObjects: Boolean;
     procedure SetOwnsObjects(const Value: Boolean);
   public
-    constructor Create;
+    constructor Create; overload;
+    constructor Create(AOwnsObjects: Boolean); overload;
+    destructor Destroy; override;
     procedure SetRelationInfo(const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationChildID:Integer);
     function GetInternalObject: TObject;
     // Part for the support of the IioLazyLoadable interfaces (Added by IupOrm)
@@ -155,10 +158,16 @@ begin
   Result := ioLazyLoader.GetInternalObj.Contains(Value);
 end;
 
+constructor TioObjectList<T>.Create(AOwnsObjects: Boolean);
+begin
+  FOwnsObjects := AOwnsObjects;
+  Create;
+end;
+
 constructor TioObjectList<T>.Create;
 begin
   inherited Create;
-  FioLazyLoader := TioLazyLoadFactory.LazyLoader<TInternalObjType>;
+  FioLazyLoader := TioLazyLoadFactory.LazyLoader<TInternalObjType>(FOwnsObjects);
 end;
 
 procedure TioObjectList<T>.Delete(Index: Integer);
@@ -169,6 +178,12 @@ end;
 procedure TioObjectList<T>.DeleteRange(AIndex, ACount: Integer);
 begin
   ioLazyLoader.GetInternalObj.DeleteRange(AIndex, ACount);
+end;
+
+destructor TioObjectList<T>.Destroy;
+begin
+
+  inherited;
 end;
 
 class procedure TioObjectList<T>.Error(const Msg: string; Data: NativeInt);

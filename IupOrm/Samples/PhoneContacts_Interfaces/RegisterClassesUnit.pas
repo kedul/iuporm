@@ -12,7 +12,8 @@ type
 implementation
 
 uses
-  IupOrm, Model, Interfaces, IupOrm.LazyLoad.Generics.List, IupOrm.Containers.Interfaces, IupOrm.Containers.List;
+  IupOrm, Model, Interfaces, IupOrm.LazyLoad.Generics.List, IupOrm.Containers.Interfaces, IupOrm.Containers.List,
+  AnotherModel;
 
 { TDIClassRegister }
 
@@ -22,6 +23,7 @@ begin
   TIupOrm.DependencyInjection.RegisterClass<TEmployee>.Implements<IEmployee>.Execute;
   TIupOrm.DependencyInjection.RegisterClass<TCustomer>.Implements<ICustomer>.Execute;
   TIupOrm.DependencyInjection.RegisterClass<TVipCustomer>.Implements<IVipCustomer>.Execute;
+  TIupOrm.DependencyInjection.RegisterClass<TAnotherPerson>.Implements<IPerson>.Alias('AnotherPerson').Execute;
 
   TIupOrm.DependencyInjection.RegisterClass<TPhoneNumber>.Implements<IPhoneNumber>.Execute;
 

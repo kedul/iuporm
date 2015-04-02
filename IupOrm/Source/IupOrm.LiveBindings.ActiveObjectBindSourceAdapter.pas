@@ -22,7 +22,7 @@ type
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FBindSource: IioNotifiableBindSource;
     FonNotify: TioBSANotificationEvent;
-    FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;
+//    FNaturalBSA_MasterBindSourceAdapter: IioActiveBindSourceAdapter;  *** NB: Code presente (commented) in the unit body ***
     FInsertObj_Enabled: Boolean;
     FInsertObj_NewObj: TObject;
  strict protected
@@ -58,7 +58,7 @@ type
     procedure Insert(AObject:TObject); overload;
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
-    procedure NaturalBSA_SetMasterBindSourceAdapter(AActiveBindSourceAdapter:IioActiveBindSourceAdapter);
+//    procedure NaturalBSA_SetMasterBindSourceAdapter(AActiveBindSourceAdapter:IioActiveBindSourceAdapter);
     function GetDataObject: TObject;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
@@ -251,11 +251,11 @@ begin
   Self.Insert;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.NaturalBSA_SetMasterBindSourceAdapter(
-  AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
-begin
-  Self.FNaturalBSA_MasterBindSourceAdapter := AActiveBindSourceAdapter;
-end;
+//procedure TioActiveObjectBindSourceAdapter.NaturalBSA_SetMasterBindSourceAdapter(
+//  AActiveBindSourceAdapter: IioActiveBindSourceAdapter);
+//begin
+//  Self.FNaturalBSA_MasterBindSourceAdapter := AActiveBindSourceAdapter;
+//end;
 
 procedure TioActiveObjectBindSourceAdapter.Notify(Sender: TObject;
   ANotification: IioBSANotification);

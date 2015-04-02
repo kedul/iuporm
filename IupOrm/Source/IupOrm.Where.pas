@@ -31,13 +31,19 @@ type
     procedure SetType(const ATypeName, ATypeAlias: String);
     // ------ Destination methods
     function ToObject(const AObj:TObject=nil): TObject; virtual;
+
     procedure ToList(const AList:TObject); overload;
     function ToList(const AListRttiType:TRttiType; const AOwnsObjects:Boolean=True): TObject; overload;
     function ToList(const AInterfacedListTypeName:String; const AAlias:String=''; const AOwnsObjects:Boolean=True): TObject; overload;
     function ToList(const AListClassRef:TioClassRef; const AOwnsObjects:Boolean=True): TObject; overload;
     function ToList<TRESULT>(const AAlias:String=''; const AOwnsObjects:Boolean=True): TRESULT; overload;
-    function ToActiveListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
+
     procedure Delete(AResolverMode:TioResolverMode=rmSingle);
+
+    function ToActiveListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
+    function ToActiveObjectBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
+    function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
+    function ToObjectBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     // ------ Conditions
     function ByOID(AOID:Integer): TioWhere;
     function Add(ATextCondition:String): TioWhere;
@@ -92,7 +98,6 @@ type
     function ToInterfacedList: IioList<T>; overload;
 //    function ToObjectList(const AOwnsObjects:Boolean=True): TObjectList<T>;
 //    function ToInterfacedObjectList(const AOwnsObjects:Boolean=True): IioList<T>; overload;
-    function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     // ------ Conditions
     function ByOID(AOID:Integer): TioWhere<T>;
     function Add(ATextCondition:String): TioWhere<T>;
@@ -149,7 +154,12 @@ uses
   IupOrm.RttiContext.Factory, IupOrm,
   IupOrm.LiveBindings.ActiveListBindSourceAdapter, IupOrm.Where.SqlItems,
   IupOrm.DB.Interfaces, System.TypInfo, IupOrm.Resolver.Factory,
-  IupOrm.Rtti.Utilities, IupOrm.Context.Interfaces, IupOrm.Containers.Factory;
+  IupOrm.Rtti.Utilities, IupOrm.Context.Interfaces, IupOrm.Containers.Factory,
+  IupOrm.LiveBindings.InterfaceListBindSourceAdapter,
+  IupOrm.LiveBindings.ActiveInterfaceListBindSourceAdapter,
+  IupOrm.LiveBindings.InterfaceObjectBindSourceAdapter,
+  IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter,
+  IupOrm.LiveBindings.ActiveObjectBindSourceAdapter;
 
 { TioWhere }
 
@@ -396,29 +406,41 @@ end;
 function TioWhere.ToActiveListBindSourceAdapter(AOwner: TComponent;
   AOwnsObject: Boolean): TBindSourceAdapter;
 var
-  AContext: IioContext;
   AResolvedTypeList: IioResolvedTypeList;
+  AContext: IioContext;
 begin
   try
-    // Resolve the type and alias
-    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
-    // Create Context
-    // (without context the "Self.GetSql(False)" fail)
-    // *** NB: PER IL MOMENTO, FINO A QUANDO NON CI SARA' IL SUPPORTO DELLE INTERFACCE ANCHE NEI BIND SOURCE ADAPTERS,
-    // ***      IN PRATICA USA IL CLASSREF DELLA PRIMA CLASSE CHE TROVA SENZA ANTENATI NELLA RESOLVEDTYPELIST (QUELLA PIU' IN
-    // ***      NELLA GERARCHIA), QUINDI SE CI SONO DUE CLASSI SENA ANTENATI (CIOE' CHE NON DISCENDONO DA UN ANTENATO COMUNE)
-    // ***      UNA DELLE DUE NON VERRA' TENUTA IN CONSIDEERAZIONE
-    AContext := TioContextFactory.Context(AResolvedTypeList[0], Self);
-    // Create the adapter
-    Result := TioActiveListBindSourceAdapter.Create(
-                                                      AContext.GetClassRef
-                                                    , Self.GetSql(AContext.GetProperties, False)
-                                                    , AOwner
-                                                    , TObjectList<TObject>.Create    // Create an empty list for adapter creation only
-                                                    , True  // AutoLoadData := True
-                                                    , AContext.ObjStatusExist  // Use ObjStatus async persist
-                                                    , AOwnsObject
-                                                   );
+    // If the master property type is an interface...
+    if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
+    begin
+      // Resolve the type and alias and get the context
+      AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
+      AContext := TioContextFactory.Context(AResolvedTypeList[0], Self);
+      // Create the BSA
+      Result := TioActiveInterfaceListBindSourceAdapter.Create(
+        FTypeName,
+        FTypeAlias,
+        Self.GetSql(AContext.GetProperties, False),
+        AOwner,
+        TList<IInterface>.Create,
+        True,  // AutoLoadData := True
+        False)
+    end
+    // else if the master property type is a class...
+    else
+    begin
+      // Get the context
+      AContext := TioContextFactory.Context(FTypeName, Self);
+      // Create the BSA
+      Result := TioActiveListBindSourceAdapter.Create(
+        AContext.GetClassRef,
+        Self.GetSql(AContext.GetProperties, False),
+        AOwner,
+        TObjectList<TObject>.Create(AOwnsObject),
+//        TList<TObject>.Create,
+        True,  // AutoLoadData := True
+        False);
+    end;
   finally
     // Destroy itself at the end to avoid memory leak
     Self.Free;
@@ -428,6 +450,48 @@ end;
 
 
 
+
+function TioWhere.ToActiveObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
+var
+  AResolvedTypeList: IioResolvedTypeList;
+  AContext: IioContext;
+begin
+  try
+    // If the master property type is an interface...
+    if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
+    begin
+      // Resolve the type and alias and get the context
+      AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
+      AContext := TioContextFactory.Context(AResolvedTypeList[0], Self);
+      // Create the BSA
+      Result := TioActiveInterfaceObjectBindSourceAdapter.Create(
+        FTypeName,
+        FTypeAlias,
+        Self.GetSql(AContext.GetProperties, False),
+        AOwner,
+        nil,   // AObject:TObject
+        True,  // AutoLoadData := True
+        False)
+    end
+    // else if the master property type is a class...
+    else
+    begin
+      // Get the context
+      AContext := TioContextFactory.Context(FTypeName, Self);
+      // Create the BSA
+      Result := TioActiveObjectBindSourceAdapter.Create(
+        AContext.GetClassRef,
+        Self.GetSql(AContext.GetProperties, False),
+        AOwner,
+        nil,   // AObject:TObject
+        True,  // AutoLoadData := True
+        False);
+    end;
+  finally
+    // Destroy itself at the end to avoid memory leak
+    Self.Free;
+  end;
+end;
 
 procedure TioWhere.ToList(const AList: TObject);
 var
@@ -541,6 +605,30 @@ begin
               );
 end;
 
+function TioWhere.ToListBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
+var
+  AContext: IioContext;
+begin
+  // If the master property type is an interface...
+  if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
+    Result := TInterfaceListBindSourceAdapter.Create(
+      AOwner,
+      Self.ToList<TList<IInterface>>,
+      FTypeAlias,
+      FTypeName,
+      AOwnsObject)
+  // else if the master property type is a class...
+  else
+  begin
+    AContext := TioContextFactory.Context(FTypeName);
+    Result := TListBindSourceAdapter.Create(
+      AOwner,
+      Self.ToList<TList<TObject>>,
+      AContext.GetClassRef,
+      AOwnsObject);
+  end;
+end;
+
 function TioWhere.ToObject(const AObj:TObject): TObject;
 var
   AResolvedTypeList: IioResolvedTypeList;
@@ -575,6 +663,30 @@ begin
   finally
     // Destroy itself at the end to avoid memory leak
     Self.Free;
+  end;
+end;
+
+function TioWhere.ToObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
+var
+  AContext: IioContext;
+begin
+  // If the master property type is an interface...
+  if TioRttiUtilities.IsAnInterfaceTypeName(FTypeName) then
+    Result := TInterfaceObjectBindSourceAdapter.Create(
+      AOwner,
+      Self.ToObject,
+      FTypeAlias,
+      FTypeName,
+      AOwnsObject)
+  // else if the master property type is a class...
+  else
+  begin
+    AContext := TioContextFactory.Context(FTypeName);
+    Result := TObjectBindSourceAdapter.Create(
+      AOwner,
+      Self.ToObject,
+      AContext.GetClassRef,
+      AOwnsObject);
   end;
 end;
 
@@ -748,35 +860,6 @@ function TioWhere<T>.ToList: TList<T>;
 begin
   Result := TList<T>.Create;
   Self.ToList(Result);
-end;
-
-function TioWhere<T>.ToListBindSourceAdapter(AOwner: TComponent;
-  AOwnsObject: Boolean): TBindSourceAdapter;
-var
-  AContext: IioContext;
-  AResolvedTypeList: IioResolvedTypeList;
-begin
-  try
-    // Resolve the type and alias
-    AResolvedTypeList := TioResolverFactory.GetResolver(rsByDependencyInjection).Resolve(FTypeName, FTypeAlias, rmAll);
-    // Create Context
-    // (without context the "Self.GetSql(False)" fail)
-    // *** NB: PER IL MOMENTO, FINO A QUANDO NON CI SARA' IL SUPPORTO DELLE INTERFACCE ANCHE NEI BIND SOURCE ADAPTERS,
-    // ***      IN PRATICA USA IL CLASSREF DELLA PRIMA CLASSE CHE TROVA SENZA ANTENATI NELLA RESOLVEDTYPELIST (QUELLA PIU' IN
-    // ***      NELLA GERARCHIA), QUINDI SE CI SONO DUE CLASSI SENA ANTENATI (CIOE' CHE NON DISCENDONO DA UN ANTENATO COMUNE)
-    // ***      UNA DELLE DUE NON VERRA' TENUTA IN CONSIDEERAZIONE
-    AContext := TioContextFactory.Context(AResolvedTypeList[0], Self);
-    // Create the adapter
-    Result := TListBindSourceAdapter.Create(
-                                             AOwner
-                                           , Self.ToList<TList<TObject>>
-                                           , AContext.GetClassRef
-                                           , AOwnsObject
-                                           );
-  finally
-    // Destroy itself at the end to avoid memory leak
-    Self.Free;
-  end;
 end;
 
 function TioWhere<T>.ToObject(const AObj:TObject): T;

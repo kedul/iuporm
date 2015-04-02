@@ -237,9 +237,12 @@ begin
   //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
   // ---------------------------------------------------------------------------
   FioLoaded := True;
-  Self.DoCreateAdapter(LAdapter);
-  if LAdapter <> nil then
-    SetRuntimeAdapter(LAdapter);
+  if not Assigned(Self.OnCreateAdapter) then
+  begin
+    Self.DoCreateAdapter(LAdapter);
+    if LAdapter <> nil then
+      SetRuntimeAdapter(LAdapter);
+  end;
   // ===========================================================================
   // INHERITED MUST BE AFTER THE DOCREATEADAPTER CALL !!!!!!
   inherited;

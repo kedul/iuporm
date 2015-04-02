@@ -7,7 +7,7 @@ uses
 
 type
 
-  TioInterfacedList<T> = class(TList<T>, IioList<T>)
+  TioInterfacedList<T> = class(TList<T>, IioList<T>, IInterface)
   protected
 // ---------------- Start: section added for IInterface support ---------------
 {$IFNDEF AUTOREFCOUNT}

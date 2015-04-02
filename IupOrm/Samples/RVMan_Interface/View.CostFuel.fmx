@@ -1,0 +1,78 @@
+inherited ViewCostFuel: TViewCostFuel
+  inherited ListBox1: TListBox
+    object GroupDettagli: TListBoxGroupHeader
+      Height = 19.000000000000000000
+      Position.Y = 137.000000000000000000
+      StyleLookup = 'listboxgroupheader'
+      TabOrder = 4
+      Text = 'Dettagli'
+      Width = 389.000000000000000000
+    end
+    object ListBoxItem4: TListBoxItem
+      Height = 49.000000000000000000
+      Position.Y = 156.000000000000000000
+      StyleLookup = 'listboxitemnodetail'
+      TabOrder = 5
+      Text = 'KM percorsi'
+      Width = 389.000000000000000000
+      object eKMTraveled: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Right
+        Anchors = [akLeft, akTop, akRight, akBottom]
+        TabOrder = 1
+        Text = '67,6699981689453'
+        Position.X = 106.000000000000000000
+        Width = 273.000000000000000000
+        Height = 49.000000000000000000
+        Margins.Right = 10.000000000000000000
+      end
+    end
+  end
+  inherited BSCost: TioPrototypeBindSource
+    FieldDefs = <
+      item
+        Name = 'ID'
+        FieldType = ftSingle
+        Generator = 'UIntegers'
+        ReadOnly = False
+      end
+      item
+        Name = 'Descrizione'
+        Generator = 'ContactNames'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostDate'
+        FieldType = ftDateTime
+        Generator = 'DateTime'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostAmount'
+        FieldType = ftCurrency
+        Generator = 'Currency'
+        ReadOnly = False
+      end
+      item
+        Name = 'CostNote'
+        Generator = 'LoremIpsum'
+        ReadOnly = False
+      end
+      item
+        Name = 'KmTraveled'
+        FieldType = ftSingle
+        Generator = 'Floats'
+        ReadOnly = False
+      end>
+    ioTypeName = 'ICostFuel'
+  end
+  inherited BindingsList1: TBindingsList
+    object LinkControlToField4: TLinkControlToField
+      Category = 'Quick Bindings'
+      DataSource = BSCost
+      FieldName = 'KmTraveled'
+      Control = eKMTraveled
+      Track = False
+    end
+  end
+end

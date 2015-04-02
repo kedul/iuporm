@@ -141,7 +141,7 @@ procedure TMainForml.PrototypeBindSource1CreateAdapter(Sender: TObject;
   var ABindSourceAdapter: TBindSourceAdapter);
 begin
   // Directly get the BindSourceAdapter from IupOrm
-  ABindSourceAdapter := TIupOrm.Load<TPizza>.ToActiveListBindSourceAdapter(Self);
+  ABindSourceAdapter := TIupOrm.Load<TPizza>.ToActiveListBindSourceAdapter(PrototypeBindSource1);
 end;
 
 end.

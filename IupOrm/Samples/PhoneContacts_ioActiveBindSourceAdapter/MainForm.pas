@@ -82,7 +82,7 @@ procedure TForm1.MasterBSCreateAdapter(Sender: TObject;
   var ABindSourceAdapter: TBindSourceAdapter);
 begin
   // Get the master active bind source adapter directly from IupOrm
-  ABindSourceAdapter := TIupOrm.Load<TPerson>.ToActiveListBindSourceAdapter(Self);
+  ABindSourceAdapter := TIupOrm.Load<TPerson>.ToActiveListBindSourceAdapter(MasterBS);
 end;
 
 procedure TForm1.DetailBSCreateAdapter(Sender: TObject;

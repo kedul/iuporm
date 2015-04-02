@@ -21,6 +21,10 @@ type
     function Count: Integer;
     function GetEnumerator: IEnumerator;
     function GetItem(Index: Integer): TObject;
+    // OwnsObjects property
+    procedure SetOwnsObjects(AValue:Boolean);
+    function GetOwnsObjects: Boolean;
+    property OwnsObjects:Boolean read GetOwnsObjects write SetOwnsObjects;
   end;
 
 implementation

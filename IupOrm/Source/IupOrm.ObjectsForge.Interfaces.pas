@@ -47,6 +47,7 @@ uses
 
 class function TioObjectMakerIntf.CheckOrCreateRelationChildObject(const AContext: IioContext; const AProperty: IioContextProperty): TObject;
 begin
+  Result := nil;
   // If the AProperty is of interface type...
   if AProperty.IsInterface then
   begin

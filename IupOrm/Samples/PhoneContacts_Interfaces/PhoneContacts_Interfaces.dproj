@@ -215,6 +215,7 @@
         <DCCReference Include="SampleData.pas"/>
         <DCCReference Include="Interfaces.pas"/>
         <DCCReference Include="RegisterClassesUnit.pas"/>
+        <DCCReference Include="AnotherModel.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
