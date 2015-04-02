@@ -54,9 +54,12 @@ type
     class function Load(const ATypeName:String; const ATypeAlias:String=''): TioWhere; overload;
     class function Load(const AClassRef:TioClassRef; const ATypeAlias:String=''): TioWhere; overload;
     class function Load<T>(const ATypeAlias:String=''): TioWhere<T>; overload;
-    class procedure Delete(AObj: TObject);
-    class procedure Persist(AObj: TObject);
-    class procedure PersistCollection(ACollection: TObject);
+    class procedure Delete(AObj: TObject); overload;
+    class procedure Delete(AIntfObj: IInterface); overload;
+    class procedure Persist(AObj: TObject); overload;
+    class procedure Persist(AIntfObj: IInterface); overload;
+    class procedure PersistCollection(ACollection: TObject); overload;
+    class procedure PersistCollection(AIntfCollection: IInterface); overload;
     class procedure StartTransaction(AConnectionName:String='');
     class procedure CommitTransaction(AConnectionName:String='');
     class procedure RollbackTransaction(AConnectionName:String='');
@@ -117,10 +120,20 @@ begin
   Self.PersistObject(AContext);
 end;
 
+class procedure TIupOrm.Persist(AIntfObj: IInterface);
+begin
+  Self.Persist(AIntfObj as TObject);
+end;
+
 class procedure TIupOrm.PersistCollection(ACollection: TObject);
 begin
   // Redirect to the internal PersistCollection_Internal (same of PersistRelationChildList)
   PersistCollection_Internal(ACollection);
+end;
+
+class procedure TIupOrm.PersistCollection(AIntfCollection: IInterface);
+begin
+  Self.PersistCollection(AIntfCollection as TObject);
 end;
 
 class procedure TIupOrm.PersistCollection_Internal(ACollection: TObject;
@@ -343,6 +356,11 @@ begin
   Self.DeleteObject(AContext);
 end;
 
+class procedure TIupOrm.Delete(AIntfObj: IInterface);
+begin
+  Self.Delete(AIntfObj as TObject);
+end;
+
 class procedure TIupOrm.DeleteObject(AContext: IioContext);
 begin
   // Create and execute query
@@ -426,5 +444,6 @@ initialization
   TIupOrm.DependencyInjection.RegisterClass<TioDuckTypedStreamObject>.Implements<IioDuckTypedStreamObject>.Execute;
 
 end.
+
 
 

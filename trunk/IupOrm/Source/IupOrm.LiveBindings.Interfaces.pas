@@ -63,7 +63,8 @@ type
 
   IioContainedBindSourceAdapter = interface
     ['{66AF6AD7-9093-4526-A18C-54447FB220A3}']
-    procedure Free;    procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
+    procedure Free;
+    procedure SetMasterAdapterContainer(AMasterAdapterContainer:IioDetailBindSourceAdaptersContainer);
     procedure SetMasterProperty(AMasterProperty: IioContextProperty);
     procedure ExtractDetailObject(AMasterObj: TObject); overload;
     function GetDetailBindSourceAdapter(AOwner:TComponent; AMasterPropertyName:String): TBindSourceAdapter;

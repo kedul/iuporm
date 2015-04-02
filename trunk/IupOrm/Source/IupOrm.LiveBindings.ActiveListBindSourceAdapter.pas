@@ -6,18 +6,22 @@ uses
   Data.Bind.ObjectScope, IupOrm.Where, System.Classes,
   System.Generics.Collections, IupOrm.Where.SqlItems.Interfaces,
   IupOrm.CommonTypes, IupOrm.Context.Properties.Interfaces,
-  IupOrm.LiveBindings.Interfaces, IupOrm.LiveBindings.Notification;
+  IupOrm.LiveBindings.Interfaces, IupOrm.LiveBindings.Notification,
+  IupOrm.LiveBindings.InterfaceListBindSourceAdapter;
 
 type
 
+//  TioActiveListBindSourceAdapter = class(TInterfaceListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
   TioActiveListBindSourceAdapter = class(TListBindSourceAdapter, IioContainedBindSourceAdapter, IioActiveBindSourceAdapter, IioNaturalBindSourceAdapterSource)
-  strict private
+  private
     FWhereStr: String;
+//    FTypeName, FTypeAlias: String;
     FClassRef: TioClassRef;
     FUseObjStatus: Boolean;  // Not use directly, use UseObjStatus function or property even for internal use
     FLocalOwnsObject: Boolean;
     FAutoLoadData: Boolean;
     FReloadDataOnRefresh: Boolean;
+//    FMasterPropertyName: String;
     FMasterProperty: IioContextProperty;
     FMasterAdaptersContainer: IioDetailBindSourceAdaptersContainer;
     FDetailAdaptersContainer: IioDetailBindSourceAdaptersContainer;
@@ -25,7 +29,7 @@ type
     FonNotify: TioBSANotificationEvent;
     FInsertObj_Enabled: Boolean;
     FInsertObj_NewObj: TObject;
-  strict protected
+  protected
     // =========================================================================
     // Part for the support of the IioNotifiableBindSource interfaces (Added by IupOrm)
     //  because is not implementing IInterface (NB: RefCount DISABLED)
@@ -68,7 +72,7 @@ implementation
 uses
   IupOrm, System.Rtti, IupOrm.LiveBindings.Factory, IupOrm.Context.Factory,
   IupOrm.Context.Interfaces, System.SysUtils, IupOrm.LazyLoad.Interfaces,
-  FMX.Dialogs, IupOrm.Exceptions;
+  FMX.Dialogs, IupOrm.Exceptions, IupOrm.Rtti.Utilities;
 
 { TioActiveListBindSourceAdapter<T> }
 
@@ -204,8 +208,10 @@ end;
 procedure TioActiveListBindSourceAdapter.ExtractDetailObject(
   AMasterObj: TObject);
 var
+  AObj: TObject;
   ADetailObj: TList<TObject>;
   AValue: TValue;
+  ALazyLoadableObj: IioLazyLoadable;
 begin
   ADetailObj := nil;
   // Check parameter
@@ -214,8 +220,24 @@ begin
   // Extract master property value
   AValue := FMasterProperty.GetValue(AMasterObj);
   // if not empty extract the detail object
-  if not AValue.IsEmpty
-    then ADetailObj := TList<TObject>(AValue.AsObject);
+//  if not AValue.IsEmpty
+//    then ADetailObj := TList<TObject>(AValue.AsObject);
+
+
+  if not AValue.IsEmpty then
+    if FMasterProperty.IsInterface then
+      AObj := TObject(AValue.AsInterface)
+    else
+      AObj := AValue.AsObject;
+  // If is a LazyLoadable list then set the internal List
+  //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
+  //       normali dava dei problemi (non dava errori ma non usciva nulla)
+  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
+    then AObj := ALazyLoadableObj.GetInternalObject;
+  ADetailObj := TList<TObject>(AObj);
+//  ADetailObj := TioRttiUtilities.CastObjectToGeneric<TList<TObject>>(AObj);
+
+
   // Set it to the Adapter itself
   Self.SetDataObject(ADetailObj);
 end;
@@ -311,8 +333,8 @@ begin
   // If is a LazyLoadable list then set the internal List
   //  NB: Assegnare direttamente anche i LazyLoadable come se fossero delle liste
   //       normali dava dei problemi (non dava errori ma non usciva nulla)
-  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
-    then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
+//  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
+//    then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
   Self.SetList(AObj, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
   Self.Active := True;
 end;

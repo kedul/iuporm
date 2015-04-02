@@ -14,6 +14,7 @@ type
     class function GenericInterfaceToGUI<T:IInterface>: String;
     class function ClassRefToRttiType(AClassRef:TioClassRef): TRttiInstanceType;
     class function CastObjectToGeneric<T>(AObj:TObject): T;
+    class function IsAnInterfaceTypeName(ATypeName:String): Boolean;
   end;
 
 implementation
@@ -59,6 +60,11 @@ begin
 //  Result := pinfo.NameFld.ToString;
 ////  Result := pinfo.Name;
   // ----------------------------------------------------------------------------------
+end;
+
+class function TioRttiUtilities.IsAnInterfaceTypeName(ATypeName: String): Boolean;
+begin
+  Result := ATypeName.StartsWith('I');
 end;
 
 class function TioRttiUtilities.IsAnInterface<T>: Boolean;

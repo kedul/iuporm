@@ -126,6 +126,10 @@ contains
   IupOrm.Rtti.Utilities in '..\..\Source\IupOrm.Rtti.Utilities.pas',
   IupOrm.Resolver.Factory in '..\..\Source\IupOrm.Resolver.Factory.pas',
   IupOrm.Resolver.ByDependencyInjection in '..\..\Source\IupOrm.Resolver.ByDependencyInjection.pas',
-  IupOrm.DB.TransactionCollection in '..\..\Source\IupOrm.DB.TransactionCollection.pas';
+  IupOrm.DB.TransactionCollection in '..\..\Source\IupOrm.DB.TransactionCollection.pas',
+  IupOrm.LiveBindings.InterfaceListBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.InterfaceListBindSourceAdapter.pas',
+  IupOrm.LiveBindings.ActiveInterfaceListBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.ActiveInterfaceListBindSourceAdapter.pas',
+  IupOrm.LiveBindings.InterfaceObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.InterfaceObjectBindSourceAdapter.pas',
+  IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter.pas';
 
 end.

@@ -25,4 +25,8 @@ type
 
 implementation
 
+uses SysUtils;
+
+{ TioResolver }
+
 end.

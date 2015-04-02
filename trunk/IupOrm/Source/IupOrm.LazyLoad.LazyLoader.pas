@@ -30,7 +30,7 @@ type
 implementation
 
 uses
-  IupOrm;
+  IupOrm, IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory;
 
 { TioLazyLoader<T> }
 
@@ -44,7 +44,11 @@ end;
 procedure TioLazyLoader<T>.CreateInternalObj;
 begin
   if Self.FioRelationChildPropertyName = ''
-    then FInternalObj := T.Create
+    then
+    begin
+      FInternalObj := T.Create;
+      TioDuckTypedFactory.DuckTypedList(FInternalObj).OwnsObjects := FOwnsObjects;
+    end
     else FInternalObj := TIupOrm.Load(FioRelationChildTypeName, FioRelationChildTypeAlias)
                                 ._PropertyEqualsTo(Self.FioRelationChildPropertyName, Self.FioRelationChildID)
                                 .ToList<T>('', Self.FOwnsObjects);

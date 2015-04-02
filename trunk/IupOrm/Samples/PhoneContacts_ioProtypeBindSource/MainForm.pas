@@ -70,7 +70,7 @@ var
 implementation
 
 uses
-  Model;
+  Model, IupOrm;
 
 {$R *.fmx}
 
