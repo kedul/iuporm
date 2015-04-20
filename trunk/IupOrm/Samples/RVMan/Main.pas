@@ -169,6 +169,7 @@ end;
 
 procedure TMainForm.acTravelAddExecute(Sender: TObject);
 begin
+  BSTravels.Append;
   acTravelPost.Visible := True;
   acTravelCancel.Visible := True;
   acTravelEdit.Visible := False;

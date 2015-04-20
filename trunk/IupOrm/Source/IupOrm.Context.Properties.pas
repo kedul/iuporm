@@ -30,11 +30,12 @@ type
     FRelationLoadType: TioLoadType;
     FTable:IioContextTable;
     FReadWrite: TioReadWrite;
-    FEmbedded: Boolean;
     // NB: Gli altri due attributes (ioEmbeddedSkip e ioEmbeddedStreamable) non sono necessari qui
     //      perchè li usa solo l'ObjectsMappers al suo interno, iupORM non li usa
   public
-    constructor Create(const ARttiProperty:TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String; const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType);
+    constructor Create(const ARttiProperty:TRttiProperty; const ATypeAlias, AFieldDefinitionString, ALoadSql, AFieldType:String;
+      const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
+      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType);
     function GetLoadSql: String;
     function LoadSqlExist: Boolean;
     function GetName: String;
@@ -48,6 +49,7 @@ type
     function IsBlob: Boolean;
     function IsStream: Boolean;
     function GetValue(Instance: Pointer): TValue;
+    function GetValueAsObject(Instance: Pointer): TObject;
     procedure SetValue(Instance: Pointer; AValue:TValue);
     function GetSqlValue(ADataObject:TObject): String;
     function GetRttiProperty: TRttiProperty;
@@ -69,7 +71,6 @@ type
     function IsID: Boolean;
     function IsWriteEnabled: Boolean;
     function IsReadEnabled: Boolean;
-    function IsEmbedded: Boolean;
   end;
 
   // Classe con l'elenco delle proprietà della classe
@@ -262,14 +263,24 @@ begin
   Result := FRttiProperty.GetValue(Instance);
 end;
 
-function TioProperty.IsBlob: Boolean;
+function TioProperty.GetValueAsObject(Instance: Pointer): TObject;
+var
+  AValue: TValue;
 begin
-  Result := (FRelationType = ioRTNone) and Self.GetFieldType.StartsWith('BLOB');
+  AValue := Self.GetValue(Instance);
+  case AValue.Kind of
+    tkClass:
+      Result := AValue.AsObject;
+    tkInterface:
+      Result := AValue.AsInterface as TObject;
+  else EIupOrmException.Create(Self.ClassName + ': The value is not a Class or Interface type.');
+  end;
 end;
 
-function TioProperty.IsEmbedded: Boolean;
+function TioProperty.IsBlob: Boolean;
 begin
-  Result := Self.FEmbedded;
+  Result := ((FRelationType = ioRTNone) or (FRelationType = ioRTEmbeddedHasMany) or (FRelationType = ioRTEmbeddedHasOne))
+    and Self.GetFieldType.StartsWith('BLOB');
 end;
 
 function TioProperty.IsID: Boolean;

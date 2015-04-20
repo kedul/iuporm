@@ -7,7 +7,7 @@ uses
 
 type
 
-  [ioTable('Persons')]
+  [ioTable('OtherPersons')]
   [ioClassFromField]
   TAnotherPerson = class(TInterfacedObject, IPerson)
   private
@@ -36,7 +36,8 @@ type
     property FirstName:String read GetFirstName write SetFirstName;
     [ioField('LAST_NAME')]          // Not necessary if property has the same name of the field
     property LastName:String read GetLastName write SetLastName;
-    [ioHasMany('IPhoneNumber', 'PersonID', ioLazyLoad)]
+    [ioEmbeddedHasMany]
+    [ioTypeAlias('Another')]
     property Phones:IioList<IPhoneNumber> read GetPhones write SetPhones;
     [ioSkip]
     property FullName:String read GetFullName;
@@ -55,13 +56,12 @@ uses
 constructor TAnotherPerson.Create;
 begin
   inherited;
-  FPhones := TIupOrm.DependencyInjection.Locate<IioList<Interfaces.IPhoneNumber>>.Get;
+  FPhones := TIupOrm.DependencyInjection.Locate<IioList<IPhoneNumber>>.Alias('Another').Get;
 end;
 
 constructor TAnotherPerson.Create(NewFirstName, NewLastName: String; NewID: Integer);
 begin
-  inherited Create;
-//  FPhones := TIupOrm.DependencyInjection.Locate<IioList<Interfaces.IPhoneNumber>>.Get;
+  Self.Create;
   FID := NewID;
   FFirstName := NewFirstName;
   FLastName := NewLastName;

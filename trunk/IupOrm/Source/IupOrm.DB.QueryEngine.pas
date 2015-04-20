@@ -15,6 +15,8 @@ type
   protected
     class function ComposeQueryIdentity(AContext:IioContext; APreIdentity:String; AIdentity:String=''): String;
     class procedure FillQueryWhereParams(AContext:IioContext; AQuery:IioQuery);
+//    class procedure PersistRelationChildObject(AMasterContext: IioContext;
+//      AMasterProperty: IioContextProperty);
   public
     class function GetQuerySelectForObject(AContext:IioContext): IioQuery;
     class function GetQuerySelectForList(AContext:IioContext): IioQuery;
@@ -114,16 +116,19 @@ begin
     // Relation type
     case AProp.GetRelationType of
       // If RelationType = ioRTNone save the current property value normally
-      ioRTNone: AQuery.SetParamValueByContext(AProp, AContext);
-      //  NB: First save the related child object (for ID if it's a new child object)
+      // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method
+      ioRTNone, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne: AQuery.SetParamValueByContext(AProp, AContext);
+      // else if RelationType = ioRTBelongsTo then save the ID
       ioRTBelongsTo: AQuery.ParamByProp(AProp).Value := AProp.GetRelationChildObjectID(AContext.DataObject);
-      // else if RelationType = ioRTHasMany then load objects and assign it to the property  (list)
+      // else if RelationType = ioRTHasOne
+      ioRTHasOne: {Nothing};
+      // else if RelationType = ioRTHasMany
       ioRTHasMany: {Nothing};
     end;
   end;
   // Add the ClassFromField value if enabled
-  if AContext.IsClassFromField
-  then AQuery.ParamByName(AContext.ClassFromField.GetSqlParamName).Value := AContext.ClassFromField.GetValue;
+  if AContext.IsClassFromField then
+    AQuery.ParamByName(AContext.ClassFromField.GetSqlParamName).Value := AContext.ClassFromField.GetValue;
 end;
 
 class function TioQueryEngine.GetQueryLastInsertRowID(AContext: IioContext): IioQuery;
@@ -186,10 +191,13 @@ begin
     // Relation type
     case AProp.GetRelationType of
       // If RelationType = ioRTNone save the current property value normally
-      ioRTNone: AQuery.SetParamValueByContext(AProp, AContext);
-      //  NB: First save the related child object (for ID if it's a new child object)
+      // If RelationType = ioRTEmbedded save the current property value normally (serialization is into the called method
+      ioRTNone, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne: AQuery.SetParamValueByContext(AProp, AContext);
+      // else if RelationType = ioRTBelongsTo then save the ID
       ioRTBelongsTo: AQuery.ParamByProp(AProp).Value := AProp.GetRelationChildObjectID(AContext.DataObject);
-      // else if RelationType = ioRTHasMany then load objects and assign it to the property  (list)
+      // else if RelationType = ioRTHasOne
+      ioRTHasOne: {Nothing};
+      // else if RelationType = ioRTHasMany
       ioRTHasMany: {Nothing};
     end;
   end;

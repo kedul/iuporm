@@ -3,12 +3,12 @@ unit IupOrm.Attributes;
 interface
 
 uses
-  IupOrm.CommonTypes, ObjectsMappers;
+  IupOrm.CommonTypes, ObjMapperAttributes;
 
 type
 
   // Relation types
-  TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne);
+  TioRelationType = (ioRTNone, ioRTBelongsTo, ioRTHasMany, ioRTHasOne, ioRTEmbeddedHasMany, ioRTEmbeddedHasOne);
 
   // LazyLoad
   TioLoadType = (ioImmediateLoad = 0, ioLazyLoad);
@@ -180,8 +180,13 @@ type
   // START EMBEDDED ATTRIBUTES
   // ---------------------------------------------------------------------------
 
-  // Embedded attribute
-  ioEmbedded = class(TioCustomAttribute)
+  // EmbeddedHasMany attribute
+  ioEmbeddedHasMany = class(TioCustomAttribute)
+
+  end;
+
+  // EmbeddedHasOne attribute
+  ioEmbeddedHasOne = class(TioCustomAttribute)
 
   end;
 

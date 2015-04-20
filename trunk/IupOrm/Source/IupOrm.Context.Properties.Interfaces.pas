@@ -31,6 +31,7 @@ type
     function IsBlob: Boolean;
     function IsStream: Boolean;
     function GetValue(Instance: Pointer): TValue;
+    function GetValueAsObject(Instance: Pointer): TObject;
     procedure SetValue(Instance: Pointer; AValue: TValue);
     function GetSqlValue(ADataObject: TObject): string;
     function GetRttiProperty: TRttiProperty;

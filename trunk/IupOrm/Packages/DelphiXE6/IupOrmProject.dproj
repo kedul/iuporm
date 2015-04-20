@@ -238,6 +238,10 @@
         <DCCReference Include="..\..\Source\IupOrm.LiveBindings.ActiveInterfaceListBindSourceAdapter.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.LiveBindings.InterfaceObjectBindSourceAdapter.pas"/>
         <DCCReference Include="..\..\Source\IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter.pas"/>
+        <DCCReference Include="..\..\ExtLibs\DMVC\ObjMapperEngine.pas"/>
+        <DCCReference Include="..\..\ExtLibs\DMVC\DuckPropFieldU.pas"/>
+        <DCCReference Include="..\..\ExtLibs\DMVC\ObjMapper.pas"/>
+        <DCCReference Include="..\..\ExtLibs\DMVC\ObjMapperAttributes.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

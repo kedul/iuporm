@@ -45,7 +45,7 @@ type
 implementation
 
 uses
-  IupOrm.Exceptions, IupOrm.RttiContext.Factory;
+  IupOrm.Exceptions, IupOrm.RttiContext.Factory, System.TypInfo;
 
 { TioDuckTypedList }
 
@@ -101,8 +101,16 @@ begin
 end;
 
 function TioDuckTypedList.GetItem(Index: Integer): TObject;
+var
+  AValue: TValue;
 begin
-  Result := FGetItemMethod.Invoke(FListObject, [index]).AsObject;
+  AValue := FGetItemMethod.Invoke(FListObject, [index]);
+  case AValue.Kind of
+    tkClass:
+      Result := FGetItemMethod.Invoke(FListObject, [index]).AsObject;
+    tkInterface:
+      Result := FGetItemMethod.Invoke(FListObject, [index]).AsInterface as TObject;
+  end;
 end;
 
 function TioDuckTypedList.GetOwnsObjects: Boolean;

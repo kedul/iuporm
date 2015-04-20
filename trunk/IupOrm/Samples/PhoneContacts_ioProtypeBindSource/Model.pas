@@ -33,6 +33,7 @@ type
     function GetFullName: String;
     function GetClassNameProp: String;
   public
+    constructor Create; overload;
     constructor Create(NewFirstName, NewLastName: String; NewID: Integer = 0); overload;
     destructor Destroy; override;
     [ioOID]                         // Not necessary if property is exactly named "ID" as in this case
@@ -89,17 +90,22 @@ uses
 
 constructor TPerson.Create(NewFirstName, NewLastName: String; NewID: Integer);
 begin
-  inherited Create;
-  FPhones := TObjectList<TPhoneNumber>.Create(True);
+  Self.Create;
   FID := NewID;
   FFirstName := NewFirstName;
   FLastName := NewLastName;
   FAttivo := True;
 end;
 
+constructor TPerson.Create;
+begin
+  inherited;
+  FPhones := TObjectList<TPhoneNumber>.Create(True);
+end;
+
 destructor TPerson.Destroy;
 begin
-  FPhones.Free;
+  if Assigned(FPhones) then FPhones.Free;
   inherited;
 end;
 

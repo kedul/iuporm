@@ -645,8 +645,9 @@ begin
 end;
 
 initialization
-  TioDependencyInjectionContainer.Build;
-  TioViewModelShuttle.Build;
+// NB: Spostato sulla initialize della unit IupOrm
+//  TioDependencyInjectionContainer.Build;
+//  TioViewModelShuttle.Build;
 
 finalization
   TioDependencyInjectionContainer.CleanUp;
