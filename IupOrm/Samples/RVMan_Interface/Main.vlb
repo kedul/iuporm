@@ -2,43 +2,43 @@
 Coordinates=98,173,78,36
 
 [ToolBar3]
-Coordinates=235,1062,58,33
+Coordinates=235,1062,67,36
 
 [TabItem2]
-Coordinates=594,1062,59,33
+Coordinates=594,1062,69,36
 
 [TabItem1]
-Coordinates=937,1062,59,33
+Coordinates=937,1062,69,36
 
 [btnBack]
-Coordinates=182,956,54,51
+Coordinates=182,956,61,58
 
 [ToolBar2]
-Coordinates=142,1062,58,33
+Coordinates=142,1062,67,36
 
 [TabItem4]
-Coordinates=749,1124,59,33
+Coordinates=749,1124,69,36
 
 [TabItem3]
-Coordinates=1118,1062,59,33
+Coordinates=1118,1062,69,36
 
 [ToolBar4]
-Coordinates=1705,956,58,33
+Coordinates=1705,956,67,36
 
 [GestureManager1]
 Coordinates=399,111,118,36
 
 [lblTitle5]
-Coordinates=965,956,53,51
+Coordinates=965,956,60,58
 
 [lblTitle4]
-Coordinates=879,956,53,51
+Coordinates=879,956,60,58
 
 [ToolBar5]
-Coordinates=328,1062,58,33
+Coordinates=328,1062,67,36
 
 [lblTitle3]
-Coordinates=391,956,53,51
+Coordinates=391,956,60,58
 
 []
 Coordinates=397,246,138,58
@@ -54,103 +54,103 @@ Coordinates=399,166,124,36
 Coordinates=399,1,124,36
 
 [TabItemCostTypeList]
-Coordinates=248,1124,119,33
+Coordinates=248,1124,137,36
 
 [TabItemTravelList]
-Coordinates=605,1124,102,33
+Coordinates=605,1124,118,36
 
 [ToolBar1]
-Coordinates=1213,1062,58,33
+Coordinates=1213,1062,67,36
 
 [SpeedButton1]
-Coordinates=269,956,84,51
+Coordinates=269,956,96,58
 
 [Label1]
-Coordinates=477,956,46,51
+Coordinates=477,956,53,58
 
 [LIstViewCosts]
-Coordinates=1196,10,89,177
+Coordinates=1196,10,107,212
 
 [TabItemCostList]
-Coordinates=803,1062,95,33
+Coordinates=803,1062,108,36
 
 [ListViewCostTypes]
-Coordinates=827,10,108,177
+Coordinates=827,10,124,212
 
 [ListViewTravels]
-Coordinates=413,600,92,177
+Coordinates=413,600,107,212
 
 [BSTravels]
-Coordinates=178,262,116,231
+Coordinates=178,262,139,262
 Visible=True
 
 [BSCostTypes]
-Coordinates=1031,65,116,87
+Coordinates=1031,65,139,102
 Visible=True
 
 [BSCosts]
-Coordinates=1383,65,116,87
+Coordinates=1383,65,139,102
 Visible=True
 
 [ChangeTabActionToCostList]
 Coordinates=644,273,181,36
 
 [TabControlTravelCosts]
-Coordinates=421,1062,128,33
+Coordinates=421,1062,147,36
 
 [TabControlMain]
-Coordinates=10,1062,92,33
+Coordinates=10,1062,106,36
 
 [ToolBar6]
-Coordinates=1343,1124,58,33
+Coordinates=1343,1124,67,36
 
 [ListBoxItemKMArrivo]
-Coordinates=1306,1062,119,33
+Coordinates=1306,1062,135,36
 
 [TabItemTravel]
-Coordinates=125,1124,84,33
+Coordinates=125,1124,97,36
 
 [ListBoxGroupHeaderKM]
-Coordinates=844,1124,133,33
+Coordinates=844,1124,153,36
 
 [ToolBarTravelList]
-Coordinates=1023,1124,101,33
+Coordinates=1023,1124,116,36
 
 [ListBoxItemDataPartenza]
-Coordinates=1636,1062,138,33
+Coordinates=1636,1062,160,36
 
 [eTravelKmPartenza]
-Coordinates=10,420,109,51
+Coordinates=10,420,128,58
 
 [Label2]
-Coordinates=1547,956,46,51
+Coordinates=1547,956,53,58
 
 [ListBoxGroupHeaderDates]
-Coordinates=411,1124,145,33
+Coordinates=411,1124,168,36
 
 [ListBoxItem1]
-Coordinates=10,1124,79,33
+Coordinates=10,1124,89,36
 
 [SpeedButton2]
-Coordinates=1170,956,84,51
+Coordinates=1170,956,96,58
 
 [eTravelDescrizione]
-Coordinates=10,220,108,51
+Coordinates=10,220,125,58
 
 [Label3]
-Coordinates=1626,956,46,51
+Coordinates=1626,956,53,58
 
 [ListBox1]
-Coordinates=694,10,89,195
+Coordinates=694,10,107,234
 
 [eTravelKmArrivo]
-Coordinates=10,480,97,51
+Coordinates=10,480,110,58
 
 [ListBoxItemDataArrivo]
-Coordinates=1467,1062,125,33
+Coordinates=1467,1062,143,36
 
 [ListBoxItemKMPartenza]
-Coordinates=1165,1124,132,33
+Coordinates=1165,1124,152,36
 
 [Module Settings]
 ModelLayerNames=
@@ -170,41 +170,41 @@ Coordinates=617,123,164,33
 Coordinates=547,327,78,33
 
 [SBTravelBack]
-Coordinates=556,956,83,51
+Coordinates=556,956,96,58
 
 [SpeedButton7]
-Coordinates=1292,956,84,51
+Coordinates=1292,956,96,58
 
 [Layout1]
-Coordinates=1032,1062,53,33
+Coordinates=1032,1062,60,36
 
 [lblTravelTitle]
-Coordinates=420,130,77,51
+Coordinates=420,130,88,58
 
 [lblTravelSubTitle]
-Coordinates=420,190,97,51
+Coordinates=420,190,111,58
 LayerNames=
 
 [acTravelEdit]
 Coordinates=468,327,75,33
 
 [SBTravelCancel]
-Coordinates=1414,956,92,51
+Coordinates=1414,956,107,58
 
 [SBTravelPost]
-Coordinates=1051,956,81,51
+Coordinates=1051,956,93,58
 
 [SBTravelEdit]
-Coordinates=678,956,78,51
+Coordinates=678,956,90,58
 
 [ChangeTabActionToCostEdit]
 Coordinates=0,0,181,36
 
 [TabItemCost]
-Coordinates=689,1062,76,33
+Coordinates=689,1062,88,36
 
 [BSCostTypesSelection]
-Coordinates=660,310,127,87
+Coordinates=660,310,146,94
 Visible=True
 
 [ListViewCostTypeSel]
@@ -213,19 +213,19 @@ ExplicitSubNodes=Text
 Visible=False
 
 [Label4]
-Coordinates=176,1,46,51
+Coordinates=176,1,53,58
 
 [SpeedButton3]
-Coordinates=0,0,84,51
+Coordinates=0,0,96,58
 
 [Layout2]
-Coordinates=157,70,53,33
+Coordinates=157,70,60,36
 
 [ToolBar7]
-Coordinates=98,70,58,33
+Coordinates=98,70,67,36
 
 [ListViewCostTypeListSelection]
-Coordinates=840,300,167,141
+Coordinates=840,300,191,168
 
 [acCostShow]
 Coordinates=310,144,86,36
@@ -237,17 +237,17 @@ Coordinates=19,77,77,36
 Coordinates=0,115,92,36
 
 [SpeedButton4]
-Coordinates=0,0,84,51
+Coordinates=0,0,96,58
 
 [SpeedButton5]
-Coordinates=267,1,84,51
+Coordinates=267,1,96,58
 
 [ChangeTabActionToCostTypeSelection]
 Coordinates=989,241,240,36
 
 [eTravelDateArrivo]
-Coordinates=10,350,103,51
+Coordinates=10,350,118,58
 
 [eTravelDatePartenza]
-Coordinates=10,290,115,51
+Coordinates=10,290,136,58
 

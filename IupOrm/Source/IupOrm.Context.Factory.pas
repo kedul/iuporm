@@ -16,7 +16,9 @@ type
   TioContextFactory = class
   public
     // I primi due metodi di classe dovranno essere spostati come protetti o privati
-    class function GetProperty(const ARttiProperty:TRttiProperty; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType:String; const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias, ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType): IioContextProperty;
+    class function GetProperty(const ARttiProperty:TRttiProperty; const ATypeAlias, ASqlFieldName, ALoadSql, AFieldType:String;
+      const AReadWrite:TioReadWrite; const ARelationType:TioRelationType; const ARelationChildTypeName, ARelationChildTypeAlias,
+      ARelationChildPropertyName:String; const ARelationLoadType:TioLoadType): IioContextProperty;
     class function Properties(Typ: TRttiInstanceType): IioContextProperties;
     class function ClassFromField(Typ: TRttiInstanceType; ASqlFieldName:String=IO_CLASSFROMFIELD_FIELDNAME): IioClassFromField;
     class function Joins: IioJoins;
@@ -177,6 +179,11 @@ begin
       if Attr is ioSkip then PropSkip := True;
       if Attr is ioReadOnly then PropReadWrite := iorwReadOnly;
       if Attr is ioWriteOnly then PropReadWrite := iorwWriteOnly;
+      // Relations
+      if Attr is ioEmbeddedHasMany then
+        PropRelationType := ioRTEmbeddedHasMany;
+      if Attr is ioEmbeddedHasOne then
+        PropRelationType := ioRTEmbeddedHasOne;
       if Attr is ioBelongsTo then
       begin
         PropRelationType := ioRTBelongsTo;

@@ -19,6 +19,8 @@ type
     class function LoadPropertyHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyBelongsTo(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
+    class function LoadPropertyEmbeddedHasMany(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
+    class function LoadPropertyEmbeddedHasOne(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class function LoadPropertyStreamable(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty): TObject;
     class procedure LoadPropertyStream(AContext:IioContext; AQuery:IioQuery; AProperty:IioContextProperty);
     class function InternalFindMethod(ARttiType:TRttiType; AMethodName,AMarkerText:String; IsConstructor:Boolean; const AParameters:Array of TValue): TRttiMethod;
@@ -41,7 +43,8 @@ uses
   System.TypInfo, IupOrm.Exceptions, IupOrm, IupOrm.RttiContext.Factory,
   IupOrm.DuckTyped.Interfaces, IupOrm.DuckTyped.Factory, System.Classes,
   Data.DB, IupOrm.LazyLoad.Interfaces, System.SysUtils, IupOrm.Attributes, FMX.Dialogs,
-  IupOrm.Resolver.Interfaces, IupOrm.Resolver.Factory;
+  IupOrm.Resolver.Interfaces, IupOrm.Resolver.Factory, System.JSON,
+  IupOrm.ObjectsForge.Factory;
 
 { TioObjectMakerIntf }
 
@@ -214,6 +217,50 @@ begin
     .ToObject(Result);
 end;
 
+class function TioObjectMakerIntf.LoadPropertyEmbeddedHasMany(AContext: IioContext; AQuery: IioQuery;
+  AProperty: IioContextProperty): TObject;
+var
+  AJSONValue: TJSONValue;
+  AJSONValueString: String;
+begin
+  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
+  //  then create it
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
+  // If the field is null then exit
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
+  // Get the JSONObject
+  AJSONValueString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
+  AJSONValue := TJSONObject.ParseJSONValue(AJSONValueString);
+  try
+    // Deserialize
+    Result := TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedList(AJSONValue, Result);
+  finally
+    AJSONValue.Free;
+  end;
+end;
+
+class function TioObjectMakerIntf.LoadPropertyEmbeddedHasOne(AContext: IioContext; AQuery: IioQuery;
+  AProperty: IioContextProperty): TObject;
+var
+  AJSONObject: TJSONObject;
+  AJSONObjectString: String;
+begin
+  // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
+  //  then create it
+  Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
+  // If the field is null then exit
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
+  // Get the JSONObject
+  AJSONObjectString := AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).AsString;
+  AJSONObject := TJSONObject.ParseJSONValue(AJSONObjectString) as TJSONObject;
+  try
+    // Deserialize
+    Result := TioObjectMakerFactory.GetObjectMapper.DeserializeEmbeddedObject(AJSONObject, Result);
+  finally
+    AJSONObject.Free;
+  end;
+end;
+
 class function TioObjectMakerIntf.LoadPropertyHasMany(AContext:IioContext;
   AQuery: IioQuery; AProperty: IioContextProperty): TObject;
 var
@@ -281,11 +328,11 @@ var
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
   ABlobStream: TStream;
 begin
+  // If the field is null then exit
+  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
   // Check if the result child relation object is alreaady created in the master object (by constructor); if it isn't
   //  then create it
   Result := Self.CheckOrCreateRelationChildObject(AContext, AProperty);
-  // If the field is null then exit
-  if AQuery.Fields.FieldByName(AProperty.GetSqlFieldAlias).IsNull then Exit;
   // Wrap the object into a DuckTypedStreamObject
   ADuckTypedStreamObject := TioDuckTypedFactory.DuckTypedStreamObject(Result);
   // Get the BlobStream

@@ -58,9 +58,11 @@ begin
       end;
 // ------------------------------ RELATION -----------------------------------------------------------------------------------------
       // Load the related object/s
-      ioRTBelongsTo: AObj := Self.LoadPropertyBelongsTo(AContext, AQuery, CurrProp);
-      ioRTHasMany:   AObj := Self.LoadPropertyHasMany(AContext, AQuery, CurrProp);
-      ioRTHasOne:    AObj := Self.LoadPropertyHasOne(AContext, AQuery, CurrProp);
+      ioRTBelongsTo:        AObj := Self.LoadPropertyBelongsTo(AContext, AQuery, CurrProp);
+      ioRTHasMany:          AObj := Self.LoadPropertyHasMany(AContext, AQuery, CurrProp);
+      ioRTHasOne:           AObj := Self.LoadPropertyHasOne(AContext, AQuery, CurrProp);
+      ioRTEmbeddedHasMany:  AObj := Self.LoadPropertyEmbeddedHasMany(AContext, AQuery, CurrProp);
+      ioRTEmbeddedHasOne:   AObj := Self.LoadPropertyEmbeddedHasOne(AContext, AQuery, CurrProp);
     end;
     // If is an Interface property then adjust the RefCount to prevent an access violation
     if CurrProp.IsInterface then

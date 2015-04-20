@@ -117,8 +117,7 @@ uses
 
 constructor TPerson.Create(NewFirstName, NewLastName: String; NewID: Integer);
 begin
-  inherited Create;
-//  FPhones := TIupOrm.DependencyInjection.Locate<IioList<Interfaces.IPhoneNumber>>.Get;
+  Self.Create;
   FID := NewID;
   FFirstName := NewFirstName;
   FLastName := NewLastName;
@@ -127,7 +126,7 @@ end;
 constructor TPerson.Create;
 begin
   Inherited;
-//  FPhones := TIupOrm.DependencyInjection.Locate<IioList<Interfaces.IPhoneNumber>>.Get;
+  FPhones := TIupOrm.DependencyInjection.Locate<IioList<IPhoneNumber>>.Get;
 end;
 
 destructor TPerson.Destroy;

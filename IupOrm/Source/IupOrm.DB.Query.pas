@@ -55,7 +55,7 @@ implementation
 uses
   System.TypInfo, IupOrm.Exceptions, IupOrm.Attributes,
   IupOrm.ObjectsForge.Factory, IupOrm.DuckTyped.Interfaces,
-  IupOrm.DuckTyped.Factory, IupOrm.DB.Factory;
+  IupOrm.DuckTyped.Factory, IupOrm.DB.Factory, System.JSON;
 
 { TioQuerySqLite }
 
@@ -138,8 +138,8 @@ begin
   // If the property is mapped into a blob field
   //  NB: Non più usato per il caricamento degli oggetti, per il caricamento dei campi
   //       BLOB vedere a partire dal metodo "MakeObject" dell'ObjectMaker
-  if AProperty.IsBlob
-    then Exit(TioObjectMakerFactory.GetObjectMaker(False).CreateObjectFromBlobField(Self, AProperty));
+//  if AProperty.IsBlob
+//    then Exit(TioObjectMakerFactory.GetObjectMaker(False).CreateObjectFromBlobField(Self, AProperty));
 
   // Else return the value for the field related to the AProperty as TValue
   Result := TioDBFactory.SqlDataConverter.QueryToTValue(Self, AProperty);
@@ -262,7 +262,9 @@ var
   ADuckTypedStreamObject: IioDuckTypedStreamObject;
   AStream: TStream;
   AParam: TioParam;
+  AJSONValue: TJSONValue;
 begin
+  AObj := nil;
   // -------------------------------------------------------------------------------------------------------------------------------
   // Normal property type (NO BLOB)
   // -------------------------------------------------------------------------------------------------------------------------------
@@ -274,7 +276,7 @@ begin
   // At this point the property refer to a blob field (and to an Object) type then
   //  check if the Object is assigned and if it isn't clear
   //  the parameter
-  AObj := AProp.GetValue(AContext.DataObject).AsObject;
+  AObj := AProp.GetValueAsObject(AContext.DataObject);
   if not Assigned(AObj) then
   begin
     Self.SetParamValueToNull(AProp);
@@ -282,6 +284,24 @@ begin
   end;
   // Get a Param reference
   AParam := Self.ParamByProp(AProp);
+  // -------------------------------------------------------------------------------------------------------------------------------
+  // Embedded property (ioRTEmbeddedHasMany & ioRTEmbeddedHasOne relation type)
+  // -------------------------------------------------------------------------------------------------------------------------------
+  if (AProp.GetRelationType = ioRTEmbeddedHasMany) or (AProp.GetRelationType = ioRTEmbeddedHasOne) then
+  begin
+    case AProp.GetRelationType of
+      ioRTEmbeddedHasMany:
+        AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedList(AObj);
+      ioRTEmbeddedHasOne:
+        AJSONValue := TioObjectMakerFactory.GetObjectMapper.SerializeEmbeddedObject(AObj);
+    end;
+    try
+      AParam.AsString := AJSONValue.ToString;
+      Exit;
+    finally
+      AJSONValue.Free;
+    end;
+  end;
   // -------------------------------------------------------------------------------------------------------------------------------
   // TStream or descendant (BLOB)
   // -------------------------------------------------------------------------------------------------------------------------------

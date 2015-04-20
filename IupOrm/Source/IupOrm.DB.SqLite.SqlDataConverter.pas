@@ -52,9 +52,11 @@ begin
         tkClass, tkInterface: Result := 'BLOB';
       end;
     end;
+    // If it is an ioRTEmbedded property then the feld type is always BLOB
+    ioRTEmbeddedHasMany, ioRTEmbeddedHasOne: Result := 'BLOB';
     // If it's a BelongsTo relation property then field type is always INTEGER
     //  because the ID fields always are INTEGERS values
-    iortBelongsTo: Result := 'INTEGER';
+    ioRTBelongsTo: Result := 'INTEGER';
     // Otherwise return NULL field type
     else Result := 'NULL';
   end;

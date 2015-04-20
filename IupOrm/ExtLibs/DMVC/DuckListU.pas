@@ -250,8 +250,19 @@ begin
 end;
 
 function TDuckTypedList.GetItem(const index: Integer): TObject;
+var
+  AValue: TValue;
 begin
-  Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
+//  Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
+// --------- Maurizio Del Magno ----------    (For intefaces compatiblity)
+  AValue := FGetItemMethod.Invoke(FObjectAsDuck, [index]);
+  case AValue.Kind of
+    tkClass:
+      Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
+    tkInterface:
+      Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsInterface as TObject;
+  end;
+// --------- End: Maurizio Del Magno ----------
 end;
 
 function TDuckTypedList.GetOwnsObjects: boolean;

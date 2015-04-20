@@ -849,7 +849,7 @@ object MainForm: TMainForm
         ReadOnly = False
       end>
     ScopeMappings = <>
-    ioTypeName = 'ITravelCostTypeWithCostList'
+    ioTypeName = 'ICostTypeWithCostList'
     ioMasterBindSource = BSTravels
     ioMasterPropertyName = 'CostTypeList'
     ioAutoRefreshOnNotification = arEnabledNoReload

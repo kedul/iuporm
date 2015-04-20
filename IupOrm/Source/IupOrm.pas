@@ -3,6 +3,7 @@ unit IupOrm;
 interface
 
 uses
+  IupOrm.DependencyInjection,
   IupOrm.Context.Properties.Interfaces,
   IupOrm.context.interfaces,
   IupOrm.Context.Factory,
@@ -13,7 +14,6 @@ uses
   IupOrm.Helpers.BindSourceHelperTools.Interfaces,
   IupOrm.LiveBindings.Interfaces,
   IupOrm.Global.Factory,
-  IupOrm.DependencyInjection,
   IupOrm.DB.ConnectionContainer;
 
 type
@@ -437,6 +437,10 @@ end;
 
 
 initialization
+
+  // Initialize the dependency injection container
+  TioDependencyInjectionContainer.Build;
+  TioViewModelShuttle.Build;
 
   // Register as default DuckTypedStreamObject invoker
   //  NB: L'ho messo qui perchè altrimenti nella unit dove è dichiarata la classe non

@@ -130,6 +130,10 @@ contains
   IupOrm.LiveBindings.InterfaceListBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.InterfaceListBindSourceAdapter.pas',
   IupOrm.LiveBindings.ActiveInterfaceListBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.ActiveInterfaceListBindSourceAdapter.pas',
   IupOrm.LiveBindings.InterfaceObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.InterfaceObjectBindSourceAdapter.pas',
-  IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter.pas';
+  IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter in '..\..\Source\IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter.pas',
+  ObjMapperEngine in '..\..\ExtLibs\DMVC\ObjMapperEngine.pas',
+  DuckPropFieldU in '..\..\ExtLibs\DMVC\DuckPropFieldU.pas',
+  ObjMapper in '..\..\ExtLibs\DMVC\ObjMapper.pas',
+  ObjMapperAttributes in '..\..\ExtLibs\DMVC\ObjMapperAttributes.pas';
 
 end.

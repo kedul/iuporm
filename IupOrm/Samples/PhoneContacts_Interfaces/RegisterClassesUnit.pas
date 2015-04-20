@@ -30,6 +30,7 @@ begin
   TIupOrm.DependencyInjection.RegisterClass<TCustomer>.Implements<IPerson>.Alias('Customer').Execute;
 
   TIupOrm.DependencyInjection.RegisterClass<TioList<IPhoneNumber>>.Implements<IioList<IPhoneNumber>>.Execute;
+  TIupOrm.DependencyInjection.RegisterClass<TioInterfacedList<IPhoneNumber>>.Implements<IioList<IPhoneNumber>>.Alias('Another').Execute;
 
 end;
 
