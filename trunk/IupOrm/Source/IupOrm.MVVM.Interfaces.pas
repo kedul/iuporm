@@ -7,6 +7,8 @@ uses
 
 type
 
+  TioViewDataType = (dtSingle, dtList);
+
   IioView = interface
     ['{AE9431A3-4D53-4ACF-98A1-7870DB6F7B0F}']
     function FindComponent(const AName: string): TComponent;

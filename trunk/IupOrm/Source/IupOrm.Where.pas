@@ -40,8 +40,8 @@ type
 
     procedure Delete(AResolverMode:TioResolverMode=rmSingle);
 
-    function ToActiveListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
-    function ToActiveObjectBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
+    function ToActiveListBindSourceAdapter(const AOwner:TComponent; const AAutoLoadData:Boolean=True; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
+    function ToActiveObjectBindSourceAdapter(const AOwner:TComponent; const AAutoLoadData:Boolean=True; const AOwnsObject:Boolean=True): TBindSourceAdapter; overload;
     function ToListBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     function ToObjectBindSourceAdapter(AOwner:TComponent; AOwnsObject:Boolean=True): TBindSourceAdapter;
     // ------ Conditions
@@ -403,8 +403,8 @@ begin
   FTypeAlias := ATypeAlias;
 end;
 
-function TioWhere.ToActiveListBindSourceAdapter(AOwner: TComponent;
-  AOwnsObject: Boolean): TBindSourceAdapter;
+function TioWhere.ToActiveListBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData:Boolean;
+  const AOwnsObject: Boolean): TBindSourceAdapter;
 var
   AResolvedTypeList: IioResolvedTypeList;
   AContext: IioContext;
@@ -423,7 +423,7 @@ begin
         Self.GetSql(AContext.GetProperties, False),
         AOwner,
         TList<IInterface>.Create,
-        True,  // AutoLoadData := True
+        AAutoLoadData,
         False)
     end
     // else if the master property type is a class...
@@ -438,7 +438,7 @@ begin
         AOwner,
         TObjectList<TObject>.Create(AOwnsObject),
 //        TList<TObject>.Create,
-        True,  // AutoLoadData := True
+        AAutoLoadData,
         False);
     end;
   finally
@@ -451,7 +451,7 @@ end;
 
 
 
-function TioWhere.ToActiveObjectBindSourceAdapter(AOwner: TComponent; AOwnsObject: Boolean): TBindSourceAdapter;
+function TioWhere.ToActiveObjectBindSourceAdapter(const AOwner: TComponent; const AAutoLoadData:Boolean; const AOwnsObject: Boolean): TBindSourceAdapter;
 var
   AResolvedTypeList: IioResolvedTypeList;
   AContext: IioContext;
@@ -470,7 +470,8 @@ begin
         Self.GetSql(AContext.GetProperties, False),
         AOwner,
         nil,   // AObject:TObject
-        True,  // AutoLoadData := True
+        AAutoLoadData,  // AutoLoadData := True
+        AContext.ObjStatusExist,  // Use ObjStatus async persist
         False)
     end
     // else if the master property type is a class...
@@ -484,7 +485,8 @@ begin
         Self.GetSql(AContext.GetProperties, False),
         AOwner,
         nil,   // AObject:TObject
-        True,  // AutoLoadData := True
+        AAutoLoadData,  // AutoLoadData := True
+        AContext.ObjStatusExist,  // Use ObjStatus async persist
         False);
     end;
   finally

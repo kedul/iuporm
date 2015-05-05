@@ -4,27 +4,34 @@ interface
 
 uses
   IupOrm.MVVM.Interfaces, IupOrm.LiveBindings.Interfaces,
-  Data.Bind.ObjectScope;
+  Data.Bind.ObjectScope, IupOrm.LiveBindings.PrototypeBindSource;
 
 type
 
   TioViewData = class(TInterfacedObject, IioViewData)
   private
-    FDataObj: TObject;
     FBindSourceAdapter: IioActiveBindSourceAdapter;
   protected
   public
     function DataObj: TObject;
     function BindSourceAdapter: TBindSourceAdapter;
-    constructor Create(ADataObj:TObject); overload;
-    constructor Create(ABindSourceAdapter:IioActiveBindSourceAdapter); overload;
+    constructor Create; overload;
+    constructor Create(const ADataObj:TObject; const AViewDataType:TioViewDataType); overload;
+    constructor Create(const ADataIntf:IInterface; const AViewDataType:TioViewDataType); overload;
+    constructor Create(const ATypeName, ATypeAlias, AWhere: String; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean=True); overload;
+    constructor Create(const ABindSourceAdapter:IioActiveBindSourceAdapter); overload;
+    constructor Create(const AMasterBindSource:TioMasterBindSource; const AMasterPropertyName:String=''); overload;
   end;
 
 implementation
 
 uses
   IupOrm.LiveBindings.ActiveListBindSourceAdapter, System.Generics.Collections,
-  IupOrm.Context.Container;
+  IupOrm.Context.Container,
+  IupOrm.LiveBindings.ActiveInterfaceListBindSourceAdapter,
+  IupOrm.LiveBindings.ActiveObjectBindSourceAdapter,
+  IupOrm.LiveBindings.ActiveInterfaceObjectBindSourceAdapter, IupOrm,
+  System.SysUtils, IupOrm.LiveBindings.Factory;
 
 { TViewData }
 
@@ -33,48 +40,71 @@ begin
   Result := FBindSourceAdapter as TBindSourceAdapter;
 end;
 
-constructor TioViewData.Create(ADataObj: TObject);
+constructor TioViewData.Create(const ADataIntf: IInterface; const AViewDataType:TioViewDataType);
 begin
-  inherited Create;
-  // Check if not assigned
-  if not assigned(ADataObj) then
-  begin
-    Self.FDataObj := nil;
-    FBindSourceAdapter := nil;
-    Exit;
-  end;
-  // Assign the DataObject
-  Self.FDataObj := ADataObj;
-  // Create the BindSourceAdapter
-  FBindSourceAdapter := TioActiveListBindSourceAdapter.Create(
-                                                    Self.FDataObj.ClassType  // DataObject class reference
-                                                  , ''  // where sql
-                                                  , nil  // Owner
-                                                  , TObjectList<TObject>.Create    // Create an empty list for adapter creation only
-                                                  , False  // AutoLoadData := False (the object is already loaded)
-                                                  , TioMapContainer.GetMap(Self.FDataObj.ClassName).ObjStatusExist  // Use ObjStatus async persist
-                                                  , False  // OwnsObject
-                                                 );
+  Self.Create(
+    (ADataIntf as TObject).ClassName,  // TypeName
+    '',  // TypeAlias
+    '',  // Where
+    AViewDataType,  // ViewDataType
+    False  // AutoLoadData
+  );
 end;
 
-constructor TioViewData.Create(ABindSourceAdapter: IioActiveBindSourceAdapter);
+constructor TioViewData.Create(const ADataObj: TObject; const AViewDataType:TioViewDataType);
 begin
-  // Check if not assigned
-  if not assigned(ABindSourceAdapter) then
-  begin
-    Self.FDataObj := nil;
-    FBindSourceAdapter := nil;
-    Exit;
-  end;
-  // Assign the BindSourceAdapter
-  Self.FBindSourceAdapter := ABindSourceAdapter;
-  // Retrieve the DataObject from the BindSourceAdapter
-  Self.FDataObj := Self.FBindSourceAdapter.GetDataObject;
+  Self.Create(
+    ADataObj.ClassName,  // TypeName
+    '',  // TypeAlias
+    '',  // Where
+    AViewDataType,  // ViewDataType
+    False  // AutoLoadData
+  );
+end;
+
+constructor TioViewData.Create(const ABindSourceAdapter: IioActiveBindSourceAdapter);
+begin
+  inherited Create;
+  FBindSourceAdapter := ABindSourceAdapter;
 end;
 
 function TioViewData.DataObj: TObject;
 begin
-  Result := FDataObj;
+  Result := FBindSourceAdapter.GetDataObject;
+end;
+
+constructor TioViewData.Create(const ATypeName, ATypeAlias, AWhere: String; const AViewDataType:TioViewDataType; const AAutoLoadData:Boolean=True);
+var
+  LocalBSA: TBindSourceAdapter;
+begin
+  inherited Create;
+  // Get the BindSourceAdapter
+  case AViewDataType of
+    // Single type BSA
+    dtSingle:
+      LocalBSA := TIupOrm.Load(ATypeName, ATypeAlias)._Where(AWhere).ToActiveObjectBindSourceAdapter(nil, AAutoLoadData);
+    // List type BSA
+    dtList:
+      LocalBSA := TIupOrm.Load(ATypeName, ATypeAlias)._Where(AWhere).ToActiveListBindSourceAdapter(nil, AAutoLoadData);
+  end;
+  // Assign the BSA
+  Supports(LocalBSA, IioActiveBindSourceAdapter, FBindSourceAdapter);
+end;
+
+constructor TioViewData.Create(const AMasterBindSource: TioMasterBindSource; const AMasterPropertyName: String);
+var
+  LocalBSA: TBindSourceAdapter;
+begin
+  inherited Create;
+  // Get the BindSourceAdapter
+  LocalBSA := TioLiveBindingsFactory.GetBSAfromMasterBindSource(nil, AMasterBindSource, AMasterPropertyName);
+  // Assign the BSA
+  Supports(LocalBSA, IioActiveBindSourceAdapter, FBindSourceAdapter);
+end;
+
+constructor TioViewData.Create;
+begin
+  FBindSourceAdapter := nil;
 end;
 
 end.

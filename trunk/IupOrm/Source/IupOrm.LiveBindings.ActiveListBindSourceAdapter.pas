@@ -44,7 +44,6 @@ type
     procedure DoAfterPost; override;
     procedure DoAfterScroll; override;
     procedure DoAfterInsert; override;
-    procedure SetDataObject(AObj: TList<TObject>);
     procedure SetObjStatus(AObjStatus: TIupOrmObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -63,6 +62,7 @@ type
     procedure Notify(Sender:TObject; ANotification:IioBSANotification); virtual;
     procedure Refresh(ReloadData:Boolean); overload;
     function GetDataObject: TObject;
+    procedure SetDataObject(const AObj:TObject);
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
   end;
@@ -324,7 +324,7 @@ begin
   FBindSource := ANotifiableBindSource;
 end;
 
-procedure TioActiveListBindSourceAdapter.SetDataObject(AObj: TList<TObject>);
+procedure TioActiveListBindSourceAdapter.SetDataObject(const AObj: TObject);
 var
   ALazyLoadableObj: IioLazyLoadable;
 begin
@@ -335,7 +335,7 @@ begin
   //       normali dava dei problemi (non dava errori ma non usciva nulla)
 //  if Supports(AObj, IioLazyLoadable, ALazyLoadableObj)
 //    then AObj := TList<TObject>(ALazyLoadableObj.GetInternalObject);
-  Self.SetList(AObj, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
+  Self.SetList(AObj as TList<TObject>, False);  // NB: AOwns (2° parameters) = False ABSOLUTELY!!!!!!
   Self.Active := True;
 end;
 

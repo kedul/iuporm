@@ -40,7 +40,6 @@ type
     procedure DoAfterPost; override;
     procedure DoAfterScroll; override;
     procedure DoAfterInsert; override;
-    procedure SetDataObject(AObj: TObject);
     procedure SetObjStatus(AObjStatus: TIupOrmObjectStatus);
     function UseObjStatus: Boolean;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -60,6 +59,7 @@ type
     procedure Refresh(ReloadData:Boolean); overload;
 //    procedure NaturalBSA_SetMasterBindSourceAdapter(AActiveBindSourceAdapter:IioActiveBindSourceAdapter);
     function GetDataObject: TObject;
+    procedure SetDataObject(const AObj: TObject);
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
   end;
@@ -307,7 +307,7 @@ begin
   FBindSource := ANotifiableBindSource;
 end;
 
-procedure TioActiveObjectBindSourceAdapter.SetDataObject(AObj: TObject);
+procedure TioActiveObjectBindSourceAdapter.SetDataObject(const AObj: TObject);
 begin
   Self.First;  // Bug
   Self.Active := False;
