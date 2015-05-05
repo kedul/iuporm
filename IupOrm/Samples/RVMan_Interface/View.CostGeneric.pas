@@ -44,11 +44,14 @@ type
   private
     { Private declarations }
     FViewMode: TViewMode;
+    FPippo: Boolean;
   protected
     procedure SetViewMode(AViewMode:TViewMode);
   public
     { Public declarations }
     constructor Create(AOwner:TComponent; AViewMode:TViewMode=VMNormal); overload;
+  published
+    property Pippo:Boolean read FPippo write FPippo;
   end;
 
 implementation

@@ -8,9 +8,12 @@ uses
 
 type
 
+
   TioPrototypeBindSource = class;
 
   TioMasterBindSource = TioPrototypeBindSource;
+
+  TioNeedViewModelEvent = procedure(Sender: TioPrototypeBindSource; var AViewModel: IioViewModel) of object;
 
   TioPrototypeBindSource = class (TPrototypeBindSource, IioNotifiableBindSource)
   strict private
@@ -19,10 +22,11 @@ type
     FioMasterBindSource: TioMasterBindSource;
     FioMasterPropertyName: String;
     FioWhere: TStrings;
-    FonNotify: TioBSANotificationEvent;
     FioAutoRefreshOnNotification: TioAutoRefreshType;
     FioViewModelInterface, FioViewModelAlias: String;
     FioViewModel: IioViewModel;
+    FonNotify: TioBSANotificationEvent;
+    FOnNeedViewModel: TioNeedViewModelEvent;
     // FioLoaded flag for IupOrm DoCreateAdapter internal use only just before
     //  the real Loaded is call. See the Loaded and the DoCreateAdapter methods.
     FioLoaded: Boolean;
@@ -35,6 +39,7 @@ type
     function _Release: Integer; stdcall;
     // =========================================================================
     function GetIsDetail: Boolean;
+    procedure DoNeedViewModel;
     procedure DoCreateAdapter(var ADataObject: TBindSourceAdapter); override;
     procedure Loaded; override;
     procedure DoNotify(ANotification:IioBSANotification);
@@ -55,6 +60,7 @@ type
     procedure Refresh(ReloadData:Boolean); overload;
 
     property ioOnNotify:TioBSANotificationEvent read FonNotify write FonNotify;
+    property ioOnNeedViewModel:TioNeedViewModelEvent read FOnNeedViewModel write FOnNeedViewModel;
 
     property ioTypeName:String read FioTypeName write FioTypeName;
     property ioTypeAlias:String read FioTypeAlias write FioTypeAlias;
@@ -150,6 +156,8 @@ var
   AActiveBSA: IioActiveBindSourceAdapter;
 begin
   inherited;
+  // Init
+  AActiveBSA  := nil;
   // If in DesignTime then Exit
   // If a ClassName is not provided then exit
   // FioLoaded flag for IupOrm DoCreateAdapter internal use only just before
@@ -185,19 +193,29 @@ begin
   and Supports(ADataObject, IioActiveBindSourceAdapter, AActiveBSA)
   and Supports(Self, IioNotifiableBindSource)
     then AActiveBSA.SetBindSource(Self);
+  // If a ViewModel is not already present and the OnNeedViewModel is specified then
+  //  use it
   // If a ViewModel interface is specified and the ioViewModel property is not
   //  already assigned then create automatically a proper ViewModel instance
   //  and use it
+  if (not Assigned(Self.ioViewModel)) then
+    Self.DoNeedViewModel;
   if  (Self.ioViewModelInterface <> '')
   and (not Assigned(Self.ioViewModel))
   then
     Self.ioViewModel := TioDependencyInjection.Locate(Self.ioViewModelInterface)
-                                                   .Alias(Self.ioViewModelAlias)
-                                                   .ConstructorParams([TValue.From(AActiveBSA)])
-                                                   .ConstructorMarker('CreateByBindSourceAdapter')
-                                                   .Get
-                                                   .ioAsInterface<IioViewModel>;
+                                              .Alias(Self.ioViewModelAlias)
+                                              .ConstructorParams([TValue.From(AActiveBSA)])
+                                              .ConstructorMarker('CreateByBindSourceAdapter')
+                                              .Get
+                                              .ioAsInterface<IioViewModel>;
   // -------------------------------------------------------------------------------------------------------------------------------
+end;
+
+procedure TioPrototypeBindSource.DoNeedViewModel;
+begin
+  if Assigned(FOnNeedViewModel) then
+    FOnNeedViewModel(Self, FioViewModel);
 end;
 
 procedure TioPrototypeBindSource.DoNotify(ANotification:IioBSANotification);
