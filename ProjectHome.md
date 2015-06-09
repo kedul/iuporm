@@ -1,0 +1,1 @@
+IupOrm is a small and light ORM for Delphi mobile projects
